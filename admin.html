@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة التحكم الشاملة - كرستال الزنقة 💎</title>
+  <title>لوحة التحكم الاحترافية - كرستال الزنقة 💎</title>
   <style>
     :root {
       --primary: #8e44ad;
@@ -50,6 +50,10 @@
     button.btn:hover { background: var(--primary-hover); }
     button.btn:disabled { background: #bdc3c7; cursor: not-allowed; }
 
+    /* معاينة الصور */
+    .image-preview-container { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+    .img-preview { width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; }
+
     /* الجداول والقوائم */
     .data-table { width: 100%; border-collapse: collapse; margin-top: 25px; }
     .data-table th, .data-table td { border: 1px solid #eee; padding: 10px; text-align: right; font-size: 14px; }
@@ -79,8 +83,8 @@
 
     <!-- التبويبات -->
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('productsTab')">📦 إدارة المنتجات والمخزون</button>
-      <button class="tab-btn" onclick="switchTab('categoriesTab')">📁 الأقسام</button>
+      <button class="tab-btn active" onclick="switchTab('productsTab')">📦 المنتجات والمخزون</button>
+      <button class="tab-btn" onclick="switchTab('categoriesTab')">📁 إدارة الأقسام</button>
       <button class="tab-btn" onclick="switchTab('couponsTab')">🎟️ الكوبونات والعروض</button>
     </div>
 
@@ -97,7 +101,7 @@
 
         <div class="row">
           <div class="col form-group">
-            <label>القسم:</label>
+            <label>القسم التابع له:</label>
             <select id="pCategory" required>
               <option value="">-- اختر القسم --</option>
             </select>
@@ -114,30 +118,33 @@
             <input type="number" id="pPrice" placeholder="50" required>
           </div>
           <div class="col form-group">
-            <label>سعر العرض / الخصم (اختياري):</label>
+            <label>سعر الخصم / العرض (اختياري):</label>
             <input type="number" id="pDiscountPrice" placeholder="40">
           </div>
         </div>
 
+        <!-- رفع الصور المباشر من المعرض -->
         <div class="form-group">
-          <label>روابط الصور (افصل بين كل رابط ورابط بفاصلة ,):</label>
-          <input type="text" id="pImages" placeholder="https://img1.jpg, https://img2.jpg" required>
+          <label>📸 اختر صور المنتج من المعرض مباشرة (يمكنك اختيار صورة أو أكثر):</label>
+          <input type="file" id="pImgFiles" accept="image/*" multiple>
+          <small style="color: #7f8c8d; display:block; margin-top:4px;">💡 اختر الصور من الاستوديو/التليفون واللوحة سترفعها أوتوماتيكياً.</small>
+          <div id="imagePreview" class="image-preview-container"></div>
         </div>
 
         <div class="row">
           <div class="col form-group">
-            <label>الألوان المتاحة (فاصلة بينهم):</label>
+            <label>الألوان المتاحة (افصل بفاصلة):</label>
             <input type="text" id="pColors" placeholder="شفاف, أحمر, أزرق">
           </div>
           <div class="col form-group">
-            <label>المقاسات المتاحة (فاصلة بينهم):</label>
+            <label>المقاسات المتاحة (افصل بفاصلة):</label>
             <input type="text" id="pSizes" placeholder="6mm, 8mm, 10mm">
           </div>
         </div>
 
         <div class="form-group">
-          <label>وصف المنتجات وتفاصيله:</label>
-          <textarea id="pDescription" rows="3" placeholder="تفاصيل الخامات أو الاستخدامات..."></textarea>
+          <label>وصف المنتج وتفاصيله:</label>
+          <textarea id="pDescription" rows="3" placeholder="اكتب تفاصيل عن خامة المنتج، طريقة الاستخدام..."></textarea>
         </div>
 
         <button type="submit" id="saveProdBtn" class="btn">حفظ المنتج والمخزون 🚀</button>
@@ -161,18 +168,18 @@
       </table>
     </div>
 
-    <!-- ==================== 2. إدارة الأقسام ==================== -->
+    <!-- ==================== 2. إدارة الأقسام المتداخلة ==================== -->
     <div id="categoriesTab" class="tab-content">
-      <h3>إضافة قسم</h3>
+      <h3>إضافة قسم جديد (رئيسي أو فرعي)</h3>
       <form id="categoryForm" style="margin-top: 15px;">
         <div class="form-group">
           <label>اسم القسم:</label>
-          <input type="text" id="catName" placeholder="خرز، أدوات هاند ميد، خامات..." required>
+          <input type="text" id="catName" placeholder="مثال: خرز، كريستال شفاف، خامات ريزين..." required>
         </div>
         <div class="form-group">
-          <label>القسم الأب (إن وجد):</label>
+          <label>ينتمي لـ (القسم الأب):</label>
           <select id="catParent">
-            <option value="root">-- قسم رئيسي --</option>
+            <option value="root">-- قسم رئيسي مستقل --</option>
           </select>
         </div>
         <button type="submit" class="btn">إضافة القسم 🚀</button>
@@ -192,7 +199,7 @@
       <form id="couponForm" style="margin-top: 15px;">
         <div class="row">
           <div class="col form-group">
-            <label>كود الخصم (رمز الكوبون):</label>
+            <label>كود الخصم:</label>
             <input type="text" id="cCode" placeholder="مثال: CRYSTAL10" style="text-transform: uppercase;" required>
           </div>
           <div class="col form-group">
