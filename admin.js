@@ -3,7 +3,49 @@ import {
   collection, addDoc, getDocs, doc, deleteDoc, updateDoc, serverTimestamp, query, orderBy 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ==================== 1. إدارة المخزون والتنبيهات والمنتجات ====================
+// ==================== مفتاح رفع الصور أوتوماتيكياً (ImgBB API) ====================
+const IMGBB_API_KEY = "388bb1b3734e5659db0ea37c95b7db5b";
+
+// دالة رفع الصور من المعرض وتحويلها لروابط في الخفاء
+async function uploadImageToImgBB(file) {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    return data.data.url;
+  } else {
+    throw new Error("فشل رفع الصورة");
+  }
+}
+
+// variables
+let existingImages = []; // التخزين في حالة التعديل
+
+// معاينة الصور في الشاشة قبل الحفظ
+document.getElementById("pImgFiles").addEventListener("change", (e) => {
+  const previewContainer = document.getElementById("imagePreview");
+  previewContainer.innerHTML = "";
+  const files = e.target.files;
+
+  for (let file of files) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = document.createElement("img");
+      img.src = event.target.result;
+      img.className = "img-preview";
+      previewContainer.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// ==================== 1. إدارة المنتجات والمخزون ====================
 
 const productForm = document.getElementById("productForm");
 const productsList = document.getElementById("productsList");
@@ -27,13 +69,12 @@ async function loadProducts() {
       const stockNum = Number(p.stock || 0);
       let stockBadge = `<span class="badge badge-ok">${stockNum} قطعة</span>`;
 
-      // فحص المخزون للتنبيه
       if (stockNum === 0) {
         stockBadge = `<span class="badge badge-out">نفذت الكمية!</span>`;
-        stockAlertList.innerHTML += `<li>المنتج <strong>${p.name}</strong> نفذ من المخزون تماماً!</li>`;
+        stockAlertList.innerHTML += `<li>المنتج <strong>${p.name}</strong> نفذ من المخزون!</li>`;
         hasLowStock = true;
       } else if (stockNum <= 5) {
-        stockBadge = `<span class="badge badge-low">متبقي ${stockNum} فقط!</span>`;
+        stockBadge = `<span class="badge badge-low">متبقي ${stockNum} قطع!</span>`;
         stockAlertList.innerHTML += `<li>المنتج <strong>${p.name}</strong> أوشك على الانتهاء (متبقي ${stockNum}).</li>`;
         hasLowStock = true;
       }
@@ -44,7 +85,7 @@ async function loadProducts() {
         ? `<del style="color:#888;">${p.price}</del> ${p.discountPrice} ج`
         : `${p.price} ج`;
 
-      const mainImg = (p.images && p.images.length > 0) ? p.images[0] : '';
+      const mainImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://via.placeholder.com/40?text=لا+صورة';
 
       productsList.innerHTML += `
         <tr>
@@ -54,7 +95,7 @@ async function loadProducts() {
           <td>${priceDisplay}</td>
           <td>${stockBadge}</td>
           <td>
-            <button class="btn-action btn-edit" onclick="editProduct('${pId}', '${p.name}', '${p.category}', ${p.price}, '${p.discountPrice || ''}', ${stockNum}, '${(p.images || []).join(',')}', '${(p.colors || []).join(',')}', '${(p.sizes || []).join(',')}', \`${p.description || ''}\`)">تعديل</button>
+            <button class="btn-action btn-edit" onclick="editProduct('${pId}', '${p.name}', '${p.category}', ${p.price}, '${p.discountPrice || ''}', ${stockNum}, '${(p.colors || []).join(',')}', '${(p.sizes || []).join(',')}', \`${p.description || ''}\`)">تعديل</button>
             <button class="btn-action btn-delete" onclick="deleteProduct('${pId}')">حذف</button>
           </td>
         </tr>
@@ -65,54 +106,76 @@ async function loadProducts() {
   }
 }
 
-// حفظ أو تعديل المنتج مع المخزون
+// حفظ أو تعديل المنتج
 productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   saveProdBtn.disabled = true;
+  saveProdBtn.innerText = "جاري رفع الصور وحفظ البيانات... ⏳";
 
   const editId = document.getElementById("editProductId").value;
-  const imagesArr = document.getElementById("pImages").value.split(',').map(img => img.trim()).filter(img => img);
-
-  const productData = {
-    name: document.getElementById("pName").value,
-    category: document.getElementById("pCategory").value,
-    stock: Number(document.getElementById("pStock").value),
-    price: Number(document.getElementById("pPrice").value),
-    discountPrice: document.getElementById("pDiscountPrice").value ? Number(document.getElementById("pDiscountPrice").value) : null,
-    images: imagesArr,
-    colors: document.getElementById("pColors").value.split(',').map(c => c.trim()).filter(c => c),
-    sizes: document.getElementById("pSizes").value.split(',').map(s => s.trim()).filter(s => s),
-    description: document.getElementById("pDescription").value,
-    createdAt: serverTimestamp()
-  };
+  const fileInput = document.getElementById("pImgFiles");
+  let uploadedImageUrls = [...existingImages];
 
   try {
+    // رفع الصور المحددة من المعرض إن وجدت
+    if (fileInput.files.length > 0) {
+      uploadedImageUrls = []; // مسح القديم لو تم اختيار جديد
+      for (let file of fileInput.files) {
+        const url = await uploadImageToImgBB(file);
+        uploadedImageUrls.push(url);
+      }
+    }
+
+    if (uploadedImageUrls.length === 0) {
+      alert("⚠️ يرجى اختيار صورة واحدة على الأقل للمنتج!");
+      saveProdBtn.disabled = false;
+      saveProdBtn.innerText = "حفظ المنتج والمخزون 🚀";
+      return;
+    }
+
+    const productData = {
+      name: document.getElementById("pName").value,
+      category: document.getElementById("pCategory").value,
+      stock: Number(document.getElementById("pStock").value),
+      price: Number(document.getElementById("pPrice").value),
+      discountPrice: document.getElementById("pDiscountPrice").value ? Number(document.getElementById("pDiscountPrice").value) : null,
+      images: uploadedImageUrls,
+      colors: document.getElementById("pColors").value.split(',').map(c => c.trim()).filter(c => c),
+      sizes: document.getElementById("pSizes").value.split(',').map(s => s.trim()).filter(s => s),
+      description: document.getElementById("pDescription").value,
+      createdAt: serverTimestamp()
+    };
+
     if (editId) {
       await updateDoc(doc(db, "products", editId), productData);
-      alert("🎉 تم تعديل المنتج والمخزون بنجاح!");
+      alert("🎉 تم تعديل المنتج بنجاح!");
       document.getElementById("editProductId").value = "";
       document.getElementById("productFormTitle").innerText = "إضافة منتج جديد";
     } else {
       await addDoc(collection(db, "products"), productData);
-      alert("🎉 تم إضافة المنتج بنجاح!");
+      alert("🎉 تم رفع الصور وإضافة المنتج بنجاح!");
     }
+
     productForm.reset();
+    document.getElementById("imagePreview").innerHTML = "";
+    existingImages = [];
     loadProducts();
+
   } catch (error) {
-    alert("❌ حدث خطأ: " + error.message);
+    alert("❌ حدث خطأ أثناء الحفظ أو رفع الصور: " + error.message);
   } finally {
     saveProdBtn.disabled = false;
+    saveProdBtn.innerText = "حفظ المنتج والمخزون 🚀";
   }
 });
 
-window.editProduct = (id, name, cat, price, discount, stock, images, colors, sizes, desc) => {
+window.editProduct = (id, name, cat, price, discount, stock, colors, sizes, desc) => {
   document.getElementById("editProductId").value = id;
   document.getElementById("pName").value = name;
   document.getElementById("pCategory").value = cat;
   document.getElementById("pPrice").value = price;
   document.getElementById("pDiscountPrice").value = discount;
   document.getElementById("pStock").value = stock;
-  document.getElementById("pImages").value = images;
   document.getElementById("pColors").value = colors;
   document.getElementById("pSizes").value = sizes;
   document.getElementById("pDescription").value = desc;
@@ -128,7 +191,7 @@ window.deleteProduct = async (id) => {
   }
 };
 
-// ==================== 2. إدارة الأقسام ====================
+// ==================== 2. إدارة الأقسام الشجرية ====================
 
 const categoryForm = document.getElementById("categoryForm");
 const catParentSelect = document.getElementById("catParent");
@@ -136,7 +199,7 @@ const pCategorySelect = document.getElementById("pCategory");
 const categoriesList = document.getElementById("categoriesList");
 
 async function loadCategories() {
-  catParentSelect.innerHTML = '<option value="root">-- قسم رئيسي --</option>';
+  catParentSelect.innerHTML = '<option value="root">-- قسم رئيسي مستقل --</option>';
   pCategorySelect.innerHTML = '<option value="">-- اختر القسم --</option>';
   categoriesList.innerHTML = '';
 
@@ -173,10 +236,10 @@ categoryForm.addEventListener("submit", async (e) => {
 });
 
 window.deleteCategory = async (id) => {
-  if (confirm("حذف القسم؟")) { await deleteDoc(doc(db, "categories", id)); loadCategories(); }
+  if (confirm("حذف هذا القسم؟")) { await deleteDoc(doc(db, "categories", id)); loadCategories(); }
 };
 
-// ==================== 3. إدارة الكوبونات والعروض ====================
+// ==================== 3. الكوبونات والعروض ====================
 
 const couponForm = document.getElementById("couponForm");
 const couponsList = document.getElementById("couponsList");
@@ -198,7 +261,7 @@ async function loadCoupons() {
         </tr>
       `;
     });
-  } catch (error) { console.error("خطأ الكوبونات:", error); }
+  } catch (error) { console.error(error); }
 }
 
 couponForm.addEventListener("submit", async (e) => {
@@ -212,19 +275,19 @@ couponForm.addEventListener("submit", async (e) => {
     createdAt: serverTimestamp()
   });
 
-  alert("🎉 تم إضافة كود الخصم بنجاح!");
+  alert("🎉 تم إضافة الكوبون بنجاح!");
   couponForm.reset();
   loadCoupons();
 });
 
 window.deleteCoupon = async (id) => {
-  if (confirm("هل تريد حذف هذا الكوبون؟")) {
+  if (confirm("حذف هذا الكوبون؟")) {
     await deleteDoc(doc(db, "coupons", id));
     loadCoupons();
   }
 };
 
-// تشغيل التحميل التلقائي
+// تشغيل القوائم
 loadProducts();
 loadCategories();
 loadCoupons();
