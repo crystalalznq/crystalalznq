@@ -17,6 +17,7 @@ form.addEventListener("submit", async (e) => {
     const status = document.getElementById("pStatus").value;
     const imageUrl = document.getElementById("pImg").value;
 
+    // إضافة البيانات إلى Firestore
     await addDoc(collection(db, "products"), {
       name: productName,
       category: category,
@@ -31,7 +32,7 @@ form.addEventListener("submit", async (e) => {
 
   } catch (error) {
     console.error("خطأ أثناء الإضافة:", error);
-    alert("❌ حصلت مشكلة: " + error.message);
+    alert("❌ حصلت مشكلة أثناء الحفظ: " + error.message);
   } finally {
     saveBtn.disabled = false;
     saveBtn.innerText = "حفظ المنتج في الداتا بيز 🚀";
