@@ -3,53 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة التحكم - كرستال الزنقة</title>
+  <title>لوحة التحكم - كرستال الزنقة 💎</title>
   <style>
-    body { font-family: system-ui, sans-serif; padding: 20px; background: #f8f9fa; direction: rtl; }
-    .card { background: white; padding: 25px; border-radius: 12px; max-width: 450px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    h2 { color: #333; text-align: center; margin-bottom: 20px; }
-    .group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-    input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-    button { background: #e91e63; color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; font-size: 16px; cursor: pointer; font-weight: bold; }
-    button:hover { background: #d81b60; }
+    * { box-sizing: border-box; font-family: system-ui, sans-serif; }
+    body { background-color: #f4f6f9; padding: 20px; direction: rtl; }
+    .card { background: white; max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+    h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 6px; font-weight: bold; color: #34495e; font-size: 14px; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+    button { background: #8e44ad; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #732d91; }
+    button:disabled { background: #bdc3c7; cursor: not-allowed; }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h2>✨ إضافة منتج جديد</h2>
+    <h2>💎 كرستال الزنقة - إضافة منتج</h2>
     <form id="addProductForm">
-      <div class="group">
+      
+      <div class="form-group">
         <label>اسم المنتج:</label>
         <input type="text" id="pName" placeholder="مثال: خرز كريستال شفاف" required>
       </div>
 
-      <div class="group">
+      <div class="form-group">
         <label>القسم:</label>
         <select id="pCategory">
           <option value="خرز">خرز</option>
           <option value="سلاسل صيني">سلاسل صيني</option>
           <option value="قوالب ريزين">قوالب ريزين</option>
           <option value="لولي">لولي</option>
+          <option value="سلاسل بالمتر">سلاسل بالمتر</option>
         </select>
       </div>
 
-      <div class="group">
+      <div class="form-group">
         <label>السعر (جنيه):</label>
         <input type="number" id="pPrice" placeholder="50" required>
       </div>
 
-      <div class="group">
-        <label>رابط الصورة (حاليًا):</label>
+      <div class="form-group">
+        <label>حالة التوفر:</label>
+        <select id="pStatus">
+          <option value="متوفر">متوفر</option>
+          <option value="كمية محدودة">كمية محدودة</option>
+          <option value="غير متوفر">غير متوفر</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>رابط صورة المنتج (مؤقتًا):</label>
         <input type="url" id="pImg" placeholder="https://..." required>
       </div>
 
-      <button type="submit" id="saveBtn">حفظ المنتج 🚀</button>
+      <button type="submit" id="saveBtn">حفظ المنتج في الداتا بيز 🚀</button>
     </form>
   </div>
 
+  <!-- ربط ملف الجافاسكريبت الخاص بالصفحة -->
   <script type="module" src="js/admin.js"></script>
 </body>
 </html>
-
