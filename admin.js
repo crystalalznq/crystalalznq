@@ -3,45 +3,105 @@ import {
   collection, addDoc, getDocs, doc, deleteDoc, updateDoc, serverTimestamp, query, orderBy 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ==================== مفتاح رفع الصور أوتوماتيكياً (ImgBB API) ====================
-const IMGBB_API_KEY = "388bb1b3734e5659db0ea37c95b7db5b";
+// ==================== مصفوفة تخزين صور المنتج الحالي ====================
+let activeProductImages = []; // تحتوي على روابط الصور أو نصوص Base64
 
-// دالة رفع الصور من المعرض وتحويلها لروابط في الخفاء
-async function uploadImageToImgBB(file) {
-  const formData = new FormData();
-  formData.append("image", file);
+// دالة ضغط الصور المرفوعة من الملفات تحويلها لـ Base64
+function compressAndConvertToBase64(file, maxWidth = 800, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
 
-  const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-    method: "POST",
-    body: formData
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxWidth) {
+            width = Math.round((width * maxWidth) / height);
+            height = maxWidth;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
+        resolve(compressedBase64);
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
   });
-
-  const data = await response.json();
-  if (data.success) {
-    return data.data.url;
-  } else {
-    throw new Error("فشل رفع الصورة");
-  }
 }
 
-// variables
-let existingImages = []; // التخزين في حالة التعديل
-
-// معاينة الصور في الشاشة قبل الحفظ
-document.getElementById("pImgFiles").addEventListener("change", (e) => {
+// عرض معاينة الصور ورسم أزرار الإزالة (X)
+function renderImagePreview() {
   const previewContainer = document.getElementById("imagePreview");
   previewContainer.innerHTML = "";
-  const files = e.target.files;
 
+  activeProductImages.forEach((imgSrc, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "img-wrapper";
+
+    const img = document.createElement("img");
+    img.src = imgSrc;
+    img.className = "img-preview";
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "remove-img-btn";
+    removeBtn.innerText = "✕";
+    removeBtn.onclick = () => removeImage(index);
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(removeBtn);
+    previewContainer.appendChild(wrapper);
+  });
+}
+
+// حذف صورة محددة باستخدام علامة (X)
+function removeImage(index) {
+  activeProductImages.splice(index, 1);
+  renderImagePreview();
+}
+
+// إضافة صور من المعرض
+document.getElementById("pImgFiles").addEventListener("change", async (e) => {
+  const files = e.target.files;
   for (let file of files) {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = document.createElement("img");
-      img.src = event.target.result;
-      img.className = "img-preview";
-      previewContainer.appendChild(img);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const base64Img = await compressAndConvertToBase64(file);
+      activeProductImages.push(base64Img);
+    } catch (err) {
+      console.error("خطأ في قراءة الصورة:", err);
+    }
+  }
+  e.target.value = ""; // إعادة تعيين لتمكين اختيار صور مجدداً
+  renderImagePreview();
+});
+
+// إضافة صورة عبر رابط مباشر
+document.getElementById("addUrlBtn").addEventListener("click", () => {
+  const urlInput = document.getElementById("pImgUrlInput");
+  const urls = urlInput.value.split(',').map(u => u.trim()).filter(u => u);
+
+  if (urls.length > 0) {
+    urls.forEach(url => activeProductImages.push(url));
+    urlInput.value = "";
+    renderImagePreview();
+  } else {
+    alert("يرجى إدخال رابط صورة صحيح!");
   }
 });
 
@@ -87,6 +147,9 @@ async function loadProducts() {
 
       const mainImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://via.placeholder.com/40?text=لا+صورة';
 
+      // تجهيز بيانات المنتجات للتعديل برمجياً
+      const imagesJson = JSON.stringify(p.images || []).replace(/"/g, '&quot;');
+
       productsList.innerHTML += `
         <tr>
           <td><img src="${mainImg}" width="40" height="40" style="object-fit:cover; border-radius:4px;"></td>
@@ -95,7 +158,7 @@ async function loadProducts() {
           <td>${priceDisplay}</td>
           <td>${stockBadge}</td>
           <td>
-            <button class="btn-action btn-edit" onclick="editProduct('${pId}', '${p.name}', '${p.category}', ${p.price}, '${p.discountPrice || ''}', ${stockNum}, '${(p.colors || []).join(',')}', '${(p.sizes || []).join(',')}', \`${p.description || ''}\`)">تعديل</button>
+            <button class="btn-action btn-edit" onclick="editProduct('${pId}', '${p.name}', '${p.category}', ${p.price}, '${p.discountPrice || ''}', ${stockNum}, '${(p.colors || []).join(',')}', '${(p.sizes || []).join(',')}', \`${p.description || ''}\`, '${imagesJson}')">تعديل</button>
             <button class="btn-action btn-delete" onclick="deleteProduct('${pId}')">حذف</button>
           </td>
         </tr>
@@ -109,37 +172,25 @@ async function loadProducts() {
 // حفظ أو تعديل المنتج
 productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  if (activeProductImages.length === 0) {
+    alert("⚠️ يرجى إضافة صورة واحدة على الأقل للمنتج سواء من المعرض أو عبر رابط!");
+    return;
+  }
+
   saveProdBtn.disabled = true;
-  saveProdBtn.innerText = "جاري رفع الصور وحفظ البيانات... ⏳";
+  saveProdBtn.innerText = "جاري حفظ البيانات... ⏳";
 
   const editId = document.getElementById("editProductId").value;
-  const fileInput = document.getElementById("pImgFiles");
-  let uploadedImageUrls = [...existingImages];
 
   try {
-    // رفع الصور المحددة من المعرض إن وجدت
-    if (fileInput.files.length > 0) {
-      uploadedImageUrls = []; // مسح القديم لو تم اختيار جديد
-      for (let file of fileInput.files) {
-        const url = await uploadImageToImgBB(file);
-        uploadedImageUrls.push(url);
-      }
-    }
-
-    if (uploadedImageUrls.length === 0) {
-      alert("⚠️ يرجى اختيار صورة واحدة على الأقل للمنتج!");
-      saveProdBtn.disabled = false;
-      saveProdBtn.innerText = "حفظ المنتج والمخزون 🚀";
-      return;
-    }
-
     const productData = {
       name: document.getElementById("pName").value,
       category: document.getElementById("pCategory").value,
       stock: Number(document.getElementById("pStock").value),
       price: Number(document.getElementById("pPrice").value),
       discountPrice: document.getElementById("pDiscountPrice").value ? Number(document.getElementById("pDiscountPrice").value) : null,
-      images: uploadedImageUrls,
+      images: activeProductImages,
       colors: document.getElementById("pColors").value.split(',').map(c => c.trim()).filter(c => c),
       sizes: document.getElementById("pSizes").value.split(',').map(s => s.trim()).filter(s => s),
       description: document.getElementById("pDescription").value,
@@ -153,23 +204,23 @@ productForm.addEventListener("submit", async (e) => {
       document.getElementById("productFormTitle").innerText = "إضافة منتج جديد";
     } else {
       await addDoc(collection(db, "products"), productData);
-      alert("🎉 تم رفع الصور وإضافة المنتج بنجاح!");
+      alert("🎉 تم إضافة المنتج والصور بنجاح!");
     }
 
     productForm.reset();
-    document.getElementById("imagePreview").innerHTML = "";
-    existingImages = [];
+    activeProductImages = [];
+    renderImagePreview();
     loadProducts();
 
   } catch (error) {
-    alert("❌ حدث خطأ أثناء الحفظ أو رفع الصور: " + error.message);
+    alert("❌ حدث خطأ أثناء الحفظ: " + error.message);
   } finally {
     saveProdBtn.disabled = false;
     saveProdBtn.innerText = "حفظ المنتج والمخزون 🚀";
   }
 });
 
-window.editProduct = (id, name, cat, price, discount, stock, colors, sizes, desc) => {
+window.editProduct = (id, name, cat, price, discount, stock, colors, sizes, desc, imagesJson) => {
   document.getElementById("editProductId").value = id;
   document.getElementById("pName").value = name;
   document.getElementById("pCategory").value = cat;
@@ -179,6 +230,13 @@ window.editProduct = (id, name, cat, price, discount, stock, colors, sizes, desc
   document.getElementById("pColors").value = colors;
   document.getElementById("pSizes").value = sizes;
   document.getElementById("pDescription").value = desc;
+
+  try {
+    activeProductImages = JSON.parse(imagesJson);
+  } catch (e) {
+    activeProductImages = [];
+  }
+  renderImagePreview();
 
   document.getElementById("productFormTitle").innerText = "تعديل بيانات المنتج ✏️";
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -191,7 +249,7 @@ window.deleteProduct = async (id) => {
   }
 };
 
-// ==================== 2. إدارة الأقسام الشجرية ====================
+// ==================== 2. إدارة الأقسام ====================
 
 const categoryForm = document.getElementById("categoryForm");
 const catParentSelect = document.getElementById("catParent");
@@ -287,7 +345,7 @@ window.deleteCoupon = async (id) => {
   }
 };
 
-// تشغيل القوائم
+// تشغيل القوائم عند التحميل
 loadProducts();
 loadCategories();
 loadCoupons();
