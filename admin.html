@@ -50,9 +50,16 @@
     button.btn:hover { background: var(--primary-hover); }
     button.btn:disabled { background: #bdc3c7; cursor: not-allowed; }
 
-    /* معاينة الصور */
-    .image-preview-container { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-    .img-preview { width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; }
+    /* حاوية معاينة الصور مع زر الإزالة (X) */
+    .image-preview-container { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+    .img-wrapper { position: relative; display: inline-block; width: 85px; height: 85px; }
+    .img-preview { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; }
+    .remove-img-btn {
+      position: absolute; top: -6px; right: -6px; background: var(--danger); color: white;
+      border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: bold;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .remove-img-btn:hover { background: #c0392b; }
 
     /* الجداول والقوائم */
     .data-table { width: 100%; border-collapse: collapse; margin-top: 25px; }
@@ -123,11 +130,24 @@
           </div>
         </div>
 
-        <!-- رفع الصور المباشر من المعرض -->
-        <div class="form-group">
-          <label>📸 اختر صور المنتج من المعرض مباشرة (يمكنك اختيار صورة أو أكثر):</label>
-          <input type="file" id="pImgFiles" accept="image/*" multiple>
-          <small style="color: #7f8c8d; display:block; margin-top:4px;">💡 اختر الصور من الاستوديو/التليفون واللوحة سترفعها أوتوماتيكياً.</small>
+        <!-- رفع الصور المباشر أو من رابط خارجي -->
+        <div class="form-group" style="background: #fafafa; padding: 15px; border-radius: 8px; border: 1px dashed #ccc;">
+          <label style="color: var(--primary);">📸 إضافة صور المنتج:</label>
+          
+          <div style="margin-bottom: 10px;">
+            <label style="font-weight: normal; font-size: 13px;">1. رفع صور من الاستوديو/المعرض المباشر:</label>
+            <input type="file" id="pImgFiles" accept="image/*" multiple>
+          </div>
+
+          <div style="margin-top: 10px;">
+            <label style="font-weight: normal; font-size: 13px;">2. أو إضافة رابط صورة خارجي مباشرة (افصل بين الروابط بفاصلة):</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="pImgUrlInput" placeholder="https://example.com/image.jpg">
+              <button type="button" id="addUrlBtn" style="width: 110px; background: #34495e; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">إضافة الرابط</button>
+            </div>
+          </div>
+
+          <!-- معاينة جميع الصور وإدارتها -->
           <div id="imagePreview" class="image-preview-container"></div>
         </div>
 
@@ -244,3 +264,4 @@
   <script type="module" src="admin.js"></script>
 </body>
 </html>
+
