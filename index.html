@@ -144,17 +144,6 @@
       display: inline-block;
     }
 
-    .slide-bg-img {
-      position: absolute;
-      left: -10px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 55%;
-      height: 110%;
-      object-fit: contain;
-      pointer-events: none;
-    }
-
     .slider-dots {
       display: flex;
       justify-content: center;
@@ -229,7 +218,7 @@
     .dot-line.left::after { left: 0; }
     .dot-line.right::after { right: 0; }
 
-    /* 5. شبكة الأقسام */
+    /* 5. شبكة الأقسام الديناميكية */
     .categories-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -247,6 +236,10 @@
       cursor: pointer;
       text-decoration: none;
       color: inherit;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cat-item:active {
+      transform: scale(0.97);
     }
     .cat-item img {
       width: 100%;
@@ -255,13 +248,17 @@
       background: #f1f5f9;
     }
     .cat-item h4 {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       color: #1e293b;
       margin-top: 6px;
+      padding: 0 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .cat-item span {
-      font-size: 11px;
+      font-size: 10px;
       color: #94a3b8;
     }
 
@@ -288,7 +285,7 @@
       line-height: 1.6;
     }
 
-    /* 7. شريط العروض السفلي (الهدية) */
+    /* 7. شريط العروض السفلي */
     .gift-strip {
       margin: 15px 20px;
       background: var(--orange-bg);
@@ -397,7 +394,7 @@
       </a>
 
       <div class="brand-center">
-        <img src="https://via.placeholder.com/150/0284c7/ffffff?text=Crystal" class="brand-logo" alt="Logo">
+        <img src="https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" class="brand-logo" alt="Logo">
         <h1 class="brand-title">كرستال الزنقة</h1>
         <p class="brand-subtitle">مستلزمات الإكسسوارات والهاند ميد</p>
       </div>
@@ -437,7 +434,7 @@
     <div class="search-box">
       <div class="search-input-inner">
         <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="ابحث عن منتج...">
+        <input type="text" id="searchInput" placeholder="ابحث عن قسم أو منتج...">
       </div>
     </div>
 
@@ -448,38 +445,9 @@
       <div class="dot-line left"></div>
     </div>
 
-    <!-- 5. شبكة الأقسام -->
+    <!-- 5. شبكة الأقسام الديناميكية -->
     <div class="categories-grid" id="categoriesGrid">
-      <div class="cat-item">
-        <img src="https://via.placeholder.com/150/e2e8f0/888888?text=خرز" alt="خرز">
-        <h4>خرز</h4>
-        <span>تصفح المنتجات</span>
-      </div>
-      <div class="cat-item">
-        <img src="https://via.placeholder.com/150/e2e8f0/888888?text=سلاسل" alt="سلاسل">
-        <h4>سلاسل</h4>
-        <span>تصفح المنتجات</span>
-      </div>
-      <div class="cat-item">
-        <img src="https://via.placeholder.com/150/e2e8f0/888888?text=لولي" alt="لولي">
-        <h4>لولي</h4>
-        <span>تصفح المنتجات</span>
-      </div>
-      <div class="cat-item">
-        <img src="https://via.placeholder.com/150/e2e8f0/888888?text=ريزين" alt="ريزين">
-        <h4>ريزين</h4>
-        <span>تصفح المنتجات</span>
-      </div>
-      <div class="cat-item">
-        <img src="https://via.placeholder.com/150/e2e8f0/888888?text=مستلزمات+شنط" alt="مستلزمات شنط">
-        <h4>مستلزمات شنط</h4>
-        <span>تصفح المنتجات</span>
-      </div>
-      <div class="cat-item">
-        <img src="https://via.placeholder.com/150/e2e8f0/888888?text=إكسسوارات" alt="إكسسوارات">
-        <h4>إكسسوارات</h4>
-        <span>تصفح المنتجات</span>
-      </div>
+      <!-- تحمّل الأقسام تلقائياً عبر JavaScript لتحضيرها للوحة التحكم -->
     </div>
 
     <!-- 6. كروت معلومات العنوان والمواعيد -->
@@ -541,6 +509,44 @@
   </div>
 
   <script>
+    // 1. مصفوفة الأقسام الافتراضية (سيتم جلبها مستقبلاً من Firebase لقراءة إضافة/حذف الأقسام)
+    const initialCategories = [
+      { id: "1", name: "الخرز", img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
+      { id: "2", name: "السلاسل", img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
+      { id: "3", name: "اللولي", img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" },
+      { id: "4", name: "ريزين", img: "https://via.placeholder.com/150/e2e8f0/888888?text=ريزين" },
+      { id: "5", name: "مستلزمات شنط", img: "https://via.placeholder.com/150/e2e8f0/888888?text=مستلزمات+شنط" },
+      { id: "6", name: "إكسسوارات", img: "https://via.placeholder.com/150/e2e8f0/888888?text=إكسسوارات" }
+    ];
+
+    // دالة عرض الأقسام على الواجهة
+    function displayCategories(categories) {
+      const grid = document.getElementById("categoriesGrid");
+      grid.innerHTML = "";
+
+      categories.forEach(cat => {
+        grid.innerHTML += `
+          <div class="cat-item" onclick="openCategory('${cat.id}')">
+            <img src="${cat.img}" alt="${cat.name}">
+            <h4>${cat.name}</h4>
+            <span>تصفح المنتجات</span>
+          </div>
+        `;
+      });
+    }
+
+    function openCategory(catId) {
+      console.log("فتح القسم رقم:", catId);
+      // يمكنك توجيه العميل لصفحة المنتجات الخاصة بهذا القسم هنا
+    }
+
+    // تصفية الأقسام أثناء البحث
+    document.getElementById("searchInput").addEventListener("input", function(e) {
+      const query = e.target.value.toLowerCase().trim();
+      const filtered = initialCategories.filter(c => c.name.toLowerCase().includes(query));
+      displayCategories(filtered);
+    });
+
     // تحريك سلايدر العروض تلقائياً
     const slider = document.getElementById('offerSlider');
     const dots = document.querySelectorAll('.dot');
@@ -558,7 +564,11 @@
         });
       }, 3500);
     }
+
+    // تشغيل العرض للبدء
+    displayCategories(initialCategories);
   </script>
 
 </body>
 </html>
+
