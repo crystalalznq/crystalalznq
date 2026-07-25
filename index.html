@@ -30,46 +30,31 @@
       background-size: 20px 20px;
     }
 
-    /* 1. الهيدر العلوي الجديد */
+    /* 1. الهيدر العلوي - لوجو كبير بملء العرض بدون أزرار */
     .header {
-      padding: 15px 20px 10px;
+      padding: 15px 15px 5px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       background: transparent;
     }
-    .header-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 1px solid var(--border-gray);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-      flex-shrink: 0;
-    }
-    .header-btn.phone svg { fill: #1e293b; }
-    .header-btn.whatsapp svg { fill: #25d366; }
 
     .brand-center {
-      flex-grow: 1;
+      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 0 10px;
-    }
-    .brand-banner-logo {
-      max-width: 220px;
-      width: 100%;
-      height: auto;
-      max-height: 65px;
-      object-fit: contain;
     }
 
-    /* 2. سلايدر العروض المتحرك (تم تصغير الحجم) */
+    .brand-banner-logo {
+      width: 100%;
+      max-width: 380px; /* تكبير الشعار بشكل ملحوظ */
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* 2. سلايدر العروض المتحرك */
     .slider-wrapper {
       padding: 10px 20px 5px;
       position: relative;
@@ -93,7 +78,7 @@
       padding: 12px 16px;
       position: relative;
       overflow: hidden;
-      min-height: 110px; /* تقليل الارتفاع حسب الطلب */
+      min-height: 110px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -346,25 +331,17 @@
 
   <div class="app-container">
 
-    <!-- 1. الهيدر العلوي بـ اللوجو العريض بدون نصوص متكررة -->
+    <!-- 1. الهيدر العلوي بـ اللوجو الكبير في المنتصف بدون أي أزرار علوية -->
     <header class="header">
-      <a href="tel:01227492921" class="header-btn phone" title="اتصل بنا">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-      </a>
-
       <div class="brand-center">
         <img src="https://raw.githubusercontent.com/crystalalznq/crystalalznq/refs/heads/main/file_00000000ac5c81f4b35db8f4a2bdb97f.png" class="brand-banner-logo" alt="كرستال الزنقة">
       </div>
-
-      <a href="https://wa.me/201227492921" target="_blank" class="header-btn whatsapp" title="واتساب">
-        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-      </a>
     </header>
 
-    <!-- 2. سلايدر العروض المصغر (قابل للربط بـ Admin Panel) -->
+    <!-- 2. سلايدر العروض المصغر -->
     <div class="slider-wrapper">
       <div class="slider-container" id="offerSlider">
-        <!-- يتم التحميل ديناميكياً من JS لتهيئتها للوحة التحكم -->
+        <!-- يتم التحميل ديناميكياً من JS -->
       </div>
       <div class="slider-dots" id="sliderDots"></div>
     </div>
@@ -384,7 +361,7 @@
       <div class="dot-line left"></div>
     </div>
 
-    <!-- 5. شبكة الأقسام (جاهزة للـ Admin Panel) -->
+    <!-- 5. شبكة الأقسام -->
     <div class="categories-grid" id="categoriesGrid"></div>
 
     <!-- 6. كروت معلومات العنوان والمواعيد -->
@@ -455,7 +432,7 @@
   </div>
 
   <script>
-    // البيانات الافتراضية (سيتم استقبالها مستقبلاً من لوحة التحكم / LocalStorage / API)
+    // البيانات الافتراضية (تأتي ديناميكياً)
     const offersData = [
       {
         tag: "% خصومات هذا الأسبوع",
@@ -544,7 +521,6 @@
       }
     }
 
-    // التهيئة البدائية
     renderSlider(offersData);
     displayCategories(initialCategories);
     startSliderAutoScroll();
