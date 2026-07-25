@@ -1,150 +1,163 @@
-<!DOCTYPE html>
+here<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>كرستال الزنقة 💎 - عالم الخرز والاكسسوارات</title>
+  <title>كرستال الزنقة - مستلزمات الإكسسوارات والهاند ميد</title>
   <style>
     :root {
-      --primary: #8e44ad;
-      --primary-dark: #732d91;
-      --secondary: #2ecc71;
-      --bg: #f8f9fa;
+      --primary-orange: #d35400;
+      --accent-orange: #e67e22;
+      --bg-color: #f7f9fa;
       --card-bg: #ffffff;
-      --text: #2c3e50;
+      --text-main: #2c3e50;
       --text-muted: #7f8c8d;
-      --danger: #e74c3c;
+      --border-color: #eef2f5;
     }
 
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
-    body { background-color: var(--bg); color: var(--text); direction: rtl; padding-bottom: 80px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); direction: rtl; padding-bottom: 90px; }
 
-    /* الهيدر وشريط البحث */
-    header { background: var(--card-bg); padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-    .header-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
-    .logo { font-size: 22px; font-weight: bold; color: var(--primary); text-decoration: none; }
-    
-    .search-box { flex: 1; max-width: 500px; position: relative; }
-    .search-box input { width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 20px; outline: none; font-size: 14px; }
-    .search-box input:focus { border-color: var(--primary); }
+    .container { max-width: 480px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); position: relative; }
 
-    .cart-icon-btn { position: relative; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); }
-    .cart-badge { position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; font-size: 12px; font-weight: bold; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+    /* Top Header */
+    .top-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #fff; }
+    .icon-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; color: #27ae60; background: #fcfdfd; }
+    .icon-btn.phone { color: #2980b9; }
 
-    /* الأقسام والتصنيفات */
-    .categories-bar { background: var(--card-bg); padding: 12px 20px; border-bottom: 1px solid #eee; overflow-x: auto; white-space: nowrap; }
-    .categories-container { max-width: 1200px; margin: 0 auto; display: flex; gap: 10px; }
-    .cat-chip { padding: 8px 16px; border-radius: 20px; background: #f0f2f5; border: none; font-size: 14px; cursor: pointer; font-weight: 500; transition: 0.2s; }
-    .cat-chip.active, .cat-chip:hover { background: var(--primary); color: white; }
+    .brand-logo-area { text-align: center; }
+    .logo-img-placeholder { width: 65px; height: 65px; border-radius: 50%; margin: 0 auto 5px; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 24px; background: #fafafa; }
+    .brand-title { font-size: 20px; font-weight: 800; color: #1a252f; line-height: 1.2; }
+    .brand-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-    /* شبكة المنتجات */
-    .main-container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+    /* Banner Slider Area */
+    .banner-container { padding: 10px 15px; }
+    .offer-banner {
+      background: linear-gradient(135deg, #fdf2e9 0%, #fae5d3 100%);
+      border-radius: 18px; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden;
+    }
+    .banner-content { z-index: 2; max-width: 60%; }
+    .tag-badge { background: #d35400; color: #fff; font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: bold; display: inline-block; margin-bottom: 8px; }
+    .banner-title { font-size: 22px; font-weight: 900; color: #a04000; line-height: 1.2; }
+    .banner-sub { font-size: 14px; font-weight: bold; color: #2c3e50; margin: 4px 0 12px; }
+    .btn-limited { background: #d35400; color: white; border: none; padding: 6px 14px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; }
 
-    /* كارت المنتج */
-    .product-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s; position: relative; display: flex; flex-direction: column; }
-    .product-card:hover { transform: translateY(-4px); }
-    .product-img { width: 100%; height: 200px; object-fit: cover; background: #eee; cursor: pointer; }
-    .discount-badge { position: absolute; top: 10px; right: 10px; background: var(--danger); color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
-    
-    .product-info { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-    .product-title { font-size: 15px; font-weight: bold; margin-bottom: 8px; line-height: 1.4; }
-    .product-specs { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
-    .spec-item { background: #f0f2f5; padding: 2px 6px; border-radius: 4px; }
-    
-    .price-box { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-    .current-price { font-size: 18px; font-weight: bold; color: var(--primary); }
-    .old-price { font-size: 14px; color: var(--text-muted); text-decoration: line-through; }
+    /* Search Bar */
+    .search-area { padding: 10px 15px; }
+    .search-input-wrapper { position: relative; }
+    .search-input-wrapper input {
+      width: 100%; padding: 12px 40px 12px 15px; border: 1px solid var(--border-color); border-radius: 25px; outline: none; font-size: 14px; background: #fafafa;
+    }
+    .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-    .add-to-cart-btn { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
-    .add-to-cart-btn:hover { background: var(--primary-dark); }
+    /* Section Divider Title */
+    .section-title { text-align: center; margin: 20px 0 15px; position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; font-weight: bold; }
+    .section-title::before, .section-title::after { content: ""; flex: 1; height: 1px; background: #e0e0e0; margin: 0 15px; }
 
-    /* مودال السلة الشفافة Sidebar / Modal */
-    .cart-modal { position: fixed; top: 0; left: -100%; width: 100%; max-width: 400px; height: 100%; background: white; box-shadow: 2px 0 15px rgba(0,0,0,0.2); z-index: 200; transition: left 0.3s ease; display: flex; flex-direction: column; }
-    .cart-modal.open { left: 0; }
-    .cart-header { padding: 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
-    .cart-body { padding: 20px; flex: 1; overflow-y: auto; }
-    .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #fafafa; }
+    /* Categories Grid */
+    .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 15px; }
+    .cat-card { background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border-color); overflow: hidden; text-align: center; padding-bottom: 8px; text-decoration: none; color: inherit; transition: 0.2s; }
+    .cat-card:hover { transform: translateY(-3px); }
+    .cat-img { width: 100%; height: 95px; object-fit: cover; }
+    .cat-name { font-size: 13px; font-weight: bold; margin-top: 6px; }
+    .cat-count { font-size: 10px; color: var(--text-muted); }
 
-    .cart-item { display: flex; gap: 12px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; align-items: center; }
-    .cart-item-img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; }
-    .cart-item-details { flex: 1; }
-    .qty-btn { width: 25px; height: 25px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    /* Bottom Offer Strip */
+    .offer-strip { margin: 20px 15px; background: #fdf2e9; border-radius: 12px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
+    .offer-strip-btn { background: #d35400; color: white; border: none; padding: 8px 14px; border-radius: 18px; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: none; }
 
-    /* التراكب الخلفي Overlay */
-    .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 150; display: none; }
-    .overlay.open { display: block; }
+    /* Social Links */
+    .social-links { display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid var(--border-color); font-size: 12px; font-weight: bold; }
+    .social-item { display: flex; align-items: center; gap: 4px; text-decoration: none; color: var(--text-main); }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; background: #fff; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+    .nav-item { text-align: center; text-decoration: none; color: var(--text-muted); font-size: 11px; font-weight: bold; }
+    .nav-item.active { color: #d35400; }
+    .nav-icon { font-size: 18px; display: block; margin-bottom: 2px; }
   </style>
 </head>
 <body>
 
-  <!-- الهيدر الرئيسي -->
-  <header>
-    <div class="header-container">
-      <a href="#" class="logo">💎 كرستال الزنقة</a>
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="ابحث عن خرز، لولي، كريستال، ريزين...">
-      </div>
-      <button class="cart-icon-btn" onclick="toggleCart()">
-        🛒
-        <span class="cart-badge" id="cartBadge">0</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- شريط الأقسام -->
-  <div class="categories-bar">
-    <div class="categories-container" id="categoriesBar">
-      <button class="cat-chip active" onclick="filterCategory('all')">الكل</button>
-    </div>
-  </div>
-
-  <!-- عرض المنتجات -->
-  <main class="main-container">
-    <div class="products-grid" id="productsGrid">
-      <p style="text-align: center; grid-column: 1/-1; padding: 40px; color: #7f8c8d;">جاري تحميل المنتجات... ⏳</p>
-    </div>
-  </main>
-
-  <!-- التراكب الخارجي -->
-  <div class="overlay" id="overlay" onclick="toggleCart()"></div>
-
-  <!-- مودال السلة -->
-  <div class="cart-modal" id="cartModal">
-    <div class="cart-header">
-      <h2>🛒 سلة الشراء</h2>
-      <button onclick="toggleCart()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">✕</button>
-    </div>
-
-    <div class="cart-body" id="cartItems">
-      <p style="text-align:center; color:#7f8c8d; margin-top:40px;">السلة فارغة حالياً</p>
-    </div>
-
-    <div class="cart-footer">
-      <!-- خيار الشحن/الحجز -->
-      <div style="margin-bottom: 12px;">
-        <label style="font-weight:bold; font-size:13px; display:block; margin-bottom:5px;">طريقة الاستلام:</label>
-        <select id="deliveryMethod" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
-          <option value="delivery">🚛 توصيل للمنزل</option>
-          <option value="pickup">🏪 حجز واستلام من المحل</option>
-        </select>
+  <div class="container">
+    
+    <!-- Top Header -->
+    <header class="top-header">
+      <a href="https://wa.me/201000000000" target="_blank" class="icon-btn">💬</a>
+      
+      <div class="brand-logo-area">
+        <!-- لما تبعتلي رابط اللوجو هنحط الصورة هنا بدل الـ Placeholder -->
+        <div class="logo-img-placeholder" id="logoContainer">💎</div>
+        <h1 class="brand-title">كرستال الزنقة</h1>
+        <p class="brand-subtitle">مستلزمات الإكسسوارات والهاند ميد</p>
       </div>
 
-      <!-- كود الخصم -->
-      <div style="display:flex; gap:8px; margin-bottom:12px;">
-        <input type="text" id="couponInput" placeholder="كود الخصم" style="flex:1; padding:8px; border:1px solid #ccc; border-radius:6px; text-transform:uppercase;">
-        <button onclick="applyCoupon()" style="padding:8px 12px; background:#34495e; color:white; border:none; border-radius:6px; cursor:pointer;">تطبيق</button>
-      </div>
+      <a href="tel:01000000000" class="icon-btn phone">📞</a>
+    </header>
 
-      <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px; margin-bottom:15px;">
-        <span>الإجمالي النهائي:</span>
-        <span id="cartTotal" style="color:var(--primary);">0 جنيه</span>
+    <!-- Banner Slider -->
+    <section class="banner-container">
+      <div class="offer-banner">
+        <div class="banner-content">
+          <span class="tag-badge">خصومات هذا الأسبوع 🏷️</span>
+          <div class="banner-title">خصم 15%</div>
+          <div class="banner-sub">على السلاسل</div>
+          <button class="btn-limited">لفترة محدودة</button>
+        </div>
       </div>
+    </section>
 
-      <button onclick="sendWhatsAppOrder()" style="width:100%; background:var(--secondary); color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; font-size:16px; cursor:pointer;">
-        تأكيد الطلب عبر الواتساب 📱
-      </button>
+    <!-- Search Bar -->
+    <section class="search-area">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="ابحث عن منتج...">
+      </div>
+    </section>
+
+    <!-- Categories Section -->
+    <div class="section-title">تصفح الأقسام</div>
+
+    <section class="categories-grid" id="categoriesGrid">
+      <p style="grid-column: 1/-1; text-align: center; color: #888;">جاري تحميل الأقسام...</p>
+    </section>
+
+    <!-- Offer Strip -->
+    <div class="offer-strip">
+      <div style="font-size: 12px; font-weight: bold;">
+        🎁 عروض جديدة كل أسبوع
+      </div>
+      <a href="#" class="offer-strip-btn">عرض الكل ←</a>
     </div>
+
+    <!-- Social Bar -->
+    <div class="social-links">
+      <a href="#" class="social-item">🎵 تيك توك</a>
+      <a href="#" class="social-item">📘 فيسبوك</a>
+      <a href="#" class="social-item">💬 واتساب</a>
+      <a href="#" class="social-item">📞 اتصل بنا</a>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="#" class="nav-item active">
+        <span class="nav-icon">🏠</span>
+        الرئيسية
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-icon">🔲</span>
+        الأقسام
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-icon">⭐</span>
+        العروض
+      </a>
+      <a href="#" class="nav-item" onclick="toggleCartModal()">
+        <span class="nav-icon">🛒</span>
+        السلة
+      </a>
+    </nav>
+
   </div>
 
   <script type="module" src="app.js"></script>
