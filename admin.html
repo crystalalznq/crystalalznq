@@ -49,6 +49,10 @@
     .form-group label { font-size: 12px; font-weight: bold; color: #334155; }
     .form-group input, .form-group select { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; background: #fff; }
 
+    .checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border-gray); cursor: pointer; }
+    .checkbox-group input { width: 16px; height: 16px; accent-color: var(--orange-btn); cursor: pointer; }
+    .checkbox-group label { font-size: 12px; font-weight: bold; color: #1e293b; cursor: pointer; }
+
     .time-inputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
     .action-btn { background: var(--primary-blue); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
@@ -79,7 +83,7 @@
   <div class="admin-container">
     <div class="admin-header">
       <h2>🛠️ لوحة الإدارة والتحكم</h2>
-      <p>إدارة العروض المتقدمة والربط بالمنتجات</p>
+      <p>إدارة العروض المتطورة والربط التدريجي بالأقسام والمنتجات</p>
     </div>
 
     <div class="admin-tabs">
@@ -149,15 +153,21 @@
     <!-- تبويب العروض المتحركة -->
     <div id="tabOffers" class="tab-content">
       <div class="admin-card">
-        <div class="admin-card-title" id="offerCardTitle">➕ إضافة عرض جديد مع عداد تنازلي وربط توجيه</div>
+        <div class="admin-card-title" id="offerCardTitle">➕ إضافة عرض جديد</div>
         <input type="hidden" id="editOfferIndex" value="-1">
         <div class="form-group"><label>شارة العرض (Tag):</label><input type="text" id="newOfferTag" placeholder="مثال: خصم خاص 🎁"></div>
         <div class="form-group"><label>عنوان العرض الرئيسي:</label><input type="text" id="newOfferTitle" placeholder="مثال: خصم 20% على السلاسل"></div>
         <div class="form-group"><label>الوصف الفرعي:</label><input type="text" id="newOfferSub" placeholder="مثال: لفترة محدودة جداً"></div>
         <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق رابط الصورة هنا" autocomplete="off"></div>
         
-        <!-- تحديد وقت العداد الدقيق -->
-        <div class="form-group">
+        <!-- تفعيل/إلغاء وقت انتهاء العرض -->
+        <div class="checkbox-group" onclick="toggleTimerCheckbox()">
+          <input type="checkbox" id="hasTimerCheckbox" onchange="handleTimerToggle()">
+          <label for="hasTimerCheckbox">تفعيل عداد تنازلي ووقت انتهاء للعرض (اختياري)</label>
+        </div>
+
+        <!-- حقول الوقت (تظهر فقط عند تفعيل العداد) -->
+        <div class="form-group" id="timerInputsContainer" style="display: none;">
           <label>⏳ مدة العرض (أيام، ساعات، دقائق):</label>
           <div class="time-inputs-grid">
             <input type="number" id="offerDays" placeholder="أيام" min="0" value="1">
@@ -166,16 +176,17 @@
           </div>
         </div>
 
-        <!-- تحديد وجهة زر استخدام العرض -->
+        <!-- تحديد وجهة زر استخدام العرض (عام / قسم / منتجات) -->
         <div class="form-group">
-          <label>🔗 توجيه الزر عند الضغط (إلى أين يذهب العميل؟):</label>
+          <label>🔗 توجيه الزر عند الضغط:</label>
           <select id="offerTargetSelect" onchange="handleOfferTargetChange()">
-            <option value="store">متجر عام (بدون تحديد وجهة خاصة)</option>
-            <option value="category">قسم محدد بالكامل</option>
-            <option value="product">منتج محدد بعينه</option>
+            <option value="store">عرض عام بالموقع</option>
+            <option value="category">قسم محدد</option>
+            <option value="product">منتج محدد (بالتدرج)</option>
           </select>
         </div>
 
+        <!-- قسم محدد -->
         <div class="form-group" id="targetCategoryGroup" style="display: none;">
           <label>اختر القسم المستهدف:</label>
           <select id="targetCategorySelect">
@@ -183,14 +194,22 @@
           </select>
         </div>
 
-        <div class="form-group" id="targetProductGroup" style="display: none;">
-          <label>اختر المنتج المستهدف:</label>
-          <select id="targetProductSelect">
-            <option value="">-- اختر المنتج --</option>
+        <!-- منتج محدد (خطوة بخطوة: اختر القسم أولاً ثم يظهر منتجاته) -->
+        <div class="form-group" id="targetProductCatGroup" style="display: none;">
+          <label>1️⃣ اختر القسم أولاً لعرض منتجاته:</label>
+          <select id="targetProdFilterCat" onchange="filterProductsBySelectedCategory()">
+            <option value="">-- اختر القسم --</option>
           </select>
         </div>
 
-        <button class="action-btn" id="offerSubmitBtn" onclick="saveOffer()">إضافة العرض وتفعيل العداد</button>
+        <div class="form-group" id="targetProductGroup" style="display: none;">
+          <label>2️⃣ اختر المنتج المطلوب:</label>
+          <select id="targetProductSelect">
+            <option value="">-- اختر المنتج من هذا القسم --</option>
+          </select>
+        </div>
+
+        <button class="action-btn" id="offerSubmitBtn" onclick="saveOffer()">حفظ وإضافة العرض</button>
         <button class="action-btn cancel-edit-btn" id="offerCancelBtn" onclick="resetOfferForm()">إلغاء التعديل</button>
       </div>
       
@@ -258,7 +277,7 @@
     }
 
     function updateOfferTargetDropdowns() {
-      // 1. الأقسام
+      // 1. أقسام زر (قسم محدد)
       const catSelect = document.getElementById('targetCategorySelect');
       let catOpts = '<option value="">-- اختر القسم --</option>';
       categoriesData.forEach(cat => {
@@ -266,20 +285,46 @@
       });
       catSelect.innerHTML = catOpts;
 
-      // 2. المنتجات
-      const prodSelect = document.getElementById('targetProductSelect');
-      let prodOpts = '<option value="">-- اختر المنتج --</option>';
-      catProductsData.forEach(prod => {
-        const cat = categoriesData.find(c => c.id === prod.categoryId);
-        const catName = cat ? cat.name : 'قسم محذوف';
-        prodOpts += `<option value="${prod.id}">${escapeHtml(prod.name)} (${escapeHtml(catName)})</option>`;
+      // 2. تدرج زر (منتجات -> اختر القسم أولاً)
+      const filterCatSelect = document.getElementById('targetProdFilterCat');
+      let filterCatOpts = '<option value="">-- اختر القسم --</option>';
+      categoriesData.forEach(cat => {
+        filterCatOpts += `<option value="${cat.id}">${escapeHtml(cat.name)}</option>`;
       });
+      filterCatSelect.innerHTML = filterCatOpts;
+      
+      filterProductsBySelectedCategory();
+    }
+
+    function filterProductsBySelectedCategory() {
+      const selectedCatId = document.getElementById('targetProdFilterCat').value;
+      const prodSelect = document.getElementById('targetProductSelect');
+      
+      let prodOpts = '<option value="">-- اختر المنتج --</option>';
+      if (selectedCatId) {
+        const filteredProds = catProductsData.filter(p => p.categoryId === selectedCatId);
+        filteredProds.forEach(prod => {
+          prodOpts += `<option value="${prod.id}">${escapeHtml(prod.name)} (${prod.price} ج.م)</option>`;
+        });
+      }
       prodSelect.innerHTML = prodOpts;
+    }
+
+    function toggleTimerCheckbox() {
+      const cb = document.getElementById('hasTimerCheckbox');
+      cb.checked = !cb.checked;
+      handleTimerToggle();
+    }
+
+    function handleTimerToggle() {
+      const hasTimer = document.getElementById('hasTimerCheckbox').checked;
+      document.getElementById('timerInputsContainer').style.display = hasTimer ? 'block' : 'none';
     }
 
     function handleOfferTargetChange() {
       const targetType = document.getElementById('offerTargetSelect').value;
       document.getElementById('targetCategoryGroup').style.display = (targetType === 'category') ? 'flex' : 'none';
+      document.getElementById('targetProductCatGroup').style.display = (targetType === 'product') ? 'flex' : 'none';
       document.getElementById('targetProductGroup').style.display = (targetType === 'product') ? 'flex' : 'none';
     }
 
@@ -369,24 +414,28 @@
 
       // 4. العروض (نشطة ومنتهية)
       const now = Date.now();
-      const activeOffers = offersData.filter(o => o.endTime > now);
-      const expiredOffers = offersData.filter(o => o.endTime <= now);
+      const activeOffers = offersData.filter(o => !o.hasTimer || o.endTime > now);
+      const expiredOffers = offersData.filter(o => o.hasTimer && o.endTime <= now);
 
       const offerList = document.getElementById('adminOffersList');
       let offerHtml = '';
       activeOffers.forEach((offer) => {
         const originalIndex = offersData.findIndex(o => o.id === offer.id);
-        const diffMs = offer.endTime - now;
-        const d = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        let timeDesc = '♾️ عرض مستمر (بدون وقت)';
+        if(offer.hasTimer) {
+          const diffMs = offer.endTime - now;
+          const d = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+          const h = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+          timeDesc = `⏳ متبقي: ${d} يوم و ${h} ساعة و ${m} دقيقة`;
+        }
 
         offerHtml += `
           <div class="admin-list-item">
             ${offer.img ? `<img src="${offer.img}" onerror="this.style.display='none'">` : ''}
             <div class="admin-item-info">
               <h5>${escapeHtml(offer.title)}</h5>
-              <p>⏳ متبقي: ${d} يوم و ${h} ساعة و ${m} دقيقة</p>
+              <p>${timeDesc}</p>
             </div>
             <div class="item-actions">
               <button class="mini-btn btn-edit" onclick="editOffer(${originalIndex})">تعديل</button>
@@ -595,28 +644,35 @@
       const subtitle = document.getElementById('newOfferSub').value.trim();
       const img = cleanImageUrl(document.getElementById('newOfferImgUrl').value);
 
-      const days = parseInt(document.getElementById('offerDays').value) || 0;
-      const hours = parseInt(document.getElementById('offerHours').value) || 0;
-      const minutes = parseInt(document.getElementById('offerMinutes').value) || 0;
+      const hasTimer = document.getElementById('hasTimerCheckbox').checked;
+      let endTime = 0;
+
+      if (hasTimer) {
+        const days = parseInt(document.getElementById('offerDays').value) || 0;
+        const hours = parseInt(document.getElementById('offerHours').value) || 0;
+        const minutes = parseInt(document.getElementById('offerMinutes').value) || 0;
+        if(days === 0 && hours === 0 && minutes === 0) return alert('برجاء تحديد وقت الانتهاء أو إلغاء تفعيل العداد!');
+        const totalMs = (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
+        endTime = Date.now() + totalMs;
+      }
 
       const targetType = document.getElementById('offerTargetSelect').value;
       const targetCategoryId = document.getElementById('targetCategorySelect').value;
+      const targetProdFilterCat = document.getElementById('targetProdFilterCat').value;
       const targetProductId = document.getElementById('targetProductSelect').value;
       const editIndex = parseInt(document.getElementById('editOfferIndex').value);
 
       if(!tag || !title) return alert('أدخل شارة وعنوان العرض!');
-      if(days === 0 && hours === 0 && minutes === 0) return alert('يجب تحديد وقت انتهاء (أيام أو ساعات أو دقائق على الأقل)!');
-
       if(targetType === 'category' && !targetCategoryId) return alert('برجاء اختيار القسم المستهدف!');
-      if(targetType === 'product' && !targetProductId) return alert('برجاء اختيار المنتج المستهدف!');
-
-      const totalMs = (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
-      const endTime = Date.now() + totalMs;
+      if(targetType === 'product') {
+        if(!targetProdFilterCat) return alert('برجاء اختيار القسم الخاص بالمنتج!');
+        if(!targetProductId) return alert('برجاء اختيار المنتج المستهدف!');
+      }
 
       const offerObj = {
         id: editIndex !== -1 ? offersData[editIndex].id : 'o' + Date.now(),
-        tag, title, subtitle, img, endTime,
-        targetType, targetCategoryId, targetProductId
+        tag, title, subtitle, img, hasTimer, endTime,
+        targetType, targetCategoryId, targetProdFilterCat, targetProductId
       };
 
       if (editIndex === -1) {
@@ -635,24 +691,37 @@
       document.getElementById('newOfferSub').value = offer.subtitle || '';
       document.getElementById('newOfferImgUrl').value = offer.img || '';
 
-      const diffMs = offer.endTime - Date.now();
-      if(diffMs > 0) {
-        const d = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        document.getElementById('offerDays').value = d;
-        document.getElementById('offerHours').value = h;
-        document.getElementById('offerMinutes').value = m;
-      } else {
-        document.getElementById('offerDays').value = 0;
-        document.getElementById('offerHours').value = 0;
-        document.getElementById('offerMinutes').value = 30;
+      const hasTimer = offer.hasTimer || false;
+      document.getElementById('hasTimerCheckbox').checked = hasTimer;
+      handleTimerToggle();
+
+      if(hasTimer && offer.endTime) {
+        const diffMs = offer.endTime - Date.now();
+        if(diffMs > 0) {
+          const d = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+          const h = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+          document.getElementById('offerDays').value = d;
+          document.getElementById('offerHours').value = h;
+          document.getElementById('offerMinutes').value = m;
+        } else {
+          document.getElementById('offerDays').value = 0;
+          document.getElementById('offerHours').value = 0;
+          document.getElementById('offerMinutes').value = 30;
+        }
       }
 
       document.getElementById('offerTargetSelect').value = offer.targetType || 'store';
       handleOfferTargetChange();
-      if(offer.targetType === 'category') document.getElementById('targetCategorySelect').value = offer.targetCategoryId || '';
-      if(offer.targetType === 'product') document.getElementById('targetProductSelect').value = offer.targetProductId || '';
+
+      if(offer.targetType === 'category') {
+        document.getElementById('targetCategorySelect').value = offer.targetCategoryId || '';
+      }
+      if(offer.targetType === 'product') {
+        document.getElementById('targetProdFilterCat').value = offer.targetProdFilterCat || '';
+        filterProductsBySelectedCategory();
+        document.getElementById('targetProductSelect').value = offer.targetProductId || '';
+      }
 
       document.getElementById('editOfferIndex').value = i;
       document.getElementById('offerCardTitle').innerText = '✏️ تعديل العرض';
@@ -667,14 +736,16 @@
       document.getElementById('newOfferTitle').value = '';
       document.getElementById('newOfferSub').value = '';
       document.getElementById('newOfferImgUrl').value = '';
+      document.getElementById('hasTimerCheckbox').checked = false;
+      handleTimerToggle();
       document.getElementById('offerDays').value = 1;
       document.getElementById('offerHours').value = 0;
       document.getElementById('offerMinutes').value = 0;
       document.getElementById('offerTargetSelect').value = 'store';
       handleOfferTargetChange();
       document.getElementById('editOfferIndex').value = -1;
-      document.getElementById('offerCardTitle').innerText = '➕ إضافة عرض جديد مع عداد تنازلي وربط توجيه';
-      document.getElementById('offerSubmitBtn').innerText = 'إضافة العرض وتفعيل العداد';
+      document.getElementById('offerCardTitle').innerText = '➕ إضافة عرض جديد';
+      document.getElementById('offerSubmitBtn').innerText = 'حفظ وإضافة العرض';
       document.getElementById('offerSubmitBtn').classList.remove('edit-mode');
       document.getElementById('offerCancelBtn').style.display = 'none';
     }
