@@ -507,10 +507,10 @@ const defaultOffers = [
 id: "off1",
 tag: "🎁 خصومات هذا الأسبوع",
 title: "خصم 15%",
-subtitle: "على جميع تشكيلات السلاسل",
+subtitle: "على سلسلة ستانلس ثقيلة",
 img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg",
-targetType: "category", // نوع الهدف: قسم
-targetId: "2",       // معرف القسم (قسم السلاسل هنا ID بتاعها 2)
+targetType: "product", // نوع الهدف منتج
+targetId: "p3",       // الـ ID بتاع المنتج المستهدف (مثلاً p3)
 endTime: new Date().getTime() + (48 * 3600 * 1000)
 },
 {
@@ -749,11 +749,10 @@ slider.onmouseleave = startAutoSlider;
 activeOffers.forEach((offer, idx) => {
 let actionButtonHtml = '';
 
-// إظهار الزر فقط إذا كان العرض مرتبطاً بقسم أو منتج
 if (offer.targetType && offer.targetType !== 'general') {
     actionButtonHtml = `
         <button class="slide-action-btn"
-            onclick="handleOfferAction('${offer.targetType}', '${offer.targetId}', '${offer.title}')">
+            onclick="handleOfferAction('${offer.targetType}', '${offer.targetId}')">
             تصفح العرض 👈
         </button>`;
 }
@@ -783,19 +782,20 @@ slider.scrollTo({ left: currentSlideIndex * slideWidth, behavior: 'smooth' });
 updateDotsActiveState();
 }
 
-// تعديل الدالة لتقوم بفتح القسم أو المنتج المطلوب بدلاً من إظهار تنبيه فقط
-function handleOfferAction(targetType, targetId, offerTitle) {
+// دالة التوجيه للمنتج أو القسم مباشرة بدون أي رسايل تنبيه (Alert)
+function handleOfferAction(targetType, targetId) {
 if (targetType === 'category') {
-// البحث عن القسم بالـ ID المرفق
 const targetCat = initialCategories.find(c => c.id === targetId);
 if (targetCat) {
 openCategoryPage(targetCat.id, targetCat.name);
-} else {
-alert(`عذراً، القسم الخاص بعرض "${offerTitle}" غير متوفر حالياً.`);
 }
 } else if (targetType === 'product') {
-// لو العرض مرتبط بمنتج محدد، ممكن تظهر تنبيه أو تضيفه أو تظهره (لو عندك صفحة منتج مستقلة)
-alert(`🌸 جاري عرض تفاصيل المنتج المرتبط بـ: (${offerTitle})`);
+// البحث عن المنتج داخل منتجات الأقسام أو المنتجات الرائجة
+let targetProduct = catProductsData.find(p => p.id === targetId) || trendingData.find(t => t.id === targetId);
+if (targetProduct) {
+// فتح القسم التابع له المنتج ونقلوه لصفحته فوراً
+openCategoryPage(targetProduct.categoryId, "المنتجات المميزة");
+}
 }
 }
 
