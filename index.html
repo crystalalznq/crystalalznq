@@ -216,70 +216,60 @@
     .security-footer { text-align: center; padding: 15px 20px 5px; font-size: 11px; color: #94a3b8; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .security-badge { display: inline-flex; align-items: center; gap: 5px; color: #16a34a; font-weight: 700; font-size: 11px; }
 
-    /* نافذة السلة */
-    .cart-modal-overlay {
+    /* النوافذ المنبثقة (السلة والقوانين) */
+    .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 2000;
       display: none; justify-content: center; align-items: flex-end;
     }
-    .cart-modal-overlay.active { display: flex; }
-    .cart-modal {
+    .modal-overlay.active { display: flex; }
+    .modal-card {
       width: 100%; max-width: 480px; background: #fff;
       border-top-left-radius: 20px; border-top-right-radius: 20px;
       padding: 20px; max-height: 85vh; overflow-y: auto;
     }
-    .cart-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .close-modal-btn { background: #f1f5f9; border: none; font-size: 18px; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
+
+    /* عناصر السلة */
     .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-gray); }
     .cart-item-controls { display: flex; align-items: center; gap: 8px; }
     .qty-btn { width: 26px; height: 26px; border: 1px solid var(--border-gray); background: #f8fafc; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .delete-item-btn { background: #fee2e2; color: #ef4444; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; }
 
     /* أزرار تحديد نوع الطلب */
-    .delivery-options {
-      margin: 15px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    .delivery-options { margin: 15px 0; display: flex; flex-direction: column; gap: 10px; }
     .delivery-title { font-size: 13px; font-weight: 800; color: #1e293b; }
     .delivery-grid { display: flex; gap: 10px; }
     .delivery-btn {
-      flex: 1;
-      border: 1.5px solid var(--border-gray);
-      border-radius: 12px;
-      padding: 10px;
-      background: #f8fafc;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s ease;
+      flex: 1; border: 1.5px solid var(--border-gray); border-radius: 12px;
+      padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transition: all 0.2s ease;
     }
-    .delivery-btn.active {
-      border-color: var(--orange-btn);
-      background: var(--orange-bg);
-      color: var(--orange-btn);
-    }
+    .delivery-btn.active { border-color: var(--orange-btn); background: var(--orange-bg); color: var(--orange-btn); }
     .delivery-btn-title { font-size: 12px; font-weight: 800; margin-bottom: 3px; }
     .delivery-btn-sub { font-size: 10px; opacity: 0.8; }
 
-    /* صندوق الشروط والقوانين */
-    .terms-card {
-      background: #fffbe8;
-      border: 1px solid #fef08a;
-      border-radius: 12px;
-      padding: 12px;
-      margin: 15px 0;
-      font-size: 11px;
-      color: #713f12;
+    /* نافذة القوانين والشروط */
+    .rules-list {
+      background: #f8fafc; border: 1px solid var(--border-gray); border-radius: 12px;
+      padding: 15px; font-size: 12px; color: #334155; line-height: 1.6; margin-bottom: 15px;
     }
-    .terms-card h5 { font-size: 12px; font-weight: 800; margin-bottom: 6px; color: #854d0e; }
-    .terms-card ul { padding-right: 15px; margin-bottom: 8px; }
-    .terms-card li { margin-bottom: 4px; line-height: 1.4; }
+    .rules-list li { margin-bottom: 8px; list-style-position: inside; }
 
-    .checkout-wa-btn {
+    .accept-checkbox-wrapper {
+      display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: bold;
+      color: #1e293b; margin: 15px 0; background: #fff7ed; padding: 12px; border-radius: 10px; border: 1px dashed #fdba74;
+    }
+    .accept-checkbox-wrapper input { width: 18px; height: 18px; accent-color: var(--orange-btn); cursor: pointer; }
+
+    .checkout-btn {
       width: 100%; background: #25d366; color: white; border: none;
       padding: 12px; border-radius: 12px; font-weight: bold; font-size: 14px;
       cursor: pointer; display: block; text-decoration: none; margin-top: 10px; text-align: center;
+      transition: all 0.3s ease;
+    }
+    .checkout-btn:disabled {
+      background: #cbd5e1 !important; color: #94a3b8 !important; cursor: not-allowed;
     }
   </style>
 </head>
@@ -306,7 +296,7 @@
     <div class="section-divider">
       <div class="line"></div>
       <div class="dot"></div>
-      <div class="title">🔥 الأكثر مبيعاً الآن</div>
+      <div class="title">✨ الأكثر مبيعاً الآن ✨</div>
       <div class="dot"></div>
       <div class="line"></div>
     </div>
@@ -317,7 +307,7 @@
     <div class="search-box">
       <div class="search-input-inner">
         <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="ابحث عن قسم أو منتج...">
+        <input type="text" id="searchInput" placeholder="ابحثي عن قسم أو منتج تحبيه...">
       </div>
     </div>
 
@@ -325,7 +315,7 @@
     <div class="section-divider">
       <div class="line"></div>
       <div class="dot"></div>
-      <div class="title">تصفح الأقسام</div>
+      <div class="title">🌸 تصفح الأقسام 🌸</div>
       <div class="dot"></div>
       <div class="line"></div>
     </div>
@@ -365,10 +355,10 @@
       <div>جميع الحقوق محفوظة © 2026 كرستال الزنقة</div>
     </div>
 
-    <!-- نافذة السلة -->
-    <div class="cart-modal-overlay" id="cartModalOverlay">
-      <div class="cart-modal">
-        <div class="cart-modal-header">
+    <!-- 1. نافذة السلة -->
+    <div class="modal-overlay" id="cartModalOverlay">
+      <div class="modal-card">
+        <div class="modal-header">
           <div style="font-weight:bold;">🛒 سلة المشتريات</div>
           <button class="close-modal-btn" onclick="toggleCartModal(false)">✕</button>
         </div>
@@ -377,33 +367,51 @@
 
         <!-- اختيار طريقة الاستلام -->
         <div class="delivery-options" id="deliveryOptionBox" style="display: none;">
-          <div class="delivery-title">طريقة الاستلام:</div>
+          <div class="delivery-title">📍 تحبي تستلمي إزاي؟</div>
           <div class="delivery-grid">
             <div class="delivery-btn active" id="btnPickup" onclick="selectDeliveryType('pickup')">
               <div class="delivery-btn-title">🏪 تحضير في المحل</div>
-              <div class="delivery-btn-sub">توفيراً لوقتك (دفع عربون والباقي كاش/انستا عند الاستلام)</div>
+              <div class="delivery-btn-sub">توفيراً لوقتك (دفع عربون والاستلام كاش/إنستا)</div>
             </div>
             <div class="delivery-btn" id="btnDelivery" onclick="selectDeliveryType('delivery')">
-              <div class="delivery-btn-title">🚚 توصيل طلبات</div>
-              <div class="delivery-btn-sub">انتظر التواصل معك لأخذ التفاصيل وإبلاغك بالموعد</div>
+              <div class="delivery-btn-title">🚚 توصيل للمنزل</div>
+              <div class="delivery-btn-sub">هنستلم الطلب ونتواصل معاكي لتأكيد التفاصيل</div>
             </div>
           </div>
         </div>
 
-        <!-- تحذير وتنبيه شروط وقوانين الطلب -->
-        <div class="terms-card" id="termsBox" style="display: none;">
-          <h5>⚠️ شروط وأحكام طلب الأوردر:</h5>
-          <ul>
-            <li>في حالة التحضير بالمحل: يتم دفع عربون تأكيد جدية عبر إنستا باي/فودافون كاش لجهوزية الطلب قبل وصولك.</li>
-            <li>في حالة التوصيل: سيتم التواصل معك هاتفياً أو عبر الواتساب لتأكيد العنوان وتكلفة التوصيل.</li>
-            <li>يرجى مراجعة تفاصيل طلبك جيداً من أعلى الشاشة قبل إتمام الإرسال.</li>
-          </ul>
-        </div>
-
         <div style="margin-top: 15px;">
           <div style="font-weight: bold;" id="cartTotalText">الإجمالي: 0 جنيه</div>
-          <a href="#" class="checkout-wa-btn" onclick="checkoutWhatsApp(event)">إرسال الطلب عبر الواتساب ←</a>
+          <button class="checkout-btn" onclick="proceedToRulesModal()">متابعة إرسال الطلب 👈</button>
         </div>
+      </div>
+    </div>
+
+    <!-- 2. نافذة الشروط والأحكام قبل الانتقال للواتس -->
+    <div class="modal-overlay" id="rulesModalOverlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div style="font-weight:bold; color: var(--orange-btn);">📋 شروط وأحكام الطلب الرسمية</div>
+          <button class="close-modal-btn" onclick="toggleRulesModal(false)">✕</button>
+        </div>
+
+        <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">لطفاً اقرئي الشروط البسيطة دي قبل الانتقال للواتساب لضمان أفضل خدمة 😊👇</p>
+
+        <ul class="rules-list">
+          <li>✨ <b>عند التحضير بالمحل:</b> يتم تحويل عربون بسيط (عبر إنستا باي أو فودافون كاش) لتأكيد جدية الطلب وبدء تحضيره قبل وصولك لتوفير وقتك.</li>
+          <li>🛵 <b>عند التوصيل للمنزل:</b> يتواصل معكِ الفريق بعد إرسال الطلب لتأكيد العنوان الدقيق وموعد التسليم وتكلفة الشحن.</li>
+          <li>🔍 <b>مراجعة المنتجات:</b> يرجى التأكد من المقاسات والألوان المطلوبة من السلة قبل إتمام الإرسال.</li>
+          <li>💛 يسعدنا ويزيدنا شرف خدمتكم دائماً في كرستال الزنقة!</li>
+        </ul>
+
+        <div class="accept-checkbox-wrapper">
+          <input type="checkbox" id="acceptRulesCheckbox" onchange="handleCheckboxChange(this)">
+          <label for="acceptRulesCheckbox">أوافق على جميع الشروط والأحكام أعلاه 🤝</label>
+        </div>
+
+        <button class="checkout-btn" id="finalWaBtn" disabled onclick="checkoutWhatsApp()">
+          💬 إرسال الطلب عبر الواتساب الآن
+        </button>
       </div>
     </div>
 
@@ -417,8 +425,8 @@
     ];
 
     const defaultOffers = [
-      { tag: "% خصومات هذا الأسبوع", title: "خصم 15%", subtitle: "على السلاسل" },
-      { tag: "% عرض خاص", title: "خصم 20%", subtitle: "على أطقم الخرز" }
+      { tag: "🎁 خصومات هذا الأسبوع", title: "خصم 15%", subtitle: "على جميع تشكيلات السلاسل" },
+      { tag: "🔥 عرض خاص جداً", title: "خصم 20%", subtitle: "على أطقم الخرز المميزة" }
     ];
 
     const defaultTrending = [
@@ -433,22 +441,41 @@
 
     let cart = [];
     let currentSlideIndex = 0;
-    let selectedDeliveryType = 'pickup'; // الافتراضي: تحضير بالمحل
+    let selectedDeliveryType = 'pickup'; 
 
     function toggleCartModal(show) {
       document.getElementById("cartModalOverlay").classList.toggle("active", show);
       if (show) renderCartItems();
     }
 
-    /* تعديل وظيفة الإضافة للسلة للتنبيه في حالة وجود المنتج مسبقاً */
+    function toggleRulesModal(show) {
+      document.getElementById("rulesModalOverlay").classList.toggle("active", show);
+      if(!show) {
+        // إعادة ضبط خانة الشروط عند الإغلاق
+        document.getElementById("acceptRulesCheckbox").checked = false;
+        document.getElementById("finalWaBtn").disabled = true;
+      }
+    }
+
+    function handleCheckboxChange(checkbox) {
+      document.getElementById("finalWaBtn").disabled = !checkbox.checked;
+    }
+
+    function proceedToRulesModal() {
+      if (cart.length === 0) return alert("🛒 السلة فارغة! اختاري بعض المنتجات أولاً 😊");
+      toggleCartModal(false);
+      toggleRulesModal(true);
+    }
+
+    /* إضافة للمنتجات مع تنبيه ودي ومبهج */
     function addToCart(product) {
       const existing = cart.find(item => item.id === product.id);
       if (existing) {
-        alert(`⚠️ هذا المنتج ("${product.name}") موجود بالفعل في السلة!\n\nيمكنك تعديل الكمية أو مراجعة الطلبية من أيقونة السلة بأعلى يسار الشاشة قبل الإرسال.`);
+        alert(`🌸 المنتَج دا ("${product.name}") موجود بالفعل في سلتك!\n\n💡 تقدري تعدلي الكمية أو تراجعي طلبك بسهولة من رمز السلة أعلى الشاشة فوق على اليسار 🛍️`);
       } else {
         cart.push({ ...product, qty: 1 });
         updateCartBadge();
-        alert(`تمت إضافة "${product.name}" إلى السلة بنجاح!`);
+        alert(`✨ تم إضافة "${product.name}" بنجاح لسلة مشترياتك! 🛍️`);
       }
     }
 
@@ -480,18 +507,15 @@
       const container = document.getElementById("cartItemsList");
       const totalText = document.getElementById("cartTotalText");
       const deliveryBox = document.getElementById("deliveryOptionBox");
-      const termsBox = document.getElementById("termsBox");
 
       if (cart.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8;">السلة فارغة حالياً</div>`;
+        container.innerHTML = `<div style="text-align:center; padding:30px 10px; color:#94a3b8;">🛒 السلة فارغة حالياً..<br>تصفحي المنتجات وأضيفي ما يعجبك! ✨</div>`;
         totalText.innerText = "الإجمالي: 0 جنيه";
         deliveryBox.style.display = "none";
-        termsBox.style.display = "none";
         return;
       }
 
       deliveryBox.style.display = "block";
-      termsBox.style.display = "block";
 
       let html = "";
       let total = 0;
@@ -500,7 +524,7 @@
         html += `
           <div class="cart-item-row">
             <div>
-              <div style="font-size:13px; font-weight:bold;">${item.name}</div>
+              <div style="font-size:13px; font-weight:bold;">💎 ${item.name}</div>
               <div style="font-size: 11px; color: #64748b;">${item.price} ج.م</div>
             </div>
             <div class="cart-item-controls">
@@ -513,31 +537,32 @@
         `;
       });
       container.innerHTML = html;
-      totalText.innerText = `الإجمالي: ${total} جنيه`;
+      totalText.innerText = `💰 الإجمالي الكلي: ${total} جنيه`;
     }
 
-    function checkoutWhatsApp(e) {
-      e.preventDefault();
-      if (cart.length === 0) return alert("السلة فارغة!");
-
+    /* نص رسالة الواتساب المليئة بالإيموجيات والملصقات اللطيفة */
+    function checkoutWhatsApp() {
       let deliveryText = selectedDeliveryType === 'pickup' 
-        ? "🏪 تحضير في المحل (توفيراً للوقت - دفع عربون وتسليم باقي المبلغ بالمحل كاش/إنستا)"
-        : "🚚 توصيل طلبات (في انتظار الرد وتأكيد التفاصيل)";
+        ? "🏪 تحضير في المحل (توفيراً للوقت - دفع عربون والباقي كاش/إنستا عند الاستلام ✨)"
+        : "🚚 توصيل للمنزل (في انتظار التواصل لتأكيد العنوان والتفاصيل 🛵)";
 
-      let msg = "مرحباً كرستال الزنقة، أريد تأكيد الطلب التالي:\n\n";
-      msg += `📌 **طريقة الاستلام المطلوبة:**\n${deliveryText}\n\n`;
-      msg += `📦 **المنتجات المطلوب تحضيرها:**\n`;
+      let msg = "أهلاً وسهلاً كرستال الزنقة! 🌸✨\n";
+      msg += "حابب/حاببة أأكد الطلب الجميل ده معاكم: 👇\n\n";
+      msg += `📍 **طريقة الاستلام:**\n${deliveryText}\n\n`;
+      msg += `📦 **قائمة المنتجات المطلوبة:**\n`;
 
       let total = 0;
       cart.forEach((item, idx) => {
-        msg += `${idx + 1}. ${item.name} | العدد: ${item.qty} | السعر: ${item.price * item.qty} ج.م\n`;
+        msg += `🔹 ${item.name}\n   └ العدد: ${item.qty} | السعر: ${item.price * item.qty} ج.م\n`;
         total += item.price * item.qty;
       });
 
-      msg += `\n💰 **الإجمالي الكلي:** ${total} جنيه`;
-      msg += `\n\n(تمت الموافقة على شروط وقوانين الطلب الرسمية)`;
+      msg += `\n💵 **المبلغ الإجمالي:** ${total} جنيه مصري`;
+      msg += `\n\n✅ (تمت الاطلاع والموافقة على جميع الشروط والأحكام الرسمية للطلب 🤝)`;
+      msg += `\n\nفي انتظار ردكم وتأكيد الطلب.. شكراً لكم! 💐`;
 
       window.open(`https://wa.me/201227492921?text=${encodeURIComponent(msg)}`, '_blank');
+      toggleRulesModal(false);
     }
 
     function displayCategories(categories) {
@@ -548,14 +573,14 @@
           <div class="cat-item" onclick="openCategoryPage('${cat.id}', '${cat.name}')">
             <img src="${cat.img}" alt="${cat.name}">
             <h4>${cat.name}</h4>
-            <span>تصفح الأشكال</span>
+            <span>تصفح الأشكال ✨</span>
           </div>
         `;
       });
     }
 
     function openCategoryPage(catId, catName) {
-      console.log(`فتح قسم: ${catName} (ID: ${catId})`);
+      console.log(`فتح قسم: ${catName}`);
     }
 
     function renderTrending(items) {
@@ -564,7 +589,7 @@
       items.forEach(item => {
         container.innerHTML += `
           <div class="trending-card">
-            <span class="trending-badge">الأكثر طلباً</span>
+            <span class="trending-badge">🔥 الأكثر طلباً</span>
             <img src="${item.img}" alt="${item.name}">
             <div>
               <div class="trending-title">${item.name}</div>
