@@ -65,7 +65,7 @@
       border-radius: 10px;
     }
 
-    /* تصميم العناوين الفاصلة */
+    /* عناوين الفواصل */
     .section-divider {
       display: flex;
       align-items: center;
@@ -114,12 +114,11 @@
     .slide-title { font-size: 20px; font-weight: 900; color: #1e293b; }
     .slide-sub { font-size: 14px; font-weight: 700; color: #475569; }
 
-    /* نقاط مؤشر العروض */
     .slider-dots { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 8px; }
     .dot-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: #cbd5e1; transition: all 0.3s ease; }
     .dot-indicator.active { background-color: var(--orange-btn); width: 20px; border-radius: 10px; }
 
-    /* قسم الأكثر مبيعاً / التريند */
+    /* قسم الأكثر مبيعاً */
     .trending-scroll-container {
       display: flex;
       gap: 12px;
@@ -227,7 +226,7 @@
     .cart-modal {
       width: 100%; max-width: 480px; background: #fff;
       border-top-left-radius: 20px; border-top-right-radius: 20px;
-      padding: 20px; max-height: 80vh; overflow-y: auto;
+      padding: 20px; max-height: 85vh; overflow-y: auto;
     }
     .cart-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .close-modal-btn { background: #f1f5f9; border: none; font-size: 18px; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
@@ -235,6 +234,48 @@
     .cart-item-controls { display: flex; align-items: center; gap: 8px; }
     .qty-btn { width: 26px; height: 26px; border: 1px solid var(--border-gray); background: #f8fafc; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .delete-item-btn { background: #fee2e2; color: #ef4444; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+
+    /* أزرار تحديد نوع الطلب */
+    .delivery-options {
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .delivery-title { font-size: 13px; font-weight: 800; color: #1e293b; }
+    .delivery-grid { display: flex; gap: 10px; }
+    .delivery-btn {
+      flex: 1;
+      border: 1.5px solid var(--border-gray);
+      border-radius: 12px;
+      padding: 10px;
+      background: #f8fafc;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .delivery-btn.active {
+      border-color: var(--orange-btn);
+      background: var(--orange-bg);
+      color: var(--orange-btn);
+    }
+    .delivery-btn-title { font-size: 12px; font-weight: 800; margin-bottom: 3px; }
+    .delivery-btn-sub { font-size: 10px; opacity: 0.8; }
+
+    /* صندوق الشروط والقوانين */
+    .terms-card {
+      background: #fffbe8;
+      border: 1px solid #fef08a;
+      border-radius: 12px;
+      padding: 12px;
+      margin: 15px 0;
+      font-size: 11px;
+      color: #713f12;
+    }
+    .terms-card h5 { font-size: 12px; font-weight: 800; margin-bottom: 6px; color: #854d0e; }
+    .terms-card ul { padding-right: 15px; margin-bottom: 8px; }
+    .terms-card li { margin-bottom: 4px; line-height: 1.4; }
+
     .checkout-wa-btn {
       width: 100%; background: #25d366; color: white; border: none;
       padding: 12px; border-radius: 12px; font-weight: bold; font-size: 14px;
@@ -255,13 +296,13 @@
       </button>
     </header>
 
-    <!-- سلايدر العروض والنقط -->
+    <!-- سلايدر العروض -->
     <div class="slider-wrapper">
       <div class="slider-container" id="offerSlider"></div>
       <div class="slider-dots" id="sliderDots"></div>
     </div>
 
-    <!-- قسم الأكثر مبيعاً (التريند) -->
+    <!-- الأكثر مبيعاً -->
     <div class="section-divider">
       <div class="line"></div>
       <div class="dot"></div>
@@ -272,7 +313,7 @@
 
     <div class="trending-scroll-container" id="trendingContainer"></div>
 
-    <!-- البحث العام في المتجر -->
+    <!-- البحث العام -->
     <div class="search-box">
       <div class="search-input-inner">
         <span class="search-icon">🔍</span>
@@ -280,7 +321,7 @@
       </div>
     </div>
 
-    <!-- فاصل الأقسام -->
+    <!-- الأقسام -->
     <div class="section-divider">
       <div class="line"></div>
       <div class="dot"></div>
@@ -331,7 +372,34 @@
           <div style="font-weight:bold;">🛒 سلة المشتريات</div>
           <button class="close-modal-btn" onclick="toggleCartModal(false)">✕</button>
         </div>
+        
         <div id="cartItemsList"></div>
+
+        <!-- اختيار طريقة الاستلام -->
+        <div class="delivery-options" id="deliveryOptionBox" style="display: none;">
+          <div class="delivery-title">طريقة الاستلام:</div>
+          <div class="delivery-grid">
+            <div class="delivery-btn active" id="btnPickup" onclick="selectDeliveryType('pickup')">
+              <div class="delivery-btn-title">🏪 تحضير في المحل</div>
+              <div class="delivery-btn-sub">توفيراً لوقتك (دفع عربون والباقي كاش/انستا عند الاستلام)</div>
+            </div>
+            <div class="delivery-btn" id="btnDelivery" onclick="selectDeliveryType('delivery')">
+              <div class="delivery-btn-title">🚚 توصيل طلبات</div>
+              <div class="delivery-btn-sub">انتظر التواصل معك لأخذ التفاصيل وإبلاغك بالموعد</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- تحذير وتنبيه شروط وقوانين الطلب -->
+        <div class="terms-card" id="termsBox" style="display: none;">
+          <h5>⚠️ شروط وأحكام طلب الأوردر:</h5>
+          <ul>
+            <li>في حالة التحضير بالمحل: يتم دفع عربون تأكيد جدية عبر إنستا باي/فودافون كاش لجهوزية الطلب قبل وصولك.</li>
+            <li>في حالة التوصيل: سيتم التواصل معك هاتفياً أو عبر الواتساب لتأكيد العنوان وتكلفة التوصيل.</li>
+            <li>يرجى مراجعة تفاصيل طلبك جيداً من أعلى الشاشة قبل إتمام الإرسال.</li>
+          </ul>
+        </div>
+
         <div style="margin-top: 15px;">
           <div style="font-weight: bold;" id="cartTotalText">الإجمالي: 0 جنيه</div>
           <a href="#" class="checkout-wa-btn" onclick="checkoutWhatsApp(event)">إرسال الطلب عبر الواتساب ←</a>
@@ -365,21 +433,29 @@
 
     let cart = [];
     let currentSlideIndex = 0;
+    let selectedDeliveryType = 'pickup'; // الافتراضي: تحضير بالمحل
 
     function toggleCartModal(show) {
       document.getElementById("cartModalOverlay").classList.toggle("active", show);
       if (show) renderCartItems();
     }
 
+    /* تعديل وظيفة الإضافة للسلة للتنبيه في حالة وجود المنتج مسبقاً */
     function addToCart(product) {
       const existing = cart.find(item => item.id === product.id);
       if (existing) {
-        existing.qty += 1;
+        alert(`⚠️ هذا المنتج ("${product.name}") موجود بالفعل في السلة!\n\nيمكنك تعديل الكمية أو مراجعة الطلبية من أيقونة السلة بأعلى يسار الشاشة قبل الإرسال.`);
       } else {
         cart.push({ ...product, qty: 1 });
+        updateCartBadge();
+        alert(`تمت إضافة "${product.name}" إلى السلة بنجاح!`);
       }
-      updateCartBadge();
-      alert(`تمت إضافة "${product.name}" إلى السلة!`);
+    }
+
+    function selectDeliveryType(type) {
+      selectedDeliveryType = type;
+      document.getElementById("btnPickup").classList.toggle("active", type === 'pickup');
+      document.getElementById("btnDelivery").classList.toggle("active", type === 'delivery');
     }
 
     function updateQuantity(index, delta) {
@@ -403,12 +479,19 @@
     function renderCartItems() {
       const container = document.getElementById("cartItemsList");
       const totalText = document.getElementById("cartTotalText");
+      const deliveryBox = document.getElementById("deliveryOptionBox");
+      const termsBox = document.getElementById("termsBox");
 
       if (cart.length === 0) {
         container.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8;">السلة فارغة حالياً</div>`;
         totalText.innerText = "الإجمالي: 0 جنيه";
+        deliveryBox.style.display = "none";
+        termsBox.style.display = "none";
         return;
       }
+
+      deliveryBox.style.display = "block";
+      termsBox.style.display = "block";
 
       let html = "";
       let total = 0;
@@ -436,13 +519,24 @@
     function checkoutWhatsApp(e) {
       e.preventDefault();
       if (cart.length === 0) return alert("السلة فارغة!");
-      let msg = "مرحباً كرستال الزنقة، أريد طلب المنتجات التالية:\n\n";
+
+      let deliveryText = selectedDeliveryType === 'pickup' 
+        ? "🏪 تحضير في المحل (توفيراً للوقت - دفع عربون وتسليم باقي المبلغ بالمحل كاش/إنستا)"
+        : "🚚 توصيل طلبات (في انتظار الرد وتأكيد التفاصيل)";
+
+      let msg = "مرحباً كرستال الزنقة، أريد تأكيد الطلب التالي:\n\n";
+      msg += `📌 **طريقة الاستلام المطلوبة:**\n${deliveryText}\n\n`;
+      msg += `📦 **المنتجات المطلوب تحضيرها:**\n`;
+
       let total = 0;
       cart.forEach((item, idx) => {
         msg += `${idx + 1}. ${item.name} | العدد: ${item.qty} | السعر: ${item.price * item.qty} ج.م\n`;
         total += item.price * item.qty;
       });
-      msg += `\nالإجمالي الكلي: ${total} جنيه`;
+
+      msg += `\n💰 **الإجمالي الكلي:** ${total} جنيه`;
+      msg += `\n\n(تمت الموافقة على شروط وقوانين الطلب الرسمية)`;
+
       window.open(`https://wa.me/201227492921?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
@@ -461,7 +555,6 @@
     }
 
     function openCategoryPage(catId, catName) {
-      // توجيه مستقبلي لصفحة القسم متضمنة شريط البحث الخاص بالقسم
       console.log(`فتح قسم: ${catName} (ID: ${catId})`);
     }
 
@@ -508,7 +601,6 @@
       });
     }
 
-    /* إصلاح حركة سلايدر العروض التلقائي للغة العربية (RTL) */
     function startAutoSlider() {
       const slider = document.getElementById("offerSlider");
       const slides = slider.querySelectorAll(".slide");
@@ -527,10 +619,8 @@
       }, 3500);
     }
 
-    // البحث الشامل
     document.getElementById("searchInput").addEventListener("input", function(e) {
       const query = e.target.value.toLowerCase().trim();
-      
       const filteredCats = initialCategories.filter(c => c.name.toLowerCase().includes(query));
       displayCategories(filteredCats);
 
