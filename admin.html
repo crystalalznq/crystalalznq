@@ -15,6 +15,7 @@
             --white: #ffffff;
             --danger: #ef4444;
             --success: #10b981;
+            --border-color: #e5e7eb;
         }
 
         * {
@@ -35,7 +36,7 @@
         aside {
             width: 260px;
             background-color: var(--white);
-            border-left: 1px solid #e5e7eb;
+            border-left: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             position: fixed;
@@ -46,7 +47,7 @@
         .sidebar-header {
             padding: 20px;
             text-align: center;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .sidebar-header h2 {
@@ -132,7 +133,7 @@
             font-weight: 700;
         }
 
-        /* Forms & Tables Sections */
+        /* Cards & Sections */
         .card {
             background: var(--white);
             border-radius: 12px;
@@ -202,18 +203,13 @@
         th, td {
             padding: 12px 15px;
             text-align: right;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid var(--border-color);
             font-size: 0.9rem;
         }
 
         th {
             background-color: var(--secondary-color);
             color: var(--primary-color);
-        }
-
-        .actions-btns {
-            display: flex;
-            gap: 8px;
         }
 
         @media (max-width: 768px) {
@@ -239,8 +235,9 @@
         <ul class="sidebar-menu">
             <li class="active"><a href="#dashboard"><i class="fa-solid fa-chart-line"></i><span>الرئيسية</span></a></li>
             <li><a href="#products"><i class="fa-solid fa-box-archive"></i><span>إدارة المنتجات</span></a></li>
-            <li><a href="#categories"><i class="fa-solid fa-tags"></i><span>الأقسام</span></a></li>
-            <li><a href="#orders"><i class="fa-solid fa-shopping-cart"></i><span>الطلبات</span></a></li>
+            <li><a href="#categories"><i class="fa-solid fa-tags"></i><span>الأقسام والتصنيفات</span></a></li>
+            <li><a href="#trending"><i class="fa-solid fa-fire"></i><span>المنتجات الأكثر مبيعاً</span></a></li>
+            <li><a href="#social"><i class="fa-solid fa-share-nodes"></i><span>روابط التواصل</span></a></li>
             <li><a href="../index.html" target="_blank"><i class="fa-solid fa-globe"></i><span>عرض المتجر</span></a></li>
         </ul>
     </aside>
@@ -248,11 +245,11 @@
     <!-- محتوى لوحة التحكم -->
     <main>
         <header>
-            <h1>لوحة الإدارة والتحكم</h1>
-            <p>مرحباً بك، مدير المتجر</p>
+            <h1>لوحة إدارة المتجر</h1>
+            <p>مرحباً بك، مدير متجر كرستال الزنقة</p>
         </header>
 
-        <!-- الإحصائيات السريعة -->
+        <!-- الإحصائيات -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon"><i class="fa-solid fa-box"></i></div>
@@ -262,21 +259,21 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+                <div class="stat-icon"><i class="fa-solid fa-tags"></i></div>
                 <div class="stat-info">
-                    <h3>الطلبات الواردة</h3>
-                    <p id="total-orders-count">0</p>
+                    <h3>الأقسام المتاحة</h3>
+                    <p id="total-categories-count">0</p>
                 </div>
             </div>
         </div>
 
-        <!-- إضافة منتج جديد -->
+        <!-- إدارة المنتجات -->
         <div class="card" id="products">
-            <h3>إضافة منتج جديد</h3>
+            <h3>إضافة منتج جديد للمتجر</h3>
             <form id="add-product-form">
                 <div class="form-group">
                     <label>اسم المنتج</label>
-                    <input type="text" id="prod-name" class="form-control" required placeholder="مثال: عقد خرز يدوي">
+                    <input type="text" id="prod-name" class="form-control" required placeholder="مثال: سبحة كريستال مصنوعة يدبقاً">
                 </div>
                 <div class="form-group">
                     <label>السعر (ج.م)</label>
@@ -284,22 +281,22 @@
                 </div>
                 <div class="form-group">
                     <label>رابط الصورة</label>
-                    <input type="url" id="prod-image" class="form-control" required placeholder="https://example.com/image.jpg">
+                    <input type="url" id="prod-image" class="form-control" required placeholder="رابط صورة المنتج">
                 </div>
                 <div class="form-group">
                     <label>القسم</label>
                     <select id="prod-category" class="form-control">
                         <option value="accessories">إكسسوارات</option>
-                        <option value="crafts">هدايا وحرف</option>
+                        <option value="crafts">مشغولات يدوية</option>
                     </select>
                 </div>
-                <button type="submit" class="btn">حفظ وإضافة المنتج</button>
+                <button type="submit" class="btn">حفظ المنتج</button>
             </form>
         </div>
 
         <!-- قائمة المنتجات الحالية -->
         <div class="card">
-            <h3>المنتجات الحالية في المتجر</h3>
+            <h3>قائمة المنتجات الحالية</h3>
             <table>
                 <thead>
                     <tr>
@@ -311,16 +308,27 @@
                     </tr>
                 </thead>
                 <tbody id="admin-products-list">
-                    <!-- يتم جلب البيانات برمجياً هنا -->
+                    <!-- يتم تعبئتها ديناميكياً -->
                 </tbody>
             </table>
+        </div>
+
+        <!-- إدارة الأقسام -->
+        <div class="card" id="categories">
+            <h3>إدارة أقسام المتجر</h3>
+            <form id="add-category-form">
+                <div class="form-group">
+                    <label>اسم القسم الجديد</label>
+                    <input type="text" id="cat-name" class="form-control" required placeholder="مثال: هدايا وميداليات">
+                </div>
+                <button type="submit" class="btn">إضافة قسم</button>
+            </form>
         </div>
     </main>
 
     <script>
-        // الكود البرمجى لإدارة المنتجات وحفظها محلياً لترتبط بالمتجر
         document.addEventListener('DOMContentLoaded', () => {
-            loadAdminProducts();
+            loadAdminData();
 
             const productForm = document.getElementById('add-product-form');
             productForm.addEventListener('submit', (e) => {
@@ -345,17 +353,21 @@
                 localStorage.setItem('store_products', JSON.stringify(products));
 
                 productForm.reset();
-                loadAdminProducts();
-                alert('تم إضافة المنتج بنجاح!');
+                loadAdminData();
+                alert('تم حفظ المنتج وتحديث المتجر بنجاح!');
             });
         });
 
-        function loadAdminProducts() {
+        function loadAdminData() {
             const tableBody = document.getElementById('admin-products-list');
             const countDisplay = document.getElementById('total-products-count');
+            const catCountDisplay = document.getElementById('total-categories-count');
+            
             let products = JSON.parse(localStorage.getItem('store_products')) || [];
+            let categories = JSON.parse(localStorage.getItem('store_categories')) || ['accessories', 'crafts'];
             
             countDisplay.textContent = products.length;
+            catCountDisplay.textContent = categories.length;
             tableBody.innerHTML = '';
 
             if (products.length === 0) {
@@ -363,7 +375,7 @@
                 return;
             }
 
-            products.forEach((prod, index) => {
+            products.forEach((prod) => {
                 tableBody.innerHTML += `
                     <tr>
                         <td><img src="${prod.image}" alt="${prod.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;"></td>
@@ -382,7 +394,7 @@
             let products = JSON.parse(localStorage.getItem('store_products')) || [];
             products = products.filter(p => p.id !== id);
             localStorage.setItem('store_products', JSON.stringify(products));
-            loadAdminProducts();
+            loadAdminData();
         }
     </script>
 </body>
