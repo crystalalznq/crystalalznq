@@ -508,15 +508,17 @@ tag: "🎁 خصومات هذا الأسبوع",
 title: "خصم 15%",
 subtitle: "على جميع تشكيلات السلاسل",
 img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg",
+targetType: "category",
 endTime: new Date().getTime() + (48 * 3600 * 1000)
 },
 {
 id: "off2",
-tag: "🔥 عرض خاص جداً",
-title: "خصم 20%",
-subtitle: "على أطقم الخرز المميزة",
+tag: "🔥 عرض عام لكل المحل",
+title: "خصم الشحن المجاني",
+subtitle: "متاح على جميع طلبات اليوم",
 img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp",
-endTime: new Date().getTime() + (24 * 3600 * 1000)
+targetType: "general"
+// بدون endTime ليبقى العرض مستمراً دائماً
 }
 ];
 
@@ -704,7 +706,7 @@ slider.innerHTML = "";
 dotsContainer.innerHTML = "";
 
 const currentTime = new Date().getTime();
-const activeOffers = offersData.filter(offer => offer.endTime > currentTime);
+const activeOffers = offersData.filter(offer => !offer.endTime || offer.endTime > currentTime);
 
 if (activeOffers.length === 0) {
 slider.innerHTML = '<div class="slide" style="justify-content:center; text-align:center;"><div class="slide-title" style="font-size:14px; color:#64748b;">لا توجد عروض نشطة حالياً.. تابعينا قريباً! ✨</div></div>';
@@ -712,14 +714,19 @@ return;
 }
 
 activeOffers.forEach((offer, idx) => {
+let actionButtonHtml = '';
+if (offer.targetType !== 'general') {
+actionButtonHtml = `<button class="slide-action-btn" onclick="handleOfferAction('${offer.title}')">تصفح العرض 👈</button>`;
+}
+
 slider.innerHTML += `
 <div class="slide" id="slide-${offer.id}">
 <div class="slide-content">
 <span class="badge-discount">${offer.tag}</span>
 <div class="slide-title">${offer.title}</div>
 <div class="slide-sub">${offer.subtitle}</div>
-<div class="countdown-timer" id="timer-${offer.id}">جاري حساب الوقت...</div>
-<button class="slide-action-btn" onclick="handleOfferAction('${offer.title}')">تصفح العرض 👈</button>
+<div class="countdown-timer" id="timer-${offer.id}">${offer.endTime ? 'جاري حساب الوقت...' : '📢 عرض مستمر'}</div>
+${actionButtonHtml}
 </div>
 ${offer.img ? `<img src="${offer.img}" alt="${offer.title}" class="slide-img" onerror="this.style.display='none'">` : ''}
 </div>`;
@@ -736,9 +743,13 @@ const currentTime = new Date().getTime();
 let needsRerender = false;
 
 offersData.forEach(offer => {
-const distance = offer.endTime - currentTime;
 const timerEl = document.getElementById(`timer-${offer.id}`);
 if (timerEl) {
+if (!offer.endTime) {
+timerEl.innerHTML = "📢 عرض مستمر";
+return;
+}
+const distance = offer.endTime - currentTime;
 if (distance < 0) {
 timerEl.innerHTML = "⏳ منتهي";
 needsRerender = true;
