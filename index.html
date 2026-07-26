@@ -80,7 +80,7 @@ scroll-snap-type: x mandatory;
 scroll-behavior: smooth;
 border-radius: 16px;
 scrollbar-width: none;
-direction: ltr; /* الحل الاحترافي لثبات الحركة على جميع المتصفحات */
+direction: ltr;
 }
 .slider-container::-webkit-scrollbar { display: none; }
 .slide {
@@ -97,7 +97,7 @@ gap: 12px;
 box-sizing: border-box;
 border: 1px solid #fed7aa;
 position: relative;
-direction: rtl; /* إعادة الاتجاه للداخل ليظهر النص العربي بالشكل الصحيح */
+direction: rtl;
 }
 .slide-content {
 flex: 1;
@@ -509,7 +509,8 @@ tag: "🎁 خصومات هذا الأسبوع",
 title: "خصم 15%",
 subtitle: "على جميع تشكيلات السلاسل",
 img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg",
-targetType: "category",
+targetType: "category", // نوع الهدف: قسم
+targetId: "2",       // معرف القسم (قسم السلاسل هنا ID بتاعها 2)
 endTime: new Date().getTime() + (48 * 3600 * 1000)
 },
 {
@@ -666,7 +667,7 @@ totalText.innerText = `💰 الإجمالي الكلي: ${total} جنيه`;
 function checkoutWhatsApp() {
 const custName = document.getElementById("custName").value.trim();
 let deliveryText = selectedDeliveryType === 'pickup'
-? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلاستلام ✨)"
+? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلام ✨)"
 : "🚚 توصيل للمنزل (في انتظار التواصل لتأكيد العنوان والتفاصيل 🛵)";
 let msg = "أهلاً وسهلاً كرستال الزنقة! 🌸✨\n";
 msg += "حابب/حاببة أؤكد الطلب الجميل ده معكم: 👇\n\n";
@@ -752,7 +753,7 @@ let actionButtonHtml = '';
 if (offer.targetType && offer.targetType !== 'general') {
     actionButtonHtml = `
         <button class="slide-action-btn"
-            onclick="handleOfferAction('${offer.title}')">
+            onclick="handleOfferAction('${offer.targetType}', '${offer.targetId}', '${offer.title}')">
             تصفح العرض 👈
         </button>`;
 }
@@ -782,8 +783,20 @@ slider.scrollTo({ left: currentSlideIndex * slideWidth, behavior: 'smooth' });
 updateDotsActiveState();
 }
 
-function handleOfferAction(offerTitle) {
-alert(`🌸 مرحباً بكِ في عرضنا المميز: (${offerTitle})\n\n💡 تفضلي بزيارة الأقسام لاختيار المنتجات والاستمتاع بالخصم مباشرة! ✨`);
+// تعديل الدالة لتقوم بفتح القسم أو المنتج المطلوب بدلاً من إظهار تنبيه فقط
+function handleOfferAction(targetType, targetId, offerTitle) {
+if (targetType === 'category') {
+// البحث عن القسم بالـ ID المرفق
+const targetCat = initialCategories.find(c => c.id === targetId);
+if (targetCat) {
+openCategoryPage(targetCat.id, targetCat.name);
+} else {
+alert(`عذراً، القسم الخاص بعرض "${offerTitle}" غير متوفر حالياً.`);
+}
+} else if (targetType === 'product') {
+// لو العرض مرتبط بمنتج محدد، ممكن تظهر تنبيه أو تضيفه أو تظهره (لو عندك صفحة منتج مستقلة)
+alert(`🌸 جاري عرض تفاصيل المنتج المرتبط بـ: (${offerTitle})`);
+}
 }
 
 function updateCountdowns() {
