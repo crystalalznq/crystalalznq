@@ -502,6 +502,20 @@ const defaultCategories = [
 { id: "3", name: "اللولي", img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
 ];
 
+const defaultCatProducts = [
+{ id: "p1", categoryId: "1", name: "خرز كرستال ملون", price: 40, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
+{ id: "p2", categoryId: "1", name: "خرز تفسيرة تركي", price: 35, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
+{ id: "p3", categoryId: "2", name: "سلسلة ستانلس ثقيلة", price: 75, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
+{ id: "p4", categoryId: "2", name: "سلسلة فضي بناتي", price: 55, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
+{ id: "p5", categoryId: "3", name: "لولي زجاجي فاخر", price: 45, img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
+];
+
+const defaultTrending = [
+{ id: "t1", name: "خرز كرستال شفاف 8 مل", price: 45, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
+{ id: "t2", name: "سلسلة مطلي جولد ناعم", price: 65, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
+{ id: "t3", name: "لولي طبيعي مقاس 6", price: 50, img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
+];
+
 const defaultOffers = [
 {
 id: "off1",
@@ -510,7 +524,7 @@ title: "خصم 15%",
 subtitle: "على سلسلة ستانلس ثقيلة",
 img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg",
 targetType: "product",
-targetId: "p3",
+targetId: "p3", // مرتبط بالـ id الخاص بـ "سلسلة ستانلس ثقيلة"
 endTime: new Date().getTime() + (48 * 3600 * 1000)
 },
 {
@@ -523,24 +537,26 @@ targetType: "general"
 }
 ];
 
-const defaultTrending = [
-{ id: "t1", name: "خرز كرستال شفاف 8 مل", price: 45, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
-{ id: "t2", name: "سلسلة مطلي جولد ناعم", price: 65, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
-{ id: "t3", name: "لولي طبيعي مقاس 6", price: 50, img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
-];
+// دالة لتوليد ID تلقائي لمنع أي خطأ بشري أو فقدان المعرّف
+function generateUniqueId(prefix = "p") {
+    return prefix + "_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+}
 
-const defaultCatProducts = [
-{ id: "p1", categoryId: "1", name: "خرز كرستال ملون", price: 40, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
-{ id: "p2", categoryId: "1", name: "خرز تفسيرة تركي", price: 35, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
-{ id: "p3", categoryId: "2", name: "سلسلة ستانلس ثقيلة", price: 75, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
-{ id: "p4", categoryId: "2", name: "سلسلة فضي بناتي", price: 55, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
-{ id: "p5", categoryId: "3", name: "لولي زجاجي فاخر", price: 45, img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
-];
-
+// التأكد من أن المنتجات تحتوي على IDs صالحة ودعم التوليد التلقائي عند الحفظ
 let initialCategories = JSON.parse(localStorage.getItem('crystal_categories')) || defaultCategories;
-let offersData = JSON.parse(localStorage.getItem('crystal_offers')) || defaultOffers;
-let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || defaultTrending;
 let catProductsData = JSON.parse(localStorage.getItem('crystal_cat_products')) || defaultCatProducts;
+
+// فحص وتصحيح المنتجات لو وُجد منتج بدون ID
+catProductsData.forEach(p => {
+    if (!p.id) p.id = generateUniqueId("p");
+});
+
+let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || defaultTrending;
+trendingData.forEach(t => {
+    if (!t.id) t.id = generateUniqueId("t");
+});
+
+let offersData = JSON.parse(localStorage.getItem('crystal_offers')) || defaultOffers;
 let cart = [];
 let selectedDeliveryType = 'pickup';
 let sliderInterval = null;
@@ -782,7 +798,7 @@ slider.scrollTo({ left: currentSlideIndex * slideWidth, behavior: 'smooth' });
 updateDotsActiveState();
 }
 
-// دالة التوجيه الاحترافية للمنتج وتحديد الإطار البرتقالي
+// الدالة الآمنة للتعامل مع العروض وربطها بالمنتجات مع التنبيه أو المعالجة الذكية لو الـ ID مش موجود
 function handleOfferAction(targetType, targetId) {
     if (targetType === "category") {
         const cat = initialCategories.find(c => c.id === targetId);
@@ -791,7 +807,12 @@ function handleOfferAction(targetType, targetId) {
         }
     } else if (targetType === "product") {
         const product = catProductsData.find(p => p.id === targetId);
-        if (!product) return;
+        
+        // حماية تامة ضد عدم وجود المنتج المرتبط
+        if (!product) {
+            alert("عذراً، هذا المنتج غير متوفر حالياً أو تم تعديل معرّفه 🌸");
+            return;
+        }
 
         openCategoryPage(product.categoryId,
             initialCategories.find(c => c.id === product.categoryId)?.name || "");
