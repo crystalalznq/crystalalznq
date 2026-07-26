@@ -542,6 +542,8 @@ let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || defau
 let catProductsData = JSON.parse(localStorage.getItem('crystal_cat_products')) || defaultCatProducts;
 let cart = [];
 let selectedDeliveryType = 'pickup';
+let sliderInterval = null;
+let currentSlideIndex = 0;
 
 window.onload = function() {
 displayCategories(initialCategories);
@@ -549,7 +551,31 @@ renderTrending(trendingData);
 renderSlider();
 updateCartBadge();
 setInterval(updateCountdowns, 1000);
+startAutoSlider();
 };
+
+function startAutoSlider() {
+if (sliderInterval) clearInterval(sliderInterval);
+sliderInterval = setInterval(() => {
+const slider = document.getElementById("offerSlider");
+const dots = document.querySelectorAll(".dot-indicator");
+const activeOffers = offersData.filter(offer => !offer.endTime || offer.endTime > new Date().getTime());
+
+if (activeOffers.length <= 1) return;
+
+currentSlideIndex = (currentSlideIndex + 1) % activeOffers.length;
+const slideWidth = slider.clientWidth;
+slider.scrollTo({ left: currentSlideIndex * slideWidth, behavior: 'smooth' });
+
+dots.forEach((dot, idx) => {
+dot.classList.toggle("active", idx === currentSlideIndex);
+});
+}, 4000);
+}
+
+function stopAutoSlider() {
+if (sliderInterval) clearInterval(sliderInterval);
+}
 
 function toggleCartModal(show) {
 document.getElementById("cartModalOverlay").classList.toggle("active", show);
@@ -637,7 +663,7 @@ totalText.innerText = `💰 الإجمالي الكلي: ${total} جنيه`;
 function checkoutWhatsApp() {
 const custName = document.getElementById("custName").value.trim();
 let deliveryText = selectedDeliveryType === 'pickup'
-? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلاستلام ✨)"
+? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلام ✨)"
 : "🚚 توصيل للمنزل (في انتظار التواصل لتأكيد العنوان والتفاصيل 🛵)";
 let msg = "أهلاً وسهلاً كرستال الزنقة! 🌸✨\n";
 msg += "حابب/حاببة أؤكد الطلب الجميل ده معكم: 👇\n\n";
@@ -712,6 +738,9 @@ if (activeOffers.length === 0) {
 slider.innerHTML = '<div class="slide" style="justify-content:center; text-align:center;"><div class="slide-title" style="font-size:14px; color:#64748b;">لا توجد عروض نشطة حالياً.. تابعينا قريباً! ✨</div></div>';
 return;
 }
+
+slider.onmouseenter = stopAutoSlider;
+slider.onmouseleave = startAutoSlider;
 
 activeOffers.forEach((offer, idx) => {
 let actionButtonHtml = '';
