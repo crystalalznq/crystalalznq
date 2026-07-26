@@ -46,7 +46,6 @@
     .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
     .form-group label { font-size: 12px; font-weight: bold; color: #334155; }
     .form-group input { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; background: #fff; }
-    .form-group input[type="file"] { padding: 6px; cursor: pointer; }
 
     .action-btn { background: var(--primary-blue); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
     
@@ -65,7 +64,7 @@
   <div class="admin-container">
     <div class="admin-header">
       <h2>🛠️ لوحة الإدارة والتحكم</h2>
-      <p>إدارة المنتجات والأقسام ورفع الصور مباشرة</p>
+      <p>أدخل أي رابط صورة تريده مباشرة وبحرية تامّة</p>
     </div>
 
     <div class="admin-tabs">
@@ -80,7 +79,7 @@
       <div class="admin-card">
         <div class="admin-card-title">➕ إضافة قسم جديد</div>
         <div class="form-group"><label>اسم القسم:</label><input type="text" id="newCatName" placeholder="مثال: أطواق هاند ميد"></div>
-        <div class="form-group"><label>اختر صورة القسم:</label><input type="file" id="newCatImgFile" accept="image/*"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newCatImgUrl" placeholder="الصق أي رابط صورة هنا مباشرة"></div>
         <button class="action-btn" onclick="addNewCategory()">إضافة القسم</button>
       </div>
       <div class="admin-card">
@@ -95,7 +94,7 @@
         <div class="admin-card-title">➕ إضافة منتج للأكثر مبيعاً</div>
         <div class="form-group"><label>اسم المنتج:</label><input type="text" id="newTrendName" placeholder="مثال: لولي أبيض"></div>
         <div class="form-group"><label>السعر (جنيه):</label><input type="number" id="newTrendPrice" placeholder="50"></div>
-        <div class="form-group"><label>اختر صورة المنتج:</label><input type="file" id="newTrendImgFile" accept="image/*"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newTrendImgUrl" placeholder="الصق أي رابط صورة هنا مباشرة"></div>
         <button class="action-btn" onclick="addNewTrending()">إضافة المنتج</button>
       </div>
       <div class="admin-card">
@@ -111,7 +110,7 @@
         <div class="form-group"><label>شارة العرض:</label><input type="text" id="newOfferTag" placeholder="مثال: خصم خاص"></div>
         <div class="form-group"><label>عنوان العرض:</label><input type="text" id="newOfferTitle" placeholder="مثال: خصم 15%"></div>
         <div class="form-group"><label>الوصف:</label><input type="text" id="newOfferSub" placeholder="مثال: على السلاسل"></div>
-        <div class="form-group"><label>اختر صورة العرض:</label><input type="file" id="newOfferImgFile" accept="image/*"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق أي رابط صورة هنا مباشرة"></div>
         <button class="action-btn" onclick="addNewOffer()">إضافة العرض</button>
       </div>
       <div class="admin-card">
@@ -148,17 +147,6 @@
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       event.target.classList.add('active');
       document.getElementById(tabId).classList.add('active');
-    }
-
-    function convertImageToBase64(fileInputId, callback) {
-      const fileInput = document.getElementById(fileInputId);
-      if (fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => callback(e.target.result);
-        reader.readAsDataURL(fileInput.files[0]);
-      } else {
-        callback(null);
-      }
     }
 
     function renderAdminLists() {
@@ -208,27 +196,25 @@
 
     function addNewCategory() {
       const name = document.getElementById('newCatName').value.trim();
+      const img = document.getElementById('newCatImgUrl').value.trim();
       if(!name) return alert('أدخل اسم القسم!');
-      convertImageToBase64('newCatImgFile', img => {
-        categoriesData.push({ id: Date.now().toString(), name, img: img || 'https://images.unsplash.com/photo-1611591485694-541dd4e7223e?w=300' });
-        saveAndSync();
-        document.getElementById('newCatName').value = '';
-        document.getElementById('newCatImgFile').value = '';
-      });
+      categoriesData.push({ id: Date.now().toString(), name, img: img || 'https://via.placeholder.com/150' });
+      saveAndSync();
+      document.getElementById('newCatName').value = '';
+      document.getElementById('newCatImgUrl').value = '';
     }
     function deleteCategory(i) { if(confirm('متأكد؟')) { categoriesData.splice(i, 1); saveAndSync(); } }
 
     function addNewTrending() {
       const name = document.getElementById('newTrendName').value.trim();
       const price = parseFloat(document.getElementById('newTrendPrice').value);
+      const img = document.getElementById('newTrendImgUrl').value.trim();
       if(!name || isNaN(price)) return alert('أدخل البيانات بشكل صحيح!');
-      convertImageToBase64('newTrendImgFile', img => {
-        trendingData.push({ id: 't' + Date.now(), name, price, img: img || 'https://images.unsplash.com/photo-1611591485694-541dd4e7223e?w=300' });
-        saveAndSync();
-        document.getElementById('newTrendName').value = '';
-        document.getElementById('newTrendPrice').value = '';
-        document.getElementById('newTrendImgFile').value = '';
-      });
+      trendingData.push({ id: 't' + Date.now(), name, price, img: img || 'https://via.placeholder.com/150' });
+      saveAndSync();
+      document.getElementById('newTrendName').value = '';
+      document.getElementById('newTrendPrice').value = '';
+      document.getElementById('newTrendImgUrl').value = '';
     }
     function deleteTrending(i) { if(confirm('متأكد؟')) { trendingData.splice(i, 1); saveAndSync(); } }
 
@@ -236,15 +222,14 @@
       const tag = document.getElementById('newOfferTag').value.trim();
       const title = document.getElementById('newOfferTitle').value.trim();
       const subtitle = document.getElementById('newOfferSub').value.trim();
+      const img = document.getElementById('newOfferImgUrl').value.trim();
       if(!tag || !title) return alert('أدخل شارة وعنوان العرض!');
-      convertImageToBase64('newOfferImgFile', img => {
-        offersData.push({ id: 'o' + Date.now(), tag, title, subtitle, img: img || 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=300' });
-        saveAndSync();
-        document.getElementById('newOfferTag').value = '';
-        document.getElementById('newOfferTitle').value = '';
-        document.getElementById('newOfferSub').value = '';
-        document.getElementById('newOfferImgFile').value = '';
-      });
+      offersData.push({ id: 'o' + Date.now(), tag, title, subtitle, img: img || 'https://via.placeholder.com/150' });
+      saveAndSync();
+      document.getElementById('newOfferTag').value = '';
+      document.getElementById('newOfferTitle').value = '';
+      document.getElementById('newOfferSub').value = '';
+      document.getElementById('newOfferImgUrl').value = '';
     }
     function deleteOffer(i) { if(confirm('متأكد؟')) { offersData.splice(i, 1); saveAndSync(); } }
 
