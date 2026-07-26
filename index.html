@@ -11,72 +11,68 @@
       --text-dark: #1e293b;
       --text-gray: #64748b;
       --border-gray: #e2e8f0;
-      --bg-app: #f8fafc;
+      --bg-app: #ffffff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background-color: #f1f5f9; color: var(--text-dark); direction: rtl; display: flex; justify-content: center; }
 
-    /* الإطار الرئيسي */
+    /* الإطار الرئيسي للتطبيق */
     .app-container {
       width: 100%;
       max-width: 480px;
       background: #ffffff;
       min-height: 100vh;
-      padding-bottom: 150px; /* مساحة كافية للشريط السفلي للسلة والنافجيشن */
+      padding-bottom: 80px;
       position: relative;
-      box-shadow: 0 0 25px rgba(0,0,0,0.08);
-      background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-      background-size: 20px 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
     }
 
-    /* 1. الهيدر العلوي - لوجو كبير + زر السلة */
+    /* 1. الهيدر العلوي */
     .header {
-      padding: 15px 20px 5px;
+      padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: transparent;
+      background: #fff;
+      border-bottom: 1px solid var(--border-gray);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .brand-banner-logo {
-      width: 100%;
-      max-width: 260px;
-      height: auto;
+      height: 40px;
+      width: auto;
       object-fit: contain;
-      display: block;
     }
 
-    /* زر السلة العلوي */
+    /* زر السلة العلوي المتناسق */
     .header-cart-btn {
-      background: #fdf2e9;
+      background: var(--orange-bg);
       border: 1px solid #fed7aa;
-      padding: 8px 12px;
-      border-radius: 12px;
+      padding: 8px 14px;
+      border-radius: 20px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       cursor: pointer;
       text-decoration: none;
       color: var(--orange-btn);
       font-weight: 800;
       font-size: 13px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
-    .header-cart-btn svg { width: 20px; height: 20px; fill: currentColor; }
+    .header-cart-btn svg { width: 18px; height: 18px; fill: currentColor; }
     .cart-badge-count {
       background: var(--orange-btn);
       color: #fff;
-      font-size: 10px;
-      padding: 1px 6px;
+      font-size: 11px;
+      padding: 2px 7px;
       border-radius: 10px;
     }
 
     /* 2. سلايدر العروض المتحرك */
-    .slider-wrapper {
-      padding: 10px 20px 5px;
-      position: relative;
-    }
+    .slider-wrapper { padding: 15px 20px 5px; }
     .slider-container {
       display: flex;
       overflow-x: auto;
@@ -90,12 +86,9 @@
     .slide {
       flex: 0 0 100%;
       scroll-snap-align: start;
-      background: #fdf2e9;
-      background-image: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
       border-radius: 16px;
-      padding: 12px 16px;
-      position: relative;
-      overflow: hidden;
+      padding: 16px;
       min-height: 110px;
       display: flex;
       flex-direction: column;
@@ -109,34 +102,13 @@
       font-weight: bold;
       padding: 2px 10px;
       border-radius: 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
       width: fit-content;
       margin-bottom: 6px;
     }
-    .slide-title { font-size: 22px; font-weight: 900; color: #1e293b; line-height: 1.1; }
-    .slide-sub { font-size: 15px; font-weight: 800; color: #334155; margin-bottom: 8px; }
-    .slide-btn {
-      background: var(--orange-btn);
-      color: #fff;
-      border: none;
-      padding: 5px 14px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: bold;
-      width: fit-content;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-    }
+    .slide-title { font-size: 20px; font-weight: 900; color: #1e293b; }
+    .slide-sub { font-size: 14px; font-weight: 700; color: #475569; margin-bottom: 8px; }
 
-    .slider-dots {
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-      margin-top: 8px;
-    }
+    .slider-dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
     .dot { width: 7px; height: 7px; border-radius: 50%; background: #cbd5e1; transition: 0.3s; }
     .dot.active { background: #0284c7; width: 9px; height: 9px; }
 
@@ -148,19 +120,11 @@
       padding: 12px 45px 12px 15px;
       border-radius: 25px;
       border: 1px solid var(--border-gray);
-      background: #ffffff;
+      background: #f8fafc;
       outline: none;
       font-size: 14px;
-      color: var(--text-dark);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
-    .search-icon {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #94a3b8;
-    }
+    .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
 
     /* 4. عنوان تصفح الأقسام */
     .section-header {
@@ -168,25 +132,13 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      margin: 15px 0 20px;
+      margin: 15px 0 15px;
       font-size: 16px;
       font-weight: 800;
       color: #0f172a;
     }
-    .dot-line { width: 60px; height: 1px; background: #cbd5e1; position: relative; }
-    .dot-line::after {
-      content: "";
-      position: absolute;
-      width: 5px;
-      height: 5px;
-      background: #0284c7;
-      border-radius: 50%;
-      top: -2px;
-    }
-    .dot-line.left::after { left: 0; }
-    .dot-line.right::after { right: 0; }
 
-    /* 5. شبكة الأقسام */
+    /* 5. شبكة الأقسام الخارجية (بدون أسعار وبدون أزرار شراء) */
     .categories-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -196,18 +148,19 @@
     .cat-item {
       background: #ffffff;
       border: 1px solid var(--border-gray);
-      border-radius: 16px;
+      border-radius: 14px;
       overflow: hidden;
       text-align: center;
       padding-bottom: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s, border-color 0.2s;
     }
+    .cat-item:hover { border-color: #cbd5e1; }
     .cat-item:active { transform: scale(0.97); }
     .cat-item img {
       width: 100%;
-      height: 90px;
+      height: 95px;
       object-fit: cover;
       background: #f1f5f9;
     }
@@ -215,171 +168,81 @@
       font-size: 13px;
       font-weight: 800;
       color: #1e293b;
-      margin-top: 6px;
-      padding: 0 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      margin-top: 8px;
     }
-    .cat-item span { font-size: 10px; color: #94a3b8; }
-    .add-to-cart-mini {
-      background: #f1f5f9;
-      color: var(--orange-btn);
-      border: none;
-      font-size: 10px;
-      font-weight: bold;
-      padding: 4px 8px;
-      border-radius: 6px;
-      margin-top: 5px;
-      cursor: pointer;
-    }
-    .add-to-cart-mini:active { background: #fed7aa; }
+    .cat-item span { font-size: 11px; color: #94a3b8; }
 
-    /* 6. كروت البيانات */
+    /* 6. كروت البيانات والمعلومات */
     .info-card {
-      margin: 15px 20px 10px;
+      margin: 15px 20px 0;
       background: #f8fafc;
       border: 1px solid var(--border-gray);
-      border-radius: 16px;
-      padding: 15px;
+      border-radius: 14px;
+      padding: 14px;
     }
-    .info-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: #0284c7;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .info-title { font-size: 13px; font-weight: 800; color: #0284c7; margin-bottom: 6px; }
     .info-text { font-size: 12px; color: #334155; line-height: 1.6; }
 
-    /* 7. شريط العروض السفلي */
-    .gift-strip {
-      margin: 15px 20px;
-      background: var(--orange-bg);
-      border-radius: 16px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .gift-info { display: flex; align-items: center; gap: 12px; }
-    .gift-icon { font-size: 28px; }
-    .gift-text-main { font-size: 13px; font-weight: 800; color: var(--orange-btn); }
-    .gift-text-sub { font-size: 11px; color: var(--text-gray); }
-    .btn-all {
-      background: var(--orange-btn);
-      color: #ffffff;
-      text-decoration: none;
-      padding: 8px 14px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    /* 8. قسم التواصل الاجتماعي */
-    .social-section {
-      padding: 20px;
-      border-top: 1px solid var(--border-gray);
-      margin-top: 15px;
-      text-align: center;
-    }
-    .social-title {
-      font-size: 14px;
-      font-weight: 800;
-      margin-bottom: 15px;
-      color: #334155;
-    }
-    .social-icons-grid {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
+    /* 7. التواصل الاجتماعي */
+    .social-section { padding: 20px; text-align: center; margin-top: 10px; }
+    .social-title { font-size: 13px; font-weight: 800; margin-bottom: 12px; color: #475569; }
+    .social-icons-grid { display: flex; justify-content: center; gap: 12px; }
     .social-icon-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      transition: transform 0.2s;
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
-    .social-icon-btn:active { transform: scale(0.92); }
-    .social-icon-btn svg { width: 26px; height: 26px; }
+    .social-icon-btn svg { width: 22px; height: 22px; }
+    .btn-fb { background: #1877f2; fill: #fff; }
+    .btn-insta { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); fill: #fff; }
+    .btn-tiktok { background: #000000; fill: #fff; }
+    .btn-wa { background: #25d366; fill: #fff; }
+    .btn-call { background: #0284c7; fill: #fff; }
 
-    .btn-fb { background: #1877f2; fill: #ffffff; }
-    .btn-tiktok { background: #000000; fill: #ffffff; }
-    .btn-insta { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); fill: #ffffff; }
-    .btn-wa { background: #25d366; fill: #ffffff; }
-    .btn-call { background: #0284c7; fill: #ffffff; }
-
-    /* شريط السلة العائم السفلي (يظهر للعميل طوال تصفحه المنتجات) */
-    .floating-cart-bar {
-      position: fixed;
-      bottom: 62px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      background: #1e293b;
-      color: #ffffff;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
-      z-index: 999;
-      border-top: 2px solid var(--orange-btn);
+    /* 8. نافذة السلة الاحترافية (Modal) */
+    .cart-modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 2000;
+      display: none; justify-content: center; align-items: flex-end;
     }
-    .cart-summary-text { font-size: 13px; font-weight: 800; }
-    .cart-summary-sub { font-size: 11px; color: #94a3b8; }
-    .checkout-btn {
-      background: var(--orange-btn);
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: none;
+    .cart-modal-overlay.active { display: flex; }
+    .cart-modal {
+      width: 100%; max-width: 480px; background: #fff;
+      border-top-left-radius: 20px; border-top-right-radius: 20px;
+      padding: 20px; max-height: 80vh; overflow-y: auto;
+      box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+    }
+    .cart-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .cart-modal-title { font-size: 16px; font-weight: 800; }
+    .close-modal-btn { background: #f1f5f9; border: none; font-size: 18px; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
+    
+    .cart-item-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border-gray);
+    }
+    .cart-item-info { font-size: 13px; font-weight: bold; }
+    .cart-item-controls { display: flex; align-items: center; gap: 8px; }
+    .qty-btn {
+      width: 26px; height: 26px; border: 1px solid var(--border-gray);
+      background: #f8fafc; border-radius: 6px; font-weight: bold; cursor: pointer;
+    }
+    .delete-item-btn { background: #fee2e2; color: #ef4444; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+    .cart-modal-footer { margin-top: 15px; text-align: center; }
+    .checkout-wa-btn {
+      width: 100%; background: #25d366; color: white; border: none;
+      padding: 12px; border-radius: 12px; font-weight: bold; font-size: 14px;
+      cursor: pointer; display: block; text-decoration: none; margin-top: 10px;
     }
 
     /* 9. شريط النافجيشن السفلي */
     .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      max-width: 480px;
-      background: #ffffff;
-      border-top: 1px solid var(--border-gray);
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      z-index: 1000;
-      box-shadow: 0 -4px 15px rgba(0,0,0,0.03);
+      position: fixed; bottom: 0; width: 100%; max-width: 480px;
+      background: #ffffff; border-top: 1px solid var(--border-gray);
+      display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000;
     }
-    .nav-link {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      font-size: 11px;
-      font-weight: 800;
-      color: #94a3b8;
-    }
+    .nav-link { display: flex; flex-direction: column; align-items: center; text-decoration: none; font-size: 11px; font-weight: 800; color: #94a3b8; }
     .nav-link.active { color: #0284c7; }
-    .nav-link svg {
-      width: 22px;
-      height: 22px;
-      fill: currentColor;
-      margin-bottom: 2px;
-    }
+    .nav-link svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 2px; }
   </style>
 </head>
 <body>
@@ -390,15 +253,15 @@
     <header class="header">
       <img src="https://raw.githubusercontent.com/crystalalznq/crystalalznq/refs/heads/main/IMG_%D9%A2%D9%A0%D9%A2%D9%A6%D9%A0%D9%A7%D9%A2%D9%A6_%D9%A0%D9%A2%D9%A4%D9%A5%D9%A3%D9%A7.png" class="brand-banner-logo" alt="كرستال الزنقة">
       
-      <!-- زر السلة العلوي -->
-      <a href="#cart" class="header-cart-btn" onclick="openCartModal()">
+      <!-- زر السلة العلوي النظيف -->
+      <button class="header-cart-btn" onclick="toggleCartModal(true)">
         <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
         <span>السلة</span>
         <span class="cart-badge-count" id="headerCartCount">0</span>
-      </a>
+      </button>
     </header>
 
-    <!-- 2. سلايدر العروض المتحرك -->
+    <!-- 2. سلايدر العروض -->
     <div class="slider-wrapper">
       <div class="slider-container" id="offerSlider"></div>
       <div class="slider-dots" id="sliderDots"></div>
@@ -408,21 +271,19 @@
     <div class="search-box">
       <div class="search-input-inner">
         <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="ابحث عن قسم أو منتج...">
+        <input type="text" id="searchInput" placeholder="ابحث عن قسم...">
       </div>
     </div>
 
     <!-- 4. عنوان الأقسام -->
     <div class="section-header">
-      <div class="dot-line right"></div>
-      <span>تصفح الأقسام</span>
-      <div class="dot-line left"></div>
+      <span>تصفح الأقسام الرئيسية</span>
     </div>
 
-    <!-- 5. شبكة الأقسام -->
+    <!-- 5. شبكة الأقسام (أقسام خارجية فقط بدون أسعار) -->
     <div class="categories-grid" id="categoriesGrid"></div>
 
-    <!-- 6. كروت معلومات العنوان والمواعيد -->
+    <!-- 6. معلومات العنوان والمواعيد -->
     <div class="info-card">
       <div class="info-title">📍 عنوان المحل</div>
       <div class="info-text">34 سوق العقادين أمام المسجد الأرضي مباشرة متفرع من شارع فرنسا المنشية - الإسكندرية</div>
@@ -432,52 +293,37 @@
       <div class="info-title">🕒 مواعيد العمل</div>
       <div class="info-text">
         • <strong>السبت ← الخميس:</strong> 11:00 صباحًا - 11:00 مساءً<br>
-        • <strong>الجمعة:</strong> بعد الصلاة - 11:00 مساءً<br>
-        • <strong>الأحد:</strong> إجازة رسمية
+        • <strong>الجمعة:</strong> بعد الصلاة - 11:00 مساءً | <strong>الأحد:</strong> إجازة
       </div>
     </div>
 
-    <!-- 7. شريط العروض السفلي -->
-    <div class="gift-strip">
-      <div class="gift-info">
-        <span class="gift-icon">🎁</span>
-        <div>
-          <div class="gift-text-main">عروض جديدة كل أسبوع 👏</div>
-          <div class="gift-text-sub">تابعنا لتكون أول من يعرف</div>
+    <!-- 7. التواصل الاجتماعي -->
+    <div class="social-section">
+      <div class="social-title">🌐 تابعنا عبر المنصات</div>
+      <div class="social-icons-grid">
+        <a href="https://www.facebook.com/share/1BZZYrJoG8/" target="_blank" class="social-icon-btn btn-fb"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+        <a href="https://www.instagram.com/crystal_alzan2a?igsh=cDVycXhvNmZxaTY4" target="_blank" class="social-icon-btn btn-insta"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+        <a href="https://www.tiktok.com/@sayedyoussif5" target="_blank" class="social-icon-btn btn-tiktok"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.82.56-1.36 1.53-1.34 2.53.01.82.4 1.62 1.07 2.11.75.56 1.73.73 2.63.49.96-.24 1.79-.98 2.06-1.93.18-.56.23-1.15.22-1.74.02-4.96.01-9.93.01-14.9z"/></svg></a>
+        <a href="https://wa.me/201227492921" target="_blank" class="social-icon-btn btn-wa"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+        <a href="tel:01227492921" class="social-icon-btn btn-call"><svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></a>
+      </div>
+    </div>
+
+    <!-- 8. النافذة المنبثقة للسلة (Modal) -->
+    <div class="cart-modal-overlay" id="cartModalOverlay">
+      <div class="cart-modal">
+        <div class="cart-modal-header">
+          <div class="cart-modal-title">🛒 سلة المشتريات</div>
+          <button class="close-modal-btn" onclick="toggleCartModal(false)">✕</button>
+        </div>
+        <div id="cartItemsList">
+          <!-- المنتجات بتنزل هنا بتنسيق نظيف -->
+        </div>
+        <div class="cart-modal-footer">
+          <div style="font-weight: bold; font-size: 14px;" id="cartTotalText">الإجمالي: 0 جنيه</div>
+          <a href="#" class="checkout-wa-btn" onclick="checkoutWhatsApp(event)">إرسال الطلب عبر الواتساب ←</a>
         </div>
       </div>
-      <a href="https://wa.me/201227492921" class="btn-all">عرض الكل ←</a>
-    </div>
-
-    <!-- 8. قسم التواصل الاجتماعي -->
-    <div class="social-section">
-      <div class="social-title">🌐 تواصل معنا عبر المنصات</div>
-      <div class="social-icons-grid">
-        <a href="https://www.facebook.com/share/1BZZYrJoG8/" target="_blank" class="social-icon-btn btn-fb" title="فيسبوك">
-          <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-        </a>
-        <a href="https://www.instagram.com/crystal_alzan2a?igsh=cDVycXhvNmZxaTY4" target="_blank" class="social-icon-btn btn-insta" title="إنستجرام">
-          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-        </a>
-        <a href="https://www.tiktok.com/@sayedyoussif5" target="_blank" class="social-icon-btn btn-tiktok" title="تيك توك">
-          <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.82.56-1.36 1.53-1.34 2.53.01.82.4 1.62 1.07 2.11.75.56 1.73.73 2.63.49.96-.24 1.79-.98 2.06-1.93.18-.56.23-1.15.22-1.74.02-4.96.01-9.93.01-14.9z"/></svg>
-        </a>
-        <a href="https://wa.me/201227492921" target="_blank" class="social-icon-btn btn-wa" title="واتساب">
-          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        </a>
-        <a href="tel:01227492921" class="social-icon-btn btn-call" title="اتصال هاتفي">
-          <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-        </a>
-      </div>
-    </div>
-
-    <!-- شريط السلة العائم السفلي -->
-    <div class="floating-cart-bar" id="floatingCartBar">
-      <div>
-        <div class="cart-summary-text" id="cartSummaryText">السلة فارغة</div>
-        <div class="cart-summary-sub" id="cartSummarySub">أضف منتجات لرؤية المجموع</div>
-      </div>
-      <a href="#" class="checkout-btn" id="checkoutBtn" onclick="checkoutWhatsApp(event)">إرسال الطلب للواتس</a>
     </div>
 
     <!-- 9. شريط النافجيشن السفلي -->
@@ -487,7 +333,7 @@
         الرئيسية
       </a>
       <a href="#categoriesGrid" class="nav-link">
-        <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4H4v4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
         الأقسام
       </a>
       <a href="#offerSlider" class="nav-link">
@@ -499,91 +345,116 @@
   </div>
 
   <script>
-    // --- بيانات قابلة للتعديل من لوحة التحكم مستقبلاً ---
+    // --- بيانات الأقسام والعروض (جاهزة للربط مع لوحة التحكم) ---
     const offersData = [
-      {
-        tag: "% خصومات هذا الأسبوع",
-        title: "خصم 15%",
-        subtitle: "على السلاسل",
-        link: "https://wa.me/201227492921?text=استفسار%20عن%20عرض%20السلاسل",
-        btnText: "اطلب العرض الآن"
-      },
-      {
-        tag: "% عرض خاص",
-        title: "خصم 20%",
-        subtitle: "على أطقم الخرز",
-        link: "https://wa.me/201227492921?text=استفسار%20عن%20عرض%20الخرز",
-        btnText: "تسوق الآن"
-      }
+      { tag: "% خصومات هذا الأسبوع", title: "خصم 15%", subtitle: "على السلاسل", link: "https://wa.me/201227492921" },
+      { tag: "% عرض خاص", title: "خصم 20%", subtitle: "على أطقم الخرز", link: "https://wa.me/201227492921" }
     ];
 
+    // الأقسام الخارجية فقط (بدون أسعار)
     const initialCategories = [
-      { id: "1", name: "الخرز", price: 25, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
-      { id: "2", name: "السلاسل", price: 35, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
-      { id: "3", name: "اللولي", price: 20, img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" },
-      { id: "4", name: "ريزين", price: 50, img: "https://via.placeholder.com/150/e2e8f0/888888?text=ريزين" },
-      { id: "5", name: "مستلزمات شنط", price: 40, img: "https://via.placeholder.com/150/e2e8f0/888888?text=مستلزمات+شنط" },
-      { id: "6", name: "إكسسوارات", price: 30, img: "https://via.placeholder.com/150/e2e8f0/888888?text=إكسسوارات" }
+      { id: "1", name: "الخرز", img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
+      { id: "2", name: "السلاسل", img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
+      { id: "3", name: "اللولي", img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" },
+      { id: "4", name: "ريزين", img: "https://via.placeholder.com/150/e2e8f0/888888?text=ريزين" },
+      { id: "5", name: "مستلزمات شنط", img: "https://via.placeholder.com/150/e2e8f0/888888?text=مستلزمات+شنط" },
+      { id: "6", name: "إكسسوارات", img: "https://via.placeholder.com/150/e2e8f0/888888?text=إكسسوارات" }
     ];
 
-    // --- نظام السلة والمشتريات ---
+    // --- إدارة السلة الذكية ---
     let cart = [];
 
-    function addToCart(catName, catPrice) {
-      const existing = cart.find(item => item.name === catName);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push({ name: catName, price: catPrice, qty: 1 });
-      }
-      updateCartUI();
+    function toggleCartModal(show) {
+      const modal = document.getElementById("cartModalOverlay");
+      modal.classList.toggle("active", show);
+      if (show) renderCartItems();
     }
 
-    function updateCartUI() {
-      const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
-      const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
-      document.getElementById("headerCartCount").innerText = totalCount;
-      
-      const summaryText = document.getElementById("cartSummaryText");
-      const summarySub = document.getElementById("cartSummarySub");
-
-      if (totalCount > 0) {
-        summaryText.innerText = `🛒 المنتجات المطلوبة (${totalCount})`;
-        summarySub.innerText = `الإجمالي: ${totalPrice} جنيه`;
-      } else {
-        summaryText.innerText = "السلة فارغة";
-        summarySub.innerText = "أضف منتجات لرؤية المجموع";
+    function updateQuantity(index, delta) {
+      cart[index].qty += delta;
+      if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
       }
+      renderCartItems();
+      updateCartBadge();
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      renderCartItems();
+      updateCartBadge();
+    }
+
+    function updateCartBadge() {
+      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById("headerCartCount").innerText = totalQty;
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById("cartItemsList");
+      const totalText = document.getElementById("cartTotalText");
+
+      if (cart.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8;">السلة فارغة حالياً</div>`;
+        totalText.innerText = "الإجمالي: 0 جنيه";
+        return;
+      }
+
+      let html = "";
+      let total = 0;
+      cart.forEach((item, idx) => {
+        const itemTotal = item.price * item.qty;
+        total += itemTotal;
+        html += `
+          <div class="cart-item-row">
+            <div class="cart-item-info">
+              <div>${item.name}</div>
+              <div style="font-size: 11px; color: #64748b;">${item.price} ج.م</div>
+            </div>
+            <div class="cart-item-controls">
+              <button class="qty-btn" onclick="updateQuantity(${idx}, -1)">-</button>
+              <span>${item.qty}</span>
+              <button class="qty-btn" onclick="updateQuantity(${idx}, 1)">+</button>
+              <button class="delete-item-btn" onclick="removeItem(${idx})">حذف</button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      totalText.innerText = `الإجمالي: ${total} جنيه`;
     }
 
     function checkoutWhatsApp(e) {
       e.preventDefault();
       if (cart.length === 0) {
-        alert("سلتك فارغة، يرجى اختيار بعض المنتجات أولاً!");
+        alert("سلتك فارغة!");
         return;
       }
-      let msg = "مرحباً، أريد طلب المنتجات الآتية:\n";
-      cart.forEach((item, index) => {
-        msg += `${index + 1}. ${item.name} (عدد: ${item.qty}) - ${item.price * item.qty} جنيه\n`;
+      let msg = "مرحباً، أريد طلب المنتجات التالية:\n\n";
+      let total = 0;
+      cart.forEach((item, idx) => {
+        msg += `${idx + 1}. ${item.name} | العدد: ${item.qty} | السعر: ${item.price * item.qty} ج.م\n`;
+        total += item.price * item.qty;
       });
-      const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-      msg += `\nالإجمالي الكلي: ${totalPrice} جنيه`;
+      msg += `\nالإجمالي الكلي: ${total} جنيه`;
 
-      const encodedUrl = `https://wa.me/201227492921?text=${encodeURIComponent(msg)}`;
-      window.open(encodedUrl, '_blank');
+      window.open(`https://wa.me/201227492921?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    function openCartModal() {
-      if (cart.length === 0) {
-        alert("السلة فارغة حالياً.");
-        return;
-      }
-      let details = "محتويات السلة:\n";
-      cart.forEach(item => {
-        details += `- ${item.name} (الكمية: ${item.qty})\n`;
+    // عرض الأقسام الرئيسية (بدون أسعار)
+    function displayCategories(categories) {
+      const grid = document.getElementById("categoriesGrid");
+      grid.innerHTML = "";
+      categories.forEach(cat => {
+        grid.innerHTML += `
+          <div class="cat-item">
+            <img src="${cat.img}" alt="${cat.name}">
+            <h4>${cat.name}</h4>
+            <span>تصفح المنتجات</span>
+          </div>
+        `;
       });
-      alert(details);
     }
 
     // بناء سلايدر العروض
@@ -599,29 +470,9 @@
             <span class="badge-discount">${offer.tag}</span>
             <div class="slide-title">${offer.title}</div>
             <div class="slide-sub">${offer.subtitle}</div>
-            <a href="${offer.link}" class="slide-btn">${offer.btnText}</a>
           </div>
         `;
         dotsContainer.innerHTML += `<div class="dot ${idx === 0 ? 'active' : ''}"></div>`;
-      });
-    }
-
-    // عرض الأقسام مع زر إضافة للسلة
-    function displayCategories(categories) {
-      const grid = document.getElementById("categoriesGrid");
-      grid.innerHTML = "";
-
-      categories.forEach(cat => {
-        grid.innerHTML += `
-          <div class="cat-item">
-            <img src="${cat.img}" alt="${cat.name}">
-            <h4>${cat.name}</h4>
-            <span>${cat.price} جنيه</span>
-            <div style="padding: 0 8px 8px;">
-              <button class="add-to-cart-mini" onclick="addToCart('${cat.name}', ${cat.price})">+ أضافه للسلة</button>
-            </div>
-          </div>
-        `;
       });
     }
 
@@ -632,28 +483,8 @@
       displayCategories(filtered);
     });
 
-    // تحريك السلايدر تلقائياً
-    let currentIndex = 0;
-    function startSliderAutoScroll() {
-      const slider = document.getElementById('offerSlider');
-      const dots = document.querySelectorAll('.dot');
-      if (slider && dots.length > 0) {
-        setInterval(() => {
-          currentIndex = (currentIndex + 1) % dots.length;
-          slider.scrollTo({
-            left: -slider.clientWidth * currentIndex,
-            behavior: 'smooth'
-          });
-          dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentIndex);
-          });
-        }, 3500);
-      }
-    }
-
     renderSlider(offersData);
     displayCategories(initialCategories);
-    startSliderAutoScroll();
   </script>
 
 </body>
