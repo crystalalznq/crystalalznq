@@ -27,7 +27,7 @@
       padding: 15px;
       border-radius: 16px;
       box-shadow: 0 0 20px rgba(0,0,0,0.05);
-      overflow: hidden; /* لمنع أي خروج للعناصر عن الحدود */
+      overflow: hidden;
     }
 
     .admin-header { background: var(--admin-dark); color: #fff; padding: 15px; border-radius: 14px; margin-bottom: 15px; text-align: center; }
@@ -54,7 +54,6 @@
     .checkbox-group input { width: 16px; height: 16px; accent-color: var(--orange-btn); cursor: pointer; flex-shrink: 0; }
     .checkbox-group label { font-size: 12px; font-weight: bold; color: #1e293b; cursor: pointer; flex: 1; }
 
-    /* شبكة المدخلات بضبط كامل للأبعاد لتجنب الخروج عن الصفحة */
     .time-inputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
     .time-inputs-grid input { width: 100%; text-align: center; padding: 8px 4px; font-size: 12px; }
 
@@ -86,7 +85,7 @@
   <div class="admin-container">
     <div class="admin-header">
       <h2>🛠️ لوحة الإدارة والتحكم</h2>
-      <p>إدارة العروض المتطورة والربط التدريجي بالأقسام والمنتجات</p>
+      <p>إدارة العروض المتطورة والتحكم المرن بالعدادات</p>
     </div>
 
     <div class="admin-tabs">
@@ -163,13 +162,13 @@
         <div class="form-group"><label>الوصف الفرعي:</label><input type="text" id="newOfferSub" placeholder="مثال: لفترة محدودة جداً"></div>
         <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق رابط الصورة هنا" autocomplete="off"></div>
         
-        <!-- تفعيل/إلغاء وقت انتهاء العرض (مربوط بدالة آمنة تمنع التهنيج) -->
+        <!-- تفعيل/إلغاء وقت انتهاء العرض -->
         <div class="checkbox-group" id="timerBoxWrapper">
           <input type="checkbox" id="hasTimerCheckbox">
           <label for="hasTimerCheckbox">تفعيل عداد تنازلي ووقت انتهاء للعرض (اختياري)</label>
         </div>
 
-        <!-- حقول الوقت (تظهر وتختفي بسلاسة داخل الحدود) -->
+        <!-- حقول الوقت (تظهر فقط عند تفعيل الخيار) -->
         <div class="form-group" id="timerInputsContainer" style="display: none;">
           <label>⏳ مدة العرض (أيام، ساعات، دقائق):</label>
           <div class="time-inputs-grid">
@@ -179,7 +178,7 @@
           </div>
         </div>
 
-        <!-- تحديد وجهة زر استخدام العرض (عام / قسم / منتجات) -->
+        <!-- تحديد وجهة زر استخدام العرض -->
         <div class="form-group">
           <label>🔗 توجيه الزر عند الضغط:</label>
           <select id="offerTargetSelect" onchange="handleOfferTargetChange()">
@@ -197,7 +196,7 @@
           </select>
         </div>
 
-        <!-- منتج محدد (خطوة بخطوة: اختر القسم أولاً ثم يظهر منتجاته) -->
+        <!-- منتج محدد -->
         <div class="form-group" id="targetProductCatGroup" style="display: none;">
           <label>1️⃣ اختر القسم أولاً لعرض منتجاته:</label>
           <select id="targetProdFilterCat" onchange="filterProductsBySelectedCategory()">
@@ -222,7 +221,7 @@
       </div>
 
       <div class="admin-card" style="border-color: #fecaca; background: #fffafaf0;">
-        <div class="admin-card-title" style="color: var(--danger-red); border-bottom-color: #fee2e2;">⚠️ العروض المنتهية (تمت إزالتها تلقائياً)</div>
+        <div class="admin-card-title" style="color: var(--danger-red); border-bottom-color: #fee2e2;">⚠️ العروض المنتهية (انتهى وقت عدادها)</div>
         <div id="adminExpiredOffersList"></div>
       </div>
     </div>
@@ -251,7 +250,6 @@
     let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || [];
     let socialData = JSON.parse(localStorage.getItem('crystal_social')) || {};
 
-    // ربط الأحداث عند تحميل المستند لتجنب التهنيج نهائياً
     document.addEventListener("DOMContentLoaded", () => {
       const timerBox = document.getElementById('timerBoxWrapper');
       const timerCheckbox = document.getElementById('hasTimerCheckbox');
@@ -427,7 +425,7 @@
       });
       trendList.innerHTML = trendHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد منتجات مضافة بعد</p>';
 
-      // 4. العروض (نشطة ومنتهية)
+      // 4. العروض (نشطة ومنتهية بناءً على خيار العداد فقط)
       const now = Date.now();
       const activeOffers = offersData.filter(o => !o.hasTimer || o.endTime > now);
       const expiredOffers = offersData.filter(o => o.hasTimer && o.endTime <= now);
@@ -436,7 +434,7 @@
       let offerHtml = '';
       activeOffers.forEach((offer) => {
         const originalIndex = offersData.findIndex(o => o.id === offer.id);
-        let timeDesc = '♾️ عرض عام (بدون زر تصفح وبدون وقت)';
+        let timeDesc = '♾️ عرض مستمر (بدون عداد)';
         if(offer.targetType === 'category') timeDesc = '📁 موجه لقسم محدد';
         if(offer.targetType === 'product') timeDesc = '📦 موجه لمنتج محدد';
 
@@ -473,7 +471,7 @@
             ${offer.img ? `<img src="${offer.img}" onerror="this.style.display='none'">` : ''}
             <div class="admin-item-info">
               <h5 style="color: #991b1b;">${escapeHtml(offer.title)}</h5>
-              <p style="color: #b91c1c;">❌ انتهى الوقت وتم إزالته تلقائياً من الموقع</p>
+              <p style="color: #b91c1c;">❌ انتهى الوقت المحدد في العداد وتم إخفاؤه</p>
             </div>
             <div class="item-actions">
               <button class="mini-btn btn-delete" onclick="deleteOffer(${originalIndex}, '${escapeHtml(offer.title)}')">حذف نهائي</button>
@@ -655,7 +653,7 @@
       } 
     }
 
-    // --- حفظ العروض المتطورة ---
+    // --- حفظ العروض (بدون إجبار على العداد) ---
     function saveOffer() {
       const tag = document.getElementById('newOfferTag').value.trim();
       const title = document.getElementById('newOfferTitle').value.trim();
@@ -665,11 +663,14 @@
       const hasTimer = document.getElementById('hasTimerCheckbox').checked;
       let endTime = 0;
 
+      // لو تم تفعيل العداد فقط، نتحقق من إدخال وقت صحيح
       if (hasTimer) {
         const days = parseInt(document.getElementById('offerDays').value) || 0;
         const hours = parseInt(document.getElementById('offerHours').value) || 0;
         const minutes = parseInt(document.getElementById('offerMinutes').value) || 0;
-        if(days === 0 && hours === 0 && minutes === 0) return alert('برجاء تحديد وقت الانتهاء أو إلغاء تفعيل العداد!');
+        if(days === 0 && hours === 0 && minutes === 0) {
+          return alert('برجاء تحديد مدة العداد أو إلغاء تحديد خانة تفعيل العداد!');
+        }
         const totalMs = (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
         endTime = Date.now() + totalMs;
       }
