@@ -14,6 +14,7 @@
       --admin-dark: #0f172a;
       --success-green: #10b981;
       --danger-red: #ef4444;
+      --purple-accent: #7c3aed;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
@@ -47,10 +48,11 @@
 
     .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
     .form-group label { font-size: 12px; font-weight: bold; color: #334155; }
-    .form-group input { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; background: #fff; }
+    .form-group input, .form-group select { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; background: #fff; }
 
     .action-btn { background: var(--primary-blue); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
     .action-btn.edit-mode { background: var(--success-green); }
+    .action-btn.purple-btn { background: var(--purple-accent); }
     .cancel-edit-btn { background: #64748b; margin-top: 5px; display: none; }
 
     .admin-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid var(--border-gray); border-radius: 10px; margin-bottom: 8px; background: #fff; gap: 10px; }
@@ -72,29 +74,53 @@
   <div class="admin-container">
     <div class="admin-header">
       <h2>🛠️ لوحة الإدارة والتحكم</h2>
-      <p>إدارة منظمة، ذكية ومحمية لبيانات المتجر</p>
+      <p>إدارة الأقسام ومنتجاتها بكل سهولة</p>
     </div>
 
     <div class="admin-tabs">
       <button class="tab-btn active" onclick="switchAdminTab('tabCategories', event)">🌸 الأقسام</button>
+      <button class="tab-btn" onclick="switchAdminTab('tabCatProducts', event)">📦 منتجات الأقسام</button>
       <button class="tab-btn" onclick="switchAdminTab('tabTrending', event)">🔥 الأكثر مبيعاً</button>
       <button class="tab-btn" onclick="switchAdminTab('tabOffers', event)">🎁 العروض</button>
       <button class="tab-btn" onclick="switchAdminTab('tabSocial', event)">📞 التواصل</button>
     </div>
 
-    <!-- تبويب الأقسام -->
+    <!-- تبويب الأقسام الرئيسية -->
     <div id="tabCategories" class="tab-content active">
       <div class="admin-card">
-        <div class="admin-card-title" id="catCardTitle">➕ إضافة قسم جديد</div>
+        <div class="admin-card-title" id="catCardTitle">➕ إضافة قسم رئيسي</div>
         <input type="hidden" id="editCatIndex" value="-1">
         <div class="form-group"><label>اسم القسم:</label><input type="text" id="newCatName" placeholder="مثال: أطواق هاند ميد"></div>
-        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newCatImgUrl" placeholder="الصق رابط الصورة أو كود ImgBB هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <div class="form-group"><label>رابط صورة القسم:</label><input type="text" id="newCatImgUrl" placeholder="الصق رابط الصورة أو كود ImgBB" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
         <button class="action-btn" id="catSubmitBtn" onclick="saveCategory()">إضافة القسم</button>
         <button class="action-btn cancel-edit-btn" id="catCancelBtn" onclick="resetCategoryForm()">إلغاء التعديل</button>
       </div>
       <div class="admin-card">
-        <div class="admin-card-title">📑 الأقسام الحالية</div>
+        <div class="admin-card-title">📑 الأقسام الرئيسية الحالية</div>
         <div id="adminCategoriesList"></div>
+      </div>
+    </div>
+
+    <!-- تبويب منتجات داخل الأقسام -->
+    <div id="tabCatProducts" class="tab-content">
+      <div class="admin-card">
+        <div class="admin-card-title" id="prodCardTitle">➕ إضافة منتج داخل قسم</div>
+        <input type="hidden" id="editProdIndex" value="-1">
+        <div class="form-group">
+          <label>اختر القسم:</label>
+          <select id="productCategorySelect">
+            <option value="">-- اختر القسم أولاً --</option>
+          </select>
+        </div>
+        <div class="form-group"><label>اسم المنتج:</label><input type="text" id="newProdName" placeholder="مثال: طوق ورد أحمر"></div>
+        <div class="form-group"><label>السعر (جنيه):</label><input type="number" id="newProdPrice" placeholder="45"></div>
+        <div class="form-group"><label>رابط صورة المنتج:</label><input type="text" id="newProdImgUrl" placeholder="الصق رابط الصورة أو كود ImgBB" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <button class="action-btn purple-btn" id="prodSubmitBtn" onclick="saveCategoryProduct()">إضافة المنتج للقسم</button>
+        <button class="action-btn cancel-edit-btn" id="prodCancelBtn" onclick="resetProductForm()">إلغاء التعديل</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">📦 المنتجات المضافة داخل الأقسام</div>
+        <div id="adminCatProductsList"></div>
       </div>
     </div>
 
@@ -105,7 +131,7 @@
         <input type="hidden" id="editTrendIndex" value="-1">
         <div class="form-group"><label>اسم المنتج:</label><input type="text" id="newTrendName" placeholder="مثال: لولي أبيض"></div>
         <div class="form-group"><label>السعر (جنيه):</label><input type="number" id="newTrendPrice" placeholder="50"></div>
-        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newTrendImgUrl" placeholder="الصق رابط الصورة أو كود ImgBB هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newTrendImgUrl" placeholder="الصق الرابط هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
         <button class="action-btn" id="trendSubmitBtn" onclick="saveTrending()">إضافة المنتج</button>
         <button class="action-btn cancel-edit-btn" id="trendCancelBtn" onclick="resetTrendingForm()">إلغاء التعديل</button>
       </div>
@@ -123,7 +149,7 @@
         <div class="form-group"><label>شارة العرض (Tag):</label><input type="text" id="newOfferTag" placeholder="مثال: خصم خاص"></div>
         <div class="form-group"><label>عنوان العرض:</label><input type="text" id="newOfferTitle" placeholder="مثال: خصم 15%"></div>
         <div class="form-group"><label>الوصف:</label><input type="text" id="newOfferSub" placeholder="مثال: على السلاسل"></div>
-        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق رابط الصورة أو كود ImgBB هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق الرابط هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
         <button class="action-btn" id="offerSubmitBtn" onclick="saveOffer()">إضافة العرض</button>
         <button class="action-btn cancel-edit-btn" id="offerCancelBtn" onclick="resetOfferForm()">إلغاء التعديل</button>
       </div>
@@ -152,6 +178,7 @@
 
   <script>
     let categoriesData = JSON.parse(localStorage.getItem('crystal_categories')) || [];
+    let catProductsData = JSON.parse(localStorage.getItem('crystal_cat_products')) || [];
     let offersData = JSON.parse(localStorage.getItem('crystal_offers')) || [];
     let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || [];
     let socialData = JSON.parse(localStorage.getItem('crystal_social')) || {};
@@ -161,23 +188,30 @@
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       event.target.classList.add('active');
       document.getElementById(tabId).classList.add('active');
+      if(tabId === 'tabCatProducts') updateCategoryDropdown();
     }
 
-    // دالة ذكية لتنظيف رابط الصورة واستخراج الرابط لو المستخدم لصق كود HTML كامل
+    // دالة استخراج وتطهير رابط الصورة لو اتلصق كود كامل
     function cleanImageUrl(rawInput) {
       let input = rawInput.trim();
       if (!input) return '';
       if (input.includes('<img') || input.includes('src=')) {
         const match = input.match(/src=["']([^"']+)["']/);
-        if (match && match[1]) {
-          return match[1];
-        }
+        if (match && match[1]) return match[1];
       }
       return input;
     }
 
+    function updateCategoryDropdown() {
+      const select = document.getElementById('productCategorySelect');
+      select.innerHTML = '<option value="">-- اختر القسم --</option>';
+      categoriesData.forEach(cat => {
+        select.innerHTML += `<option value="${cat.id}">${escapeHtml(cat.name)}</option>`;
+      });
+    }
+
     function renderAdminLists() {
-      // 1. الأقسام
+      // 1. الأقسام الرئيسية
       const catList = document.getElementById('adminCategoriesList');
       let catHtml = '';
       categoriesData.forEach((cat, index) => {
@@ -196,7 +230,29 @@
       });
       catList.innerHTML = catHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد أقسام مضافة بعد</p>';
 
-      // 2. الأكثر مبيعاً
+      // 2. منتجات الأقسام
+      const prodList = document.getElementById('adminCatProductsList');
+      let prodHtml = '';
+      catProductsData.forEach((prod, index) => {
+        const parentCat = categoriesData.find(c => c.id === prod.categoryId);
+        const catName = parentCat ? parentCat.name : 'قسم محذوف';
+        prodHtml += `
+          <div class="admin-list-item">
+            ${prod.img ? `<img src="${prod.img}" onerror="this.style.display='none'">` : ''}
+            <div class="admin-item-info">
+              <h5>${escapeHtml(prod.name)} (${escapeHtml(catName)})</h5>
+              <p>${prod.price} ج.م</p>
+            </div>
+            <div class="item-actions">
+              <button class="mini-btn btn-edit" onclick="editCategoryProduct(${index})">تعديل</button>
+              <button class="mini-btn btn-delete" onclick="deleteCategoryProduct(${index}, '${escapeHtml(prod.name)}')">حذف</button>
+            </div>
+          </div>
+        `;
+      });
+      prodList.innerHTML = prodHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد منتجات داخل الأقسام بعد</p>';
+
+      // 3. الأكثر مبيعاً
       const trendList = document.getElementById('adminTrendingList');
       let trendHtml = '';
       trendingData.forEach((item, index) => {
@@ -216,7 +272,7 @@
       });
       trendList.innerHTML = trendHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد منتجات مضافة بعد</p>';
 
-      // 3. العروض
+      // 4. العروض
       const offerList = document.getElementById('adminOffersList');
       let offerHtml = '';
       offersData.forEach((offer, index) => {
@@ -236,7 +292,7 @@
       });
       offerList.innerHTML = offerHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد عروض نشطة بعد</p>';
 
-      // 4. التواصل
+      // 5. التواصل
       document.getElementById('socialWa').value = socialData.wa || '';
       document.getElementById('socialPhone').value = socialData.phone || '';
       document.getElementById('socialLandline').value = socialData.landline || '';
@@ -245,13 +301,12 @@
       document.getElementById('socialTiktok').value = socialData.tiktok || '';
     }
 
-    // تأمين النصوص ضد الثغرات (XSS Prevention)
     function escapeHtml(text) {
       if (!text) return '';
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // --- منطق الأقسام ---
+    // --- منطق الأقسام الرئيسية ---
     function saveCategory() {
       const name = document.getElementById('newCatName').value.trim();
       const img = cleanImageUrl(document.getElementById('newCatImgUrl').value);
@@ -260,7 +315,7 @@
       if(!name) return alert('أدخل اسم القسم من فضلك!');
 
       if (editIndex === -1) {
-        categoriesData.push({ id: Date.now().toString(), name, img });
+        categoriesData.push({ id: 'cat_' + Date.now(), name, img });
       } else {
         categoriesData[editIndex].name = name;
         categoriesData[editIndex].img = img;
@@ -287,7 +342,7 @@
       document.getElementById('newCatName').value = '';
       document.getElementById('newCatImgUrl').value = '';
       document.getElementById('editCatIndex').value = -1;
-      document.getElementById('catCardTitle').innerText = '➕ إضافة قسم جديد';
+      document.getElementById('catCardTitle').innerText = '➕ إضافة قسم رئيسي';
       document.getElementById('catSubmitBtn').innerText = 'إضافة القسم';
       document.getElementById('catSubmitBtn').classList.remove('edit-mode');
       document.getElementById('catCancelBtn').style.display = 'none';
@@ -299,6 +354,68 @@
         resetCategoryForm();
         saveAndSync(); 
       } 
+    }
+
+    // --- منطق منتجات الأقسام ---
+    function saveCategoryProduct() {
+      const categoryId = document.getElementById('productCategorySelect').value;
+      const name = document.getElementById('newProdName').value.trim();
+      const price = parseFloat(document.getElementById('newProdPrice').value);
+      const img = cleanImageUrl(document.getElementById('newProdImgUrl').value);
+      const editIndex = parseInt(document.getElementById('editProdIndex').value);
+
+      if(!categoryId) return alert('يرجى اختيار القسم أولاً!');
+      if(!name || isNaN(price)) return alert('أدخل اسم المنتج والسعر بشكل صحيح!');
+      if(price <= 0) return alert('السعر يجب أن يكون أكبر من صفر!');
+
+      if (editIndex === -1) {
+        catProductsData.push({ id: 'prod_' + Date.now(), categoryId, name, price, img });
+      } else {
+        catProductsData[editIndex].categoryId = categoryId;
+        catProductsData[editIndex].name = name;
+        catProductsData[editIndex].price = price;
+        catProductsData[editIndex].img = img;
+        resetProductForm();
+      }
+      saveAndSync();
+      document.getElementById('newProdName').value = '';
+      document.getElementById('newProdPrice').value = '';
+      document.getElementById('newProdImgUrl').value = '';
+    }
+
+    function editCategoryProduct(i) {
+      const prod = catProductsData[i];
+      updateCategoryDropdown();
+      document.getElementById('productCategorySelect').value = prod.categoryId;
+      document.getElementById('newProdName').value = prod.name;
+      document.getElementById('newProdPrice').value = prod.price;
+      document.getElementById('newProdImgUrl').value = prod.img || '';
+      document.getElementById('editProdIndex').value = i;
+      document.getElementById('prodCardTitle').innerText = '✏️ تعديل منتج القسم';
+      document.getElementById('prodSubmitBtn').innerText = 'حفظ التعديل';
+      document.getElementById('prodSubmitBtn').classList.add('edit-mode');
+      document.getElementById('prodCancelBtn').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetProductForm() {
+      document.getElementById('productCategorySelect').value = '';
+      document.getElementById('newProdName').value = '';
+      document.getElementById('newProdPrice').value = '';
+      document.getElementById('newProdImgUrl').value = '';
+      document.getElementById('editProdIndex').value = -1;
+      document.getElementById('prodCardTitle').innerText = '➕ إضافة منتج داخل قسم';
+      document.getElementById('prodSubmitBtn').innerText = 'إضافة المنتج للقسم';
+      document.getElementById('prodSubmitBtn').classList.remove('edit-mode');
+      document.getElementById('prodCancelBtn').style.display = 'none';
+    }
+
+    function deleteCategoryProduct(i, name) {
+      if(confirm(`هل أنت متأكد من حذف المنتج "${name}"؟`)) {
+        catProductsData.splice(i, 1);
+        resetProductForm();
+        saveAndSync();
+      }
     }
 
     // --- منطق الأكثر مبيعاً ---
@@ -393,6 +510,7 @@
       document.getElementById('offerCardTitle').innerText = '✏️ تعديل العرض';
       document.getElementById('offerSubmitBtn').innerText = 'حفظ التعديل';
       document.getElementById('offerSubmitBtn').classList.add('edit-mode');
+      document.getElementById('offerCardTitle').style.display = 'block';
       document.getElementById('offerCancelBtn').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -433,6 +551,7 @@
 
     function saveAndSync() {
       localStorage.setItem('crystal_categories', JSON.stringify(categoriesData));
+      localStorage.setItem('crystal_cat_products', JSON.stringify(catProductsData));
       localStorage.setItem('crystal_offers', JSON.stringify(offersData));
       localStorage.setItem('crystal_trending', JSON.stringify(trendingData));
       localStorage.setItem('crystal_social', JSON.stringify(socialData));
