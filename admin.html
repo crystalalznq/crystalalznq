@@ -1,401 +1,584 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - كرستال الزنقة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #8b5cf6;
-            --secondary-color: #f3e8ff;
-            --text-color: #1f2937;
-            --bg-color: #f8fafc;
-            --white: #ffffff;
-            --danger: #ef4444;
-            --success: #10b981;
-            --border-color: #e5e7eb;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>كرستال الزنقة - لوحة الإدارة والتحكم الاحترافية</title>
+  <style>
+    :root {
+      --orange-btn: #d9531e;
+      --orange-bg: #fdf5ef;
+      --text-dark: #1e293b;
+      --border-gray: #e2e8f0;
+      --primary-blue: #0284c7;
+      --admin-dark: #0f172a;
+      --success-green: #10b981;
+      --danger-red: #ef4444;
+      --purple-accent: #7c3aed;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: #f1f5f9; color: var(--text-dark); direction: rtl; display: flex; justify-content: center; padding: 20px 10px; }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
-        }
+    .admin-container {
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      min-height: 95vh;
+      padding: 15px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            min-height: 100vh;
-        }
+    .admin-header { background: var(--admin-dark); color: #fff; padding: 15px; border-radius: 14px; margin-bottom: 15px; text-align: center; }
+    .admin-header h2 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .admin-header p { font-size: 11px; opacity: 0.8; }
 
-        /* Sidebar */
-        aside {
-            width: 260px;
-            background-color: var(--white);
-            border-left: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-            z-index: 10;
-        }
+    .admin-tabs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 15px; scrollbar-width: none; }
+    .admin-tabs::-webkit-scrollbar { display: none; }
 
-        .sidebar-header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-        }
+    .tab-btn { flex: 0 0 auto; padding: 8px 14px; background: #e2e8f0; color: #334155; border: none; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .tab-btn.active { background: var(--orange-btn); color: #fff; }
 
-        .sidebar-header h2 {
-            color: var(--primary-color);
-            font-size: 1.25rem;
-        }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-        .sidebar-menu {
-            list-style: none;
-            padding: 20px 0;
-        }
+    .admin-card { background: #fff; border: 1px solid var(--border-gray); border-radius: 14px; padding: 15px; margin-bottom: 15px; }
+    .admin-card-title { font-size: 14px; font-weight: 800; color: var(--admin-dark); margin-bottom: 12px; border-bottom: 2px solid var(--orange-bg); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
 
-        .sidebar-menu li a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            color: var(--text-color);
-            text-decoration: none;
-            transition: 0.3s;
-        }
+    .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+    .form-group label { font-size: 12px; font-weight: bold; color: #334155; }
+    .form-group input, .form-group select { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; background: #fff; }
 
-        .sidebar-menu li.active a, .sidebar-menu li a:hover {
-            background-color: var(--secondary-color);
-            color: var(--primary-color);
-            border-right: 4px solid var(--primary-color);
-        }
+    .action-btn { background: var(--primary-blue); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
+    .action-btn.edit-mode { background: var(--success-green); }
+    .action-btn.purple-btn { background: var(--purple-accent); }
+    .cancel-edit-btn { background: #64748b; margin-top: 5px; display: none; }
 
-        /* Main Content */
-        main {
-            flex: 1;
-            margin-right: 260px;
-            padding: 30px;
-        }
+    .admin-category-group { border: 1px solid var(--border-gray); border-radius: 12px; margin-bottom: 12px; overflow: hidden; background: #fafafa; }
+    .admin-category-group-header { background: #f1f5f9; padding: 10px 12px; font-size: 13px; font-weight: 800; color: var(--admin-dark); border-bottom: 1px solid var(--border-gray); display: flex; justify-content: space-between; align-items: center; }
+    .admin-category-group-body { padding: 8px; }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: var(--white);
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
+    .admin-list-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--border-gray); border-radius: 8px; margin-bottom: 6px; background: #fff; gap: 8px; }
+    .admin-list-item img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: #f8fafc; }
+    .admin-item-info { flex: 1; min-width: 0; overflow: hidden; }
+    .admin-item-info h5 { font-size: 12px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .admin-item-info p { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .item-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .mini-btn { padding: 4px 8px; font-size: 10px; border-radius: 6px; border: none; cursor: pointer; color: #fff; font-weight: bold; }
+    .btn-edit { background: var(--success-green); }
+    .btn-delete { background: var(--danger-red); }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: var(--white);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            background: var(--secondary-color);
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .stat-info h3 {
-            font-size: 0.85rem;
-            color: #6b7280;
-        }
-
-        .stat-info p {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        /* Cards & Sections */
-        .card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-
-        .card h3 {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-            color: var(--text-color);
-            border-bottom: 2px solid var(--secondary-color);
-            padding-bottom: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--secondary-color);
-        }
-
-        .btn {
-            background-color: var(--primary-color);
-            color: var(--white);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .btn-danger {
-            background-color: var(--danger);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: right;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.9rem;
-        }
-
-        th {
-            background-color: var(--secondary-color);
-            color: var(--primary-color);
-        }
-
-        @media (max-width: 768px) {
-            aside {
-                width: 70px;
-            }
-            aside .sidebar-header h2, aside span {
-                display: none;
-            }
-            main {
-                margin-right: 70px;
-            }
-        }
-    </style>
+    .back-store-link { display: block; text-align: center; margin-top: 15px; font-size: 12px; color: var(--primary-blue); text-decoration: none; font-weight: bold; }
+  </style>
 </head>
 <body>
+  <div class="admin-container">
+    <div class="admin-header">
+      <h2>🛠️ لوحة الإدارة والتحكم</h2>
+      <p>إدارة الأقسام ومنتجاتها بكل سهولة</p>
+    </div>
 
-    <!-- القائمة الجانبية -->
-    <aside>
-        <div class="sidebar-header">
-            <h2>كرستال الزنقة</h2>
+    <div class="admin-tabs">
+      <button class="tab-btn active" onclick="switchAdminTab('tabCategories', event)">🌸 الأقسام</button>
+      <button class="tab-btn" onclick="switchAdminTab('tabCatProducts', event)">📦 منتجات الأقسام</button>
+      <button class="tab-btn" onclick="switchAdminTab('tabTrending', event)">🔥 الأكثر مبيعاً</button>
+      <button class="tab-btn" onclick="switchAdminTab('tabOffers', event)">🎁 العروض</button>
+      <button class="tab-btn" onclick="switchAdminTab('tabSocial', event)">📞 التواصل</button>
+    </div>
+
+    <!-- تبويب الأقسام الرئيسية -->
+    <div id="tabCategories" class="tab-content active">
+      <div class="admin-card">
+        <div class="admin-card-title" id="catCardTitle">➕ إضافة قسم رئيسي</div>
+        <input type="hidden" id="editCatIndex" value="-1">
+        <div class="form-group"><label>اسم القسم:</label><input type="text" id="newCatName" placeholder="مثال: أطواق هاند ميد"></div>
+        <div class="form-group"><label>رابط صورة القسم:</label><input type="text" id="newCatImgUrl" placeholder="الصق رابط الصورة أو كود ImgBB" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <button class="action-btn" id="catSubmitBtn" onclick="saveCategory()">إضافة القسم</button>
+        <button class="action-btn cancel-edit-btn" id="catCancelBtn" onclick="resetCategoryForm()">إلغاء التعديل</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">📑 الأقسام الرئيسية الحالية</div>
+        <div id="adminCategoriesList"></div>
+      </div>
+    </div>
+
+    <!-- تبويب منتجات داخل الأقسام -->
+    <div id="tabCatProducts" class="tab-content">
+      <div class="admin-card">
+        <div class="admin-card-title" id="prodCardTitle">➕ إضافة منتج داخل قسم</div>
+        <input type="hidden" id="editProdIndex" value="-1">
+        <div class="form-group">
+          <label>اختر القسم:</label>
+          <select id="productCategorySelect">
+            <option value="">-- اختر القسم أولاً --</option>
+          </select>
         </div>
-        <ul class="sidebar-menu">
-            <li class="active"><a href="#dashboard"><i class="fa-solid fa-chart-line"></i><span>الرئيسية</span></a></li>
-            <li><a href="#products"><i class="fa-solid fa-box-archive"></i><span>إدارة المنتجات</span></a></li>
-            <li><a href="#categories"><i class="fa-solid fa-tags"></i><span>الأقسام والتصنيفات</span></a></li>
-            <li><a href="#trending"><i class="fa-solid fa-fire"></i><span>المنتجات الأكثر مبيعاً</span></a></li>
-            <li><a href="#social"><i class="fa-solid fa-share-nodes"></i><span>روابط التواصل</span></a></li>
-            <li><a href="../index.html" target="_blank"><i class="fa-solid fa-globe"></i><span>عرض المتجر</span></a></li>
-        </ul>
-    </aside>
+        <div class="form-group"><label>اسم المنتج:</label><input type="text" id="newProdName" placeholder="مثال: طوق ورد أحمر"></div>
+        <div class="form-group"><label>السعر (جنيه):</label><input type="number" id="newProdPrice" placeholder="45"></div>
+        <div class="form-group"><label>رابط صورة المنتج:</label><input type="text" id="newProdImgUrl" placeholder="الصق رابط الصورة أو كود ImgBB" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <button class="action-btn purple-btn" id="prodSubmitBtn" onclick="saveCategoryProduct()">إضافة المنتج للقسم</button>
+        <button class="action-btn cancel-edit-btn" id="prodCancelBtn" onclick="resetProductForm()">إلغاء التعديل</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">📦 المنتجات مرتبة داخل أقسامها</div>
+        <div id="adminCatProductsList"></div>
+      </div>
+    </div>
 
-    <!-- محتوى لوحة التحكم -->
-    <main>
-        <header>
-            <h1>لوحة إدارة المتجر</h1>
-            <p>مرحباً بك، مدير متجر كرستال الزنقة</p>
-        </header>
+    <!-- تبويب الأكثر مبيعاً -->
+    <div id="tabTrending" class="tab-content">
+      <div class="admin-card">
+        <div class="admin-card-title" id="trendCardTitle">➕ إضافة منتج للأكثر مبيعاً</div>
+        <input type="hidden" id="editTrendIndex" value="-1">
+        <div class="form-group"><label>اسم المنتج:</label><input type="text" id="newTrendName" placeholder="مثال: لولي أبيض"></div>
+        <div class="form-group"><label>السعر (جنيه):</label><input type="number" id="newTrendPrice" placeholder="50"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newTrendImgUrl" placeholder="الصق الرابط هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <button class="action-btn" id="trendSubmitBtn" onclick="saveTrending()">إضافة المنتج</button>
+        <button class="action-btn cancel-edit-btn" id="trendCancelBtn" onclick="resetTrendingForm()">إلغاء التعديل</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">🔥 منتجات الأكثر مبيعاً الحالية</div>
+        <div id="adminTrendingList"></div>
+      </div>
+    </div>
 
-        <!-- الإحصائيات -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fa-solid fa-box"></i></div>
-                <div class="stat-info">
-                    <h3>إجمالي المنتجات</h3>
-                    <p id="total-products-count">0</p>
-                </div>
+    <!-- تبويب العروض -->
+    <div id="tabOffers" class="tab-content">
+      <div class="admin-card">
+        <div class="admin-card-title" id="offerCardTitle">➕ إضافة عرض جديد</div>
+        <input type="hidden" id="editOfferIndex" value="-1">
+        <div class="form-group"><label>شارة العرض (Tag):</label><input type="text" id="newOfferTag" placeholder="مثال: خصم خاص"></div>
+        <div class="form-group"><label>عنوان العرض:</label><input type="text" id="newOfferTitle" placeholder="مثال: خصم 15%"></div>
+        <div class="form-group"><label>الوصف:</label><input type="text" id="newOfferSub" placeholder="مثال: على السلاسل"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق الرابط هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <button class="action-btn" id="offerSubmitBtn" onclick="saveOffer()">إضافة العرض</button>
+        <button class="action-btn cancel-edit-btn" id="offerCancelBtn" onclick="resetOfferForm()">إلغاء التعديل</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">🎁 العروض النشطة</div>
+        <div id="adminOffersList"></div>
+      </div>
+    </div>
+
+    <!-- تبويب التواصل -->
+    <div id="tabSocial" class="tab-content">
+      <div class="admin-card">
+        <div class="admin-card-title">✏️ تعديل وسائل التواصل</div>
+        <div class="form-group"><label>رقم الواتساب:</label><input type="text" id="socialWa"></div>
+        <div class="form-group"><label>رقم الموبايل:</label><input type="text" id="socialPhone"></div>
+        <div class="form-group"><label>رقم الأرضي:</label><input type="text" id="socialLandline"></div>
+        <div class="form-group"><label>رابط الفيسبوك:</label><input type="text" id="socialFb"></div>
+        <div class="form-group"><label>رابط الانستجرام:</label><input type="text" id="socialInsta"></div>
+        <div class="form-group"><label>رابط التيك توك:</label><input type="text" id="socialTiktok"></div>
+        <button class="action-btn" onclick="saveSocialLinks()">حفظ التعديلات</button>
+      </div>
+    </div>
+
+    <a href="index.html" class="back-store-link">🛍️ الانتقال إلى صفحة المتجر الرئيسية</a>
+  </div>
+
+  <script>
+    let categoriesData = JSON.parse(localStorage.getItem('crystal_categories')) || [];
+    let catProductsData = JSON.parse(localStorage.getItem('crystal_cat_products')) || [];
+    let offersData = JSON.parse(localStorage.getItem('crystal_offers')) || [];
+    let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || [];
+    let socialData = JSON.parse(localStorage.getItem('crystal_social')) || {};
+
+    function switchAdminTab(tabId, event) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+      if(tabId === 'tabCatProducts') updateCategoryDropdown();
+    }
+
+    function cleanImageUrl(rawInput) {
+      let input = rawInput.trim();
+      if (!input) return '';
+      if (input.includes('<img') || input.includes('src=')) {
+        const match = input.match(/src=["']([^"']+)["']/);
+        if (match && match[1]) return match[1];
+      }
+      return input;
+    }
+
+    function updateCategoryDropdown() {
+      const select = document.getElementById('productCategorySelect');
+      let optionsHtml = '<option value="">-- اختر القسم أولاً --</option>';
+      categoriesData.forEach(cat => {
+        optionsHtml += `<option value="${cat.id}">${escapeHtml(cat.name)}</option>`;
+      });
+      select.innerHTML = optionsHtml;
+    }
+
+    function renderAdminLists() {
+      updateCategoryDropdown();
+
+      // 1. الأقسام الرئيسية
+      const catList = document.getElementById('adminCategoriesList');
+      let catHtml = '';
+      categoriesData.forEach((cat, index) => {
+        catHtml += `
+          <div class="admin-list-item">
+            ${cat.img ? `<img src="${cat.img}" onerror="this.style.display='none'">` : ''}
+            <div class="admin-item-info">
+              <h5>${escapeHtml(cat.name)}</h5>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fa-solid fa-tags"></i></div>
-                <div class="stat-info">
-                    <h3>الأقسام المتاحة</h3>
-                    <p id="total-categories-count">0</p>
-                </div>
+            <div class="item-actions">
+              <button class="mini-btn btn-edit" onclick="editCategory(${index})">تعديل</button>
+              <button class="mini-btn btn-delete" onclick="deleteCategory(${index}, '${escapeHtml(cat.name)}')">حذف</button>
             </div>
-        </div>
+          </div>
+        `;
+      });
+      catList.innerHTML = catHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد أقسام مضافة بعد</p>';
 
-        <!-- إدارة المنتجات -->
-        <div class="card" id="products">
-            <h3>إضافة منتج جديد للمتجر</h3>
-            <form id="add-product-form">
-                <div class="form-group">
-                    <label>اسم المنتج</label>
-                    <input type="text" id="prod-name" class="form-control" required placeholder="مثال: سبحة كريستال مصنوعة يدبقاً">
+      // 2. منتجات الأقسام
+      const prodList = document.getElementById('adminCatProductsList');
+      let prodHtml = '';
+
+      if (categoriesData.length === 0) {
+        prodHtml = '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">أضف أقساماً رئيسية أولاً</p>';
+      } else {
+        categoriesData.forEach(cat => {
+          const productsInThisCat = catProductsData.filter(p => p.categoryId === cat.id);
+          prodHtml += `
+            <div class="admin-category-group">
+              <div class="admin-category-group-header">
+                <span>📁 ${escapeHtml(cat.name)}</span>
+                <span style="font-size: 11px; background: #e2e8f0; padding: 2px 6px; border-radius: 6px;">${productsInThisCat.length} منتج</span>
+              </div>
+              <div class="admin-category-group-body">
+          `;
+
+          if (productsInThisCat.length === 0) {
+            prodHtml += `<p style="font-size: 11px; color: #94a3b8; text-align: center; padding: 6px;">لا توجد منتجات في هذا القسم بعد</p>`;
+          } else {
+            productsInThisCat.forEach(prod => {
+              const originalIndex = catProductsData.findIndex(p => p.id === prod.id);
+              prodHtml += `
+                <div class="admin-list-item">
+                  ${prod.img ? `<img src="${prod.img}" onerror="this.style.display='none'">` : ''}
+                  <div class="admin-item-info">
+                    <h5>${escapeHtml(prod.name)}</h5>
+                    <p>${prod.price} ج.م</p>
+                  </div>
+                  <div class="item-actions">
+                    <button class="mini-btn btn-edit" onclick="editCategoryProduct(${originalIndex})">تعديل</button>
+                    <button class="mini-btn btn-delete" onclick="deleteCategoryProduct(${originalIndex}, '${escapeHtml(prod.name)}')">حذف</button>
+                  </div>
                 </div>
-                <div class="form-group">
-                    <label>السعر (ج.م)</label>
-                    <input type="number" id="prod-price" class="form-control" required placeholder="0.00">
-                </div>
-                <div class="form-group">
-                    <label>رابط الصورة</label>
-                    <input type="url" id="prod-image" class="form-control" required placeholder="رابط صورة المنتج">
-                </div>
-                <div class="form-group">
-                    <label>القسم</label>
-                    <select id="prod-category" class="form-control">
-                        <option value="accessories">إكسسوارات</option>
-                        <option value="crafts">مشغولات يدوية</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn">حفظ المنتج</button>
-            </form>
-        </div>
-
-        <!-- قائمة المنتجات الحالية -->
-        <div class="card">
-            <h3>قائمة المنتجات الحالية</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>الصورة</th>
-                        <th>اسم المنتج</th>
-                        <th>السعر</th>
-                        <th>القسم</th>
-                        <th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-products-list">
-                    <!-- يتم تعبئتها ديناميكياً -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- إدارة الأقسام -->
-        <div class="card" id="categories">
-            <h3>إدارة أقسام المتجر</h3>
-            <form id="add-category-form">
-                <div class="form-group">
-                    <label>اسم القسم الجديد</label>
-                    <input type="text" id="cat-name" class="form-control" required placeholder="مثال: هدايا وميداليات">
-                </div>
-                <button type="submit" class="btn">إضافة قسم</button>
-            </form>
-        </div>
-    </main>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAdminData();
-
-            const productForm = document.getElementById('add-product-form');
-            productForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const name = document.getElementById('prod-name').value;
-                const price = document.getElementById('prod-price').value;
-                const image = document.getElementById('prod-image').value;
-                const category = document.getElementById('prod-category').value;
-
-                let products = JSON.parse(localStorage.getItem('store_products')) || [];
-                
-                const newProduct = {
-                    id: Date.now(),
-                    name,
-                    price,
-                    image,
-                    category
-                };
-
-                products.push(newProduct);
-                localStorage.setItem('store_products', JSON.stringify(products));
-
-                productForm.reset();
-                loadAdminData();
-                alert('تم حفظ المنتج وتحديث المتجر بنجاح!');
+              `;
             });
+          }
+          prodHtml += `</div></div>`;
         });
+      }
+      prodList.innerHTML = prodHtml;
 
-        function loadAdminData() {
-            const tableBody = document.getElementById('admin-products-list');
-            const countDisplay = document.getElementById('total-products-count');
-            const catCountDisplay = document.getElementById('total-categories-count');
-            
-            let products = JSON.parse(localStorage.getItem('store_products')) || [];
-            let categories = JSON.parse(localStorage.getItem('store_categories')) || ['accessories', 'crafts'];
-            
-            countDisplay.textContent = products.length;
-            catCountDisplay.textContent = categories.length;
-            tableBody.innerHTML = '';
+      // 3. الأكثر مبيعاً
+      const trendList = document.getElementById('adminTrendingList');
+      let trendHtml = '';
+      trendingData.forEach((item, index) => {
+        trendHtml += `
+          <div class="admin-list-item">
+            ${item.img ? `<img src="${item.img}" onerror="this.style.display='none'">` : ''}
+            <div class="admin-item-info">
+              <h5>${escapeHtml(item.name)}</h5>
+              <p>${item.price} ج.م</p>
+            </div>
+            <div class="item-actions">
+              <button class="mini-btn btn-edit" onclick="editTrending(${index})">تعديل</button>
+              <button class="mini-btn btn-delete" onclick="deleteTrending(${index}, '${escapeHtml(item.name)}')">حذف</button>
+            </div>
+          </div>
+        `;
+      });
+      trendList.innerHTML = trendHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد منتجات مضافة بعد</p>';
 
-            if (products.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #6b7280;">لا توجد منتجات مضافة حتى الآن</td></tr>`;
-                return;
-            }
+      // 4. العروض
+      const offerList = document.getElementById('adminOffersList');
+      let offerHtml = '';
+      offersData.forEach((offer, index) => {
+        offerHtml += `
+          <div class="admin-list-item">
+            ${offer.img ? `<img src="${offer.img}" onerror="this.style.display='none'">` : ''}
+            <div class="admin-item-info">
+              <h5>${escapeHtml(offer.title)}</h5>
+              <p>${escapeHtml(offer.tag)} ${offer.subtitle ? '- ' + escapeHtml(offer.subtitle) : ''}</p>
+            </div>
+            <div class="item-actions">
+              <button class="mini-btn btn-edit" onclick="editOffer(${index})">تعديل</button>
+              <button class="mini-btn btn-delete" onclick="deleteOffer(${index}, '${escapeHtml(offer.title)}')">حذف</button>
+            </div>
+          </div>
+        `;
+      });
+      offerList.innerHTML = offerHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد عروض نشطة بعد</p>';
 
-            products.forEach((prod) => {
-                tableBody.innerHTML += `
-                    <tr>
-                        <td><img src="${prod.image}" alt="${prod.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;"></td>
-                        <td>${prod.name}</td>
-                        <td>${prod.price} ج.م</td>
-                        <td>${prod.category}</td>
-                        <td>
-                            <button class="btn btn-danger" onclick="deleteProduct(${prod.id})" style="padding: 5px 10px; font-size: 0.8rem;">حذف</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
+      // 5. التواصل
+      document.getElementById('socialWa').value = socialData.wa || '';
+      document.getElementById('socialPhone').value = socialData.phone || '';
+      document.getElementById('socialLandline').value = socialData.landline || '';
+      document.getElementById('socialFb').value = socialData.fb || '';
+      document.getElementById('socialInsta').value = socialData.insta || '';
+      document.getElementById('socialTiktok').value = socialData.tiktok || '';
+    }
 
-        function deleteProduct(id) {
-            let products = JSON.parse(localStorage.getItem('store_products')) || [];
-            products = products.filter(p => p.id !== id);
-            localStorage.setItem('store_products', JSON.stringify(products));
-            loadAdminData();
-        }
-    </script>
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // --- الأقسام الرئيسية ---
+    function saveCategory() {
+      const name = document.getElementById('newCatName').value.trim();
+      const img = cleanImageUrl(document.getElementById('newCatImgUrl').value);
+      const editIndex = parseInt(document.getElementById('editCatIndex').value);
+
+      if(!name) return alert('أدخل اسم القسم من فضلك!');
+
+      if (editIndex === -1) {
+        categoriesData.push({ id: 'cat_' + Date.now(), name, img });
+      } else {
+        categoriesData[editIndex].name = name;
+        categoriesData[editIndex].img = img;
+        resetCategoryForm();
+      }
+      saveAndSync();
+    }
+
+    function editCategory(i) {
+      const cat = categoriesData[i];
+      document.getElementById('newCatName').value = cat.name;
+      document.getElementById('newCatImgUrl').value = cat.img || '';
+      document.getElementById('editCatIndex').value = i;
+      document.getElementById('catCardTitle').innerText = '✏️ تعديل القسم';
+      document.getElementById('catSubmitBtn').innerText = 'حفظ التعديل';
+      document.getElementById('catSubmitBtn').classList.add('edit-mode');
+      document.getElementById('catCancelBtn').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetCategoryForm() {
+      document.getElementById('newCatName').value = '';
+      document.getElementById('newCatImgUrl').value = '';
+      document.getElementById('editCatIndex').value = -1;
+      document.getElementById('catCardTitle').innerText = '➕ إضافة قسم رئيسي';
+      document.getElementById('catSubmitBtn').innerText = 'إضافة القسم';
+      document.getElementById('catSubmitBtn').classList.remove('edit-mode');
+      document.getElementById('catCancelBtn').style.display = 'none';
+    }
+
+    function deleteCategory(i, name) { 
+      if(confirm(`هل أنت متأكد من حذف القسم "${name}" وكل المنتجات التابعة ليه؟`)) { 
+        const catId = categoriesData[i].id;
+        categoriesData.splice(i, 1); 
+        catProductsData = catProductsData.filter(p => p.categoryId !== catId);
+        resetCategoryForm(); 
+        saveAndSync(); 
+      } 
+    }
+
+    // --- منتجات الأقسام ---
+    function saveCategoryProduct() {
+      const categoryId = document.getElementById('productCategorySelect').value;
+      const name = document.getElementById('newProdName').value.trim();
+      const price = parseFloat(document.getElementById('newProdPrice').value);
+      const img = cleanImageUrl(document.getElementById('newProdImgUrl').value);
+      const editIndex = parseInt(document.getElementById('editProdIndex').value);
+
+      if(!categoryId) return alert('يرجى اختيار القسم أولاً من القائمة!');
+      if(!name || isNaN(price)) return alert('أدخل اسم المنتج والسعر بشكل صحيح!');
+      if(price <= 0) return alert('السعر يجب أن يكون أكبر من صفر!');
+
+      if (editIndex === -1) {
+        catProductsData.push({ id: 'prod_' + Date.now(), categoryId, name, price, img });
+      } else {
+        catProductsData[editIndex].categoryId = categoryId;
+        catProductsData[editIndex].name = name;
+        catProductsData[editIndex].price = price;
+        catProductsData[editIndex].img = img;
+        resetProductForm();
+      }
+      saveAndSync();
+    }
+
+    function editCategoryProduct(i) {
+      const prod = catProductsData[i];
+      updateCategoryDropdown();
+      document.getElementById('productCategorySelect').value = prod.categoryId;
+      document.getElementById('newProdName').value = prod.name;
+      document.getElementById('newProdPrice').value = prod.price;
+      document.getElementById('newProdImgUrl').value = prod.img || '';
+      document.getElementById('editProdIndex').value = i;
+      document.getElementById('prodCardTitle').innerText = '✏️ تعديل منتج القسم';
+      document.getElementById('prodSubmitBtn').innerText = 'حفظ التعديل';
+      document.getElementById('prodSubmitBtn').classList.add('edit-mode');
+      document.getElementById('prodCancelBtn').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetProductForm() {
+      document.getElementById('productCategorySelect').value = '';
+      document.getElementById('newProdName').value = '';
+      document.getElementById('newProdPrice').value = '';
+      document.getElementById('newProdImgUrl').value = '';
+      document.getElementById('editProdIndex').value = -1;
+      document.getElementById('prodCardTitle').innerText = '➕ إضافة منتج داخل قسم';
+      document.getElementById('prodSubmitBtn').innerText = 'إضافة المنتج للقسم';
+      document.getElementById('prodSubmitBtn').classList.remove('edit-mode');
+      document.getElementById('prodCancelBtn').style.display = 'none';
+    }
+
+    function deleteCategoryProduct(i, name) {
+      if(confirm(`هل أنت متأكد من حذف المنتج "${name}"؟`)) {
+        catProductsData.splice(i, 1);
+        resetProductForm();
+        saveAndSync();
+      }
+    }
+
+    // --- الأكثر مبيعاً ---
+    function saveTrending() {
+      const name = document.getElementById('newTrendName').value.trim();
+      const price = parseFloat(document.getElementById('newTrendPrice').value);
+      const img = cleanImageUrl(document.getElementById('newTrendImgUrl').value);
+      const editIndex = parseInt(document.getElementById('editTrendIndex').value);
+
+      if(!name || isNaN(price)) return alert('أدخل اسم المنتج والسعر بشكل صحيح!');
+      if(price <= 0) return alert('السعر يجب أن يكون أكبر من صفر!');
+
+      if (editIndex === -1) {
+        trendingData.push({ id: 't' + Date.now(), name, price, img });
+      } else {
+        trendingData[editIndex].name = name;
+        trendingData[editIndex].price = price;
+        trendingData[editIndex].img = img;
+        resetTrendingForm();
+      }
+      saveAndSync();
+    }
+
+    function editTrending(i) {
+      const item = trendingData[i];
+      document.getElementById('newTrendName').value = item.name;
+      document.getElementById('newTrendPrice').value = item.price;
+      document.getElementById('newTrendImgUrl').value = item.img || '';
+      document.getElementById('editTrendIndex').value = i;
+      document.getElementById('trendCardTitle').innerText = '✏️ تعديل المنتج';
+      document.getElementById('trendSubmitBtn').innerText = 'حفظ التعديل';
+      document.getElementById('trendSubmitBtn').classList.add('edit-mode');
+      document.getElementById('trendCancelBtn').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetTrendingForm() {
+      document.getElementById('newTrendName').value = '';
+      document.getElementById('newTrendPrice').value = '';
+      document.getElementById('newTrendImgUrl').value = '';
+      document.getElementById('editTrendIndex').value = -1;
+      document.getElementById('trendCardTitle').innerText = '➕ إضافة منتج للأكثر مبيعاً';
+      document.getElementById('trendSubmitBtn').innerText = 'إضافة المنتج';
+      document.getElementById('trendSubmitBtn').classList.remove('edit-mode');
+      document.getElementById('trendCancelBtn').style.display = 'none';
+    }
+
+    function deleteTrending(i, name) { 
+      if(confirm(`هل أنت متأكد من حذف المنتج "${name}"؟`)) { 
+        trendingData.splice(i, 1); 
+        resetTrendingForm();
+        saveAndSync(); 
+      } 
+    }
+
+    // --- العروض ---
+    function saveOffer() {
+      const tag = document.getElementById('newOfferTag').value.trim();
+      const title = document.getElementById('newOfferTitle').value.trim();
+      const subtitle = document.getElementById('newOfferSub').value.trim();
+      const img = cleanImageUrl(document.getElementById('newOfferImgUrl').value);
+      const editIndex = parseInt(document.getElementById('editOfferIndex').value);
+
+      if(!tag || !title) return alert('أدخل شارة وعنوان العرض!');
+
+      if (editIndex === -1) {
+        offersData.push({ id: 'o' + Date.now(), tag, title, subtitle, img });
+      } else {
+        offersData[editIndex].tag = tag;
+        offersData[editIndex].title = title;
+        offersData[editIndex].subtitle = subtitle;
+        offersData[editIndex].img = img;
+        resetOfferForm();
+      }
+      saveAndSync();
+    }
+
+    function editOffer(i) {
+      const offer = offersData[i];
+      document.getElementById('newOfferTag').value = offer.tag;
+      document.getElementById('newOfferTitle').value = offer.title;
+      document.getElementById('newOfferSub').value = offer.subtitle || '';
+      document.getElementById('newOfferImgUrl').value = offer.img || '';
+      document.getElementById('editOfferIndex').value = i;
+      document.getElementById('offerCardTitle').innerText = '✏️ تعديل العرض';
+      document.getElementById('offerSubmitBtn').innerText = 'حفظ التعديل';
+      document.getElementById('offerSubmitBtn').classList.add('edit-mode');
+      document.getElementById('offerCancelBtn').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetOfferForm() {
+      document.getElementById('newOfferTag').value = '';
+      document.getElementById('newOfferTitle').value = '';
+      document.getElementById('newOfferSub').value = '';
+      document.getElementById('newOfferImgUrl').value = '';
+      document.getElementById('editOfferIndex').value = -1;
+      document.getElementById('offerCardTitle').innerText = '➕ إضافة عرض جديد';
+      document.getElementById('offerSubmitBtn').innerText = 'إضافة العرض';
+      document.getElementById('offerSubmitBtn').classList.remove('edit-mode');
+      document.getElementById('offerCancelBtn').style.display = 'none';
+    }
+
+    function deleteOffer(i, title) { 
+      if(confirm(`هل أنت متأكد من حذف العرض "${title}"؟`)) { 
+        offersData.splice(i, 1); 
+        resetOfferForm();
+        saveAndSync(); 
+      } 
+    }
+
+    // --- التواصل ---
+    function saveSocialLinks() {
+      socialData = {
+        wa: document.getElementById('socialWa').value.trim(),
+        phone: document.getElementById('socialPhone').value.trim(),
+        landline: document.getElementById('socialLandline').value.trim(),
+        fb: document.getElementById('socialFb').value.trim(),
+        insta: document.getElementById('socialInsta').value.trim(),
+        tiktok: document.getElementById('socialTiktok').value.trim()
+      };
+      saveAndSync();
+      alert('✨ تم حفظ وسائل التواصل بنجاح!');
+    }
+
+    function saveAndSync() {
+      localStorage.setItem('crystal_categories', JSON.stringify(categoriesData));
+      localStorage.setItem('crystal_cat_products', JSON.stringify(catProductsData));
+      localStorage.setItem('crystal_offers', JSON.stringify(offersData));
+      localStorage.setItem('crystal_trending', JSON.stringify(trendingData));
+      localStorage.setItem('crystal_social', JSON.stringify(socialData));
+      
+      // إعادة تصفير الحقول وإعادة العرض
+      document.querySelectorAll('input[type="text"]:not([id^="social"]), input[type="number"]').forEach(input => {
+        if (!input.id.includes('Index')) input.value = '';
+      });
+      
+      renderAdminLists();
+    }
+
+    renderAdminLists();
+  </script>
 </body>
 </html>
