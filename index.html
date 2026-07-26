@@ -77,7 +77,7 @@
     .section-divider .dot { width: 6px; height: 6px; border-radius: 50%; background-color: #0284c7; }
     .section-divider .title { font-size: 15px; font-weight: 800; color: #0f172a; white-space: nowrap; }
 
-    /* سلايدر العروض */
+    /* سلايدر العروض المعدّل مع دعم الصور */
     .slider-wrapper { padding: 15px 20px 5px; }
     .slider-container {
       display: flex;
@@ -95,12 +95,31 @@
       background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
       border-radius: 16px;
       padding: 16px;
-      min-height: 110px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-sizing: border-box;
+    }
+    
+    .slide-content {
+      flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
-    
+
+    .slide-img {
+      width: 95px;
+      height: 95px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      border: 2px solid #ffffff;
+      flex-shrink: 0;
+    }
+
     .badge-discount {
       background: var(--orange-btn);
       color: #fff;
@@ -111,8 +130,8 @@
       width: fit-content;
       margin-bottom: 6px;
     }
-    .slide-title { font-size: 20px; font-weight: 900; color: #1e293b; }
-    .slide-sub { font-size: 14px; font-weight: 700; color: #475569; }
+    .slide-title { font-size: 18px; font-weight: 900; color: #1e293b; }
+    .slide-sub { font-size: 13px; font-weight: 700; color: #475569; margin-top: 2px; }
 
     .slider-dots { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 8px; }
     .dot-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: #cbd5e1; transition: all 0.3s ease; }
@@ -216,7 +235,7 @@
     .security-footer { text-align: center; padding: 15px 20px 5px; font-size: 11px; color: #94a3b8; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .security-badge { display: inline-flex; align-items: center; gap: 5px; color: #16a34a; font-weight: 700; font-size: 11px; }
 
-    /* النوافذ المنبثقة (السلة والقوانين) */
+    /* النوافذ المنبثقة */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 2000;
@@ -404,7 +423,7 @@
       </div>
     </div>
 
-    <!-- 2. نافذة الشروط واسم المستلم معدلة -->
+    <!-- 2. نافذة الشروط واسم المستلم -->
     <div class="modal-overlay" id="rulesModalOverlay">
       <div class="modal-card">
         <div class="modal-header">
@@ -412,7 +431,6 @@
           <button class="close-modal-btn" onclick="toggleRulesModal(false)">✕</button>
         </div>
 
-        <!-- خانة الاسم مع التعديل المطلوب -->
         <div class="customer-info-box">
           <div class="form-group">
             <label for="custName">👤 اسم حضرتك (المستلم):</label>
@@ -446,9 +464,20 @@
       { id: "3", name: "اللولي", img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
     ];
 
+    /* مصفوفة العروض مع إضافة رابط الصورة لكل عرض */
     const defaultOffers = [
-      { tag: "🎁 خصومات هذا الأسبوع", title: "خصم 15%", subtitle: "على جميع تشكيلات السلاسل" },
-      { tag: "🔥 عرض خاص جداً", title: "خصم 20%", subtitle: "على أطقم الخرز المميزة" }
+      { 
+        tag: "🎁 خصومات هذا الأسبوع", 
+        title: "خصم 15%", 
+        subtitle: "على جميع تشكيلات السلاسل",
+        img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg"
+      },
+      { 
+        tag: "🔥 عرض خاص جداً", 
+        title: "خصم 20%", 
+        subtitle: "على أطقم الخرز المميزة",
+        img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp"
+      }
     ];
 
     const defaultTrending = [
@@ -573,7 +602,7 @@
         : "🚚 توصيل للمنزل (في انتظار التواصل لتأكيد العنوان والتفاصيل 🛵)";
 
       let msg = "أهلاً وسهلاً كرستال الزنقة! 🌸✨\n";
-      msg += "حابب/حاببة أؤكد الطلب الجميل ده معاكم: 👇\n\n";
+      msg += "حابب/حاببة أؤكد الطلب الجميل ده معكم: 👇\n\n";
       msg += `👤 **اسم المستلم:** ${custName}\n\n`;
       msg += `📍 **طريقة الاستلام:**\n${deliveryText}\n\n`;
       msg += `📦 **قائمة المنتجات المطلوبة:**\n`;
@@ -628,6 +657,7 @@
       });
     }
 
+    /* دالة السلايدر المعدلة لترسيم الصور بجانب النص */
     function renderSlider(offers) {
       const slider = document.getElementById("offerSlider");
       const dotsContainer = document.getElementById("sliderDots");
@@ -637,9 +667,12 @@
       offers.forEach((offer, idx) => {
         slider.innerHTML += `
           <div class="slide">
-            <span class="badge-discount">${offer.tag}</span>
-            <div class="slide-title">${offer.title}</div>
-            <div class="slide-sub">${offer.subtitle}</div>
+            <div class="slide-content">
+              <span class="badge-discount">${offer.tag}</span>
+              <div class="slide-title">${offer.title}</div>
+              <div class="slide-sub">${offer.subtitle}</div>
+            </div>
+            ${offer.img ? `<img src="${offer.img}" alt="${offer.title}" class="slide-img">` : ''}
           </div>
         `;
         dotsContainer.innerHTML += `<div class="dot-indicator ${idx === 0 ? 'active' : ''}"></div>`;
