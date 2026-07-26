@@ -191,7 +191,7 @@
       if(tabId === 'tabCatProducts') updateCategoryDropdown();
     }
 
-    // دالة استخراج وتطهير رابط الصورة لو اتلصق كود كامل
+    // دالة استخراج وتطهير رابط الصورة
     function cleanImageUrl(rawInput) {
       let input = rawInput.trim();
       if (!input) return '';
@@ -204,13 +204,16 @@
 
     function updateCategoryDropdown() {
       const select = document.getElementById('productCategorySelect');
-      select.innerHTML = '<option value="">-- اختر القسم --</option>';
+      let optionsHtml = '<option value="">-- اختر القسم أولاً --</option>';
       categoriesData.forEach(cat => {
-        select.innerHTML += `<option value="${cat.id}">${escapeHtml(cat.name)}</option>`;
+        optionsHtml += `<option value="${cat.id}">${escapeHtml(cat.name)}</option>`;
       });
+      select.innerHTML = optionsHtml;
     }
 
     function renderAdminLists() {
+      updateCategoryDropdown(); // تحديث القائمة المنسدلة تلقائياً مع كل عملية حفظ
+
       // 1. الأقسام الرئيسية
       const catList = document.getElementById('adminCategoriesList');
       let catHtml = '';
@@ -240,7 +243,7 @@
           <div class="admin-list-item">
             ${prod.img ? `<img src="${prod.img}" onerror="this.style.display='none'">` : ''}
             <div class="admin-item-info">
-              <h5>${escapeHtml(prod.name)} (${escapeHtml(catName)})</h5>
+              <h5>${escapeHtml(prod.name)} <span style="font-size:10px; color:#0284c7;">(${escapeHtml(catName)})</span></h5>
               <p>${prod.price} ج.م</p>
             </div>
             <div class="item-actions">
@@ -364,7 +367,7 @@
       const img = cleanImageUrl(document.getElementById('newProdImgUrl').value);
       const editIndex = parseInt(document.getElementById('editProdIndex').value);
 
-      if(!categoryId) return alert('يرجى اختيار القسم أولاً!');
+      if(!categoryId) return alert('يرجى اختيار القسم أولاً من القائمة!');
       if(!name || isNaN(price)) return alert('أدخل اسم المنتج والسعر بشكل صحيح!');
       if(price <= 0) return alert('السعر يجب أن يكون أكبر من صفر!');
 
@@ -510,7 +513,6 @@
       document.getElementById('offerCardTitle').innerText = '✏️ تعديل العرض';
       document.getElementById('offerSubmitBtn').innerText = 'حفظ التعديل';
       document.getElementById('offerSubmitBtn').classList.add('edit-mode');
-      document.getElementById('offerCardTitle').style.display = 'block';
       document.getElementById('offerCancelBtn').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
