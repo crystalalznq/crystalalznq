@@ -49,6 +49,8 @@
     .form-group label { font-size: 12px; font-weight: bold; color: #334155; }
     .form-group input, .form-group select { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; background: #fff; }
 
+    .time-inputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
     .action-btn { background: var(--primary-blue); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
     .action-btn.edit-mode { background: var(--success-green); }
     .action-btn.purple-btn { background: var(--purple-accent); }
@@ -59,6 +61,7 @@
     .admin-category-group-body { padding: 8px; }
 
     .admin-list-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--border-gray); border-radius: 8px; margin-bottom: 6px; background: #fff; gap: 8px; }
+    .admin-list-item.expired-item { background: #fff5f5; border-color: #fecaca; }
     .admin-list-item img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: #f8fafc; }
     .admin-item-info { flex: 1; min-width: 0; overflow: hidden; }
     .admin-item-info h5 { font-size: 12px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
@@ -76,14 +79,14 @@
   <div class="admin-container">
     <div class="admin-header">
       <h2>🛠️ لوحة الإدارة والتحكم</h2>
-      <p>إدارة الأقسام والعروض والمنتجات</p>
+      <p>إدارة العروض المتقدمة والربط بالمنتجات</p>
     </div>
 
     <div class="admin-tabs">
       <button class="tab-btn active" onclick="switchAdminTab('tabCategories', event)">🌸 الأقسام</button>
-      <button class="tab-btn" onclick="switchAdminTab('tabCatProducts', event)">📦 منتجات الأقسام</button>
+      <button class="tab-btn" onclick="switchAdminTab('tabCatProducts', event)">📦 المنتجات</button>
       <button class="tab-btn" onclick="switchAdminTab('tabTrending', event)">🔥 الأكثر مبيعاً</button>
-      <button class="tab-btn" onclick="switchAdminTab('tabOffers', event)">🎁 العروض</button>
+      <button class="tab-btn" onclick="switchAdminTab('tabOffers', event)">🎁 العروض والعداد</button>
       <button class="tab-btn" onclick="switchAdminTab('tabSocial', event)">📞 التواصل</button>
     </div>
 
@@ -93,7 +96,7 @@
         <div class="admin-card-title" id="catCardTitle">➕ إضافة قسم رئيسي</div>
         <input type="hidden" id="editCatIndex" value="-1">
         <div class="form-group"><label>اسم القسم:</label><input type="text" id="newCatName" placeholder="مثال: أطواق هاند ميد"></div>
-        <div class="form-group"><label>رابط صورة القسم:</label><input type="text" id="newCatImgUrl" placeholder="الصق رابط الصورة أو كود ImgBB" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <div class="form-group"><label>رابط صورة القسم:</label><input type="text" id="newCatImgUrl" placeholder="الصق رابط الصورة أو كود ImgBB" autocomplete="off"></div>
         <button class="action-btn" id="catSubmitBtn" onclick="saveCategory()">إضافة القسم</button>
         <button class="action-btn cancel-edit-btn" id="catCancelBtn" onclick="resetCategoryForm()">إلغاء التعديل</button>
       </div>
@@ -103,7 +106,7 @@
       </div>
     </div>
 
-    <!-- تبويب منتجات داخل الأقسام -->
+    <!-- تبويب منتجات الأقسام -->
     <div id="tabCatProducts" class="tab-content">
       <div class="admin-card">
         <div class="admin-card-title" id="prodCardTitle">➕ إضافة منتج داخل قسم</div>
@@ -116,7 +119,7 @@
         </div>
         <div class="form-group"><label>اسم المنتج:</label><input type="text" id="newProdName" placeholder="مثال: طوق ورد أحمر"></div>
         <div class="form-group"><label>السعر (جنيه):</label><input type="number" id="newProdPrice" placeholder="45"></div>
-        <div class="form-group"><label>رابط صورة المنتج:</label><input type="text" id="newProdImgUrl" placeholder="الصق رابط الصورة أو كود ImgBB" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <div class="form-group"><label>رابط صورة المنتج:</label><input type="text" id="newProdImgUrl" placeholder="الصق رابط الصورة" autocomplete="off"></div>
         <button class="action-btn purple-btn" id="prodSubmitBtn" onclick="saveCategoryProduct()">إضافة المنتج للقسم</button>
         <button class="action-btn cancel-edit-btn" id="prodCancelBtn" onclick="resetProductForm()">إلغاء التعديل</button>
       </div>
@@ -133,7 +136,7 @@
         <input type="hidden" id="editTrendIndex" value="-1">
         <div class="form-group"><label>اسم المنتج:</label><input type="text" id="newTrendName" placeholder="مثال: لولي أبيض"></div>
         <div class="form-group"><label>السعر (جنيه):</label><input type="number" id="newTrendPrice" placeholder="50"></div>
-        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newTrendImgUrl" placeholder="الصق الرابط هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newTrendImgUrl" placeholder="الصق الرابط هنا" autocomplete="off"></div>
         <button class="action-btn" id="trendSubmitBtn" onclick="saveTrending()">إضافة المنتج</button>
         <button class="action-btn cancel-edit-btn" id="trendCancelBtn" onclick="resetTrendingForm()">إلغاء التعديل</button>
       </div>
@@ -146,22 +149,59 @@
     <!-- تبويب العروض المتحركة -->
     <div id="tabOffers" class="tab-content">
       <div class="admin-card">
-        <div class="admin-card-title" id="offerCardTitle">➕ إضافة عرض جديد مع عداد تنازلي</div>
+        <div class="admin-card-title" id="offerCardTitle">➕ إضافة عرض جديد مع عداد تنازلي وربط توجيه</div>
         <input type="hidden" id="editOfferIndex" value="-1">
         <div class="form-group"><label>شارة العرض (Tag):</label><input type="text" id="newOfferTag" placeholder="مثال: خصم خاص 🎁"></div>
-        <div class="form-group"><label>عنوان العرض الرئيسي:</label><input type="text" id="newOfferTitle" placeholder="مثال: خصم 20% على جميع السلاسل"></div>
-        <div class="form-group"><label>الوصف الفرعي:</label><input type="text" id="newOfferSub" placeholder="مثال: العرض ساري لفترة محدودة جداً"></div>
-        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق رابط الصورة هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <div class="form-group"><label>عنوان العرض الرئيسي:</label><input type="text" id="newOfferTitle" placeholder="مثال: خصم 20% على السلاسل"></div>
+        <div class="form-group"><label>الوصف الفرعي:</label><input type="text" id="newOfferSub" placeholder="مثال: لفترة محدودة جداً"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق رابط الصورة هنا" autocomplete="off"></div>
+        
+        <!-- تحديد وقت العداد الدقيق -->
         <div class="form-group">
-          <label>مدة انتهاء العرض (بالأيام من الآن):</label>
-          <input type="number" id="newOfferDays" placeholder="مثال: 3 (يعني ينتهي بعد 3 أيام)" min="1" value="3">
+          <label>⏳ مدة العرض (أيام، ساعات، دقائق):</label>
+          <div class="time-inputs-grid">
+            <input type="number" id="offerDays" placeholder="أيام" min="0" value="1">
+            <input type="number" id="offerHours" placeholder="ساعات" min="0" max="23" value="0">
+            <input type="number" id="offerMinutes" placeholder="دقائق" min="0" max="59" value="0">
+          </div>
         </div>
+
+        <!-- تحديد وجهة زر استخدام العرض -->
+        <div class="form-group">
+          <label>🔗 توجيه الزر عند الضغط (إلى أين يذهب العميل؟):</label>
+          <select id="offerTargetSelect" onchange="handleOfferTargetChange()">
+            <option value="store">متجر عام (بدون تحديد وجهة خاصة)</option>
+            <option value="category">قسم محدد بالكامل</option>
+            <option value="product">منتج محدد بعينه</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="targetCategoryGroup" style="display: none;">
+          <label>اختر القسم المستهدف:</label>
+          <select id="targetCategorySelect">
+            <option value="">-- اختر القسم --</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="targetProductGroup" style="display: none;">
+          <label>اختر المنتج المستهدف:</label>
+          <select id="targetProductSelect">
+            <option value="">-- اختر المنتج --</option>
+          </select>
+        </div>
+
         <button class="action-btn" id="offerSubmitBtn" onclick="saveOffer()">إضافة العرض وتفعيل العداد</button>
         <button class="action-btn cancel-edit-btn" id="offerCancelBtn" onclick="resetOfferForm()">إلغاء التعديل</button>
       </div>
+      
       <div class="admin-card">
-        <div class="admin-card-title">🎁 العروض النشطة حالياً</div>
+        <div class="admin-card-title">🎁 العروض النشطة حالياً بالموقع</div>
         <div id="adminOffersList"></div>
+      </div>
+
+      <div class="admin-card" style="border-color: #fecaca; background: #fffafaf0;">
+        <div class="admin-card-title" style="color: var(--danger-red); border-bottom-color: #fee2e2;">⚠️ العروض المنتهية (تمت إزالتها تلقائياً)</div>
+        <div id="adminExpiredOffersList"></div>
       </div>
     </div>
 
@@ -195,6 +235,7 @@
       event.target.classList.add('active');
       document.getElementById(tabId).classList.add('active');
       if(tabId === 'tabCatProducts') updateCategoryDropdown();
+      if(tabId === 'tabOffers') updateOfferTargetDropdowns();
     }
 
     function cleanImageUrl(rawInput) {
@@ -216,8 +257,35 @@
       select.innerHTML = optionsHtml;
     }
 
+    function updateOfferTargetDropdowns() {
+      // 1. الأقسام
+      const catSelect = document.getElementById('targetCategorySelect');
+      let catOpts = '<option value="">-- اختر القسم --</option>';
+      categoriesData.forEach(cat => {
+        catOpts += `<option value="${cat.id}">${escapeHtml(cat.name)}</option>`;
+      });
+      catSelect.innerHTML = catOpts;
+
+      // 2. المنتجات
+      const prodSelect = document.getElementById('targetProductSelect');
+      let prodOpts = '<option value="">-- اختر المنتج --</option>';
+      catProductsData.forEach(prod => {
+        const cat = categoriesData.find(c => c.id === prod.categoryId);
+        const catName = cat ? cat.name : 'قسم محذوف';
+        prodOpts += `<option value="${prod.id}">${escapeHtml(prod.name)} (${escapeHtml(catName)})</option>`;
+      });
+      prodSelect.innerHTML = prodOpts;
+    }
+
+    function handleOfferTargetChange() {
+      const targetType = document.getElementById('offerTargetSelect').value;
+      document.getElementById('targetCategoryGroup').style.display = (targetType === 'category') ? 'flex' : 'none';
+      document.getElementById('targetProductGroup').style.display = (targetType === 'product') ? 'flex' : 'none';
+    }
+
     function renderAdminLists() {
       updateCategoryDropdown();
+      updateOfferTargetDropdowns();
 
       // 1. الأقسام الرئيسية
       const catList = document.getElementById('adminCategoriesList');
@@ -241,7 +309,6 @@
       // 2. منتجات الأقسام
       const prodList = document.getElementById('adminCatProductsList');
       let prodHtml = '';
-
       if (categoriesData.length === 0) {
         prodHtml = '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">أضف أقساماً رئيسية أولاً</p>';
       } else {
@@ -255,7 +322,6 @@
               </div>
               <div class="admin-category-group-body">
           `;
-
           if (productsInThisCat.length === 0) {
             prodHtml += `<p style="font-size: 11px; color: #94a3b8; text-align: center; padding: 6px;">لا توجد منتجات في هذا القسم بعد</p>`;
           } else {
@@ -301,28 +367,54 @@
       });
       trendList.innerHTML = trendHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد منتجات مضافة بعد</p>';
 
-      // 4. العروض المتحركة
+      // 4. العروض (نشطة ومنتهية)
+      const now = Date.now();
+      const activeOffers = offersData.filter(o => o.endTime > now);
+      const expiredOffers = offersData.filter(o => o.endTime <= now);
+
       const offerList = document.getElementById('adminOffersList');
       let offerHtml = '';
-      offersData.forEach((offer, index) => {
-        let remainingDays = Math.ceil((offer.endTime - Date.now()) / (1000 * 60 * 60 * 24));
-        if (remainingDays < 0) remainingDays = 0;
+      activeOffers.forEach((offer) => {
+        const originalIndex = offersData.findIndex(o => o.id === offer.id);
+        const diffMs = offer.endTime - now;
+        const d = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
         offerHtml += `
           <div class="admin-list-item">
             ${offer.img ? `<img src="${offer.img}" onerror="this.style.display='none'">` : ''}
             <div class="admin-item-info">
               <h5>${escapeHtml(offer.title)}</h5>
-              <p>⏳ ينتهي خلال: ${remainingDays} أيام (${escapeHtml(offer.tag)})</p>
+              <p>⏳ متبقي: ${d} يوم و ${h} ساعة و ${m} دقيقة</p>
             </div>
             <div class="item-actions">
-              <button class="mini-btn btn-edit" onclick="editOffer(${index})">تعديل</button>
-              <button class="mini-btn btn-delete" onclick="deleteOffer(${index}, '${escapeHtml(offer.title)}')">حذف</button>
+              <button class="mini-btn btn-edit" onclick="editOffer(${originalIndex})">تعديل</button>
+              <button class="mini-btn btn-delete" onclick="deleteOffer(${originalIndex}, '${escapeHtml(offer.title)}')">حذف</button>
             </div>
           </div>
         `;
       });
-      offerList.innerHTML = offerHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد عروض نشطة بعد</p>';
+      offerList.innerHTML = offerHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد عروض نشطة حالياً</p>';
+
+      const expiredList = document.getElementById('adminExpiredOffersList');
+      let expiredHtml = '';
+      expiredOffers.forEach((offer) => {
+        const originalIndex = offersData.findIndex(o => o.id === offer.id);
+        expiredHtml += `
+          <div class="admin-list-item expired-item">
+            ${offer.img ? `<img src="${offer.img}" onerror="this.style.display='none'">` : ''}
+            <div class="admin-item-info">
+              <h5 style="color: #991b1b;">${escapeHtml(offer.title)}</h5>
+              <p style="color: #b91c1c;">❌ انتهى الوقت وتم إزالته تلقائياً من الموقع</p>
+            </div>
+            <div class="item-actions">
+              <button class="mini-btn btn-delete" onclick="deleteOffer(${originalIndex}, '${escapeHtml(offer.title)}')">حذف نهائي</button>
+            </div>
+          </div>
+        `;
+      });
+      expiredList.innerHTML = expiredHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد عروض منتهية مسجلة</p>';
 
       // 5. التواصل
       document.getElementById('socialWa').value = socialData.wa || '';
@@ -338,14 +430,12 @@
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // --- الأقسام الرئيسية ---
+    // --- حفظ الأقسام ---
     function saveCategory() {
       const name = document.getElementById('newCatName').value.trim();
       const img = cleanImageUrl(document.getElementById('newCatImgUrl').value);
       const editIndex = parseInt(document.getElementById('editCatIndex').value);
-
       if(!name) return alert('أدخل اسم القسم من فضلك!');
-
       if (editIndex === -1) {
         categoriesData.push({ id: 'cat_' + Date.now(), name, img });
       } else {
@@ -388,7 +478,7 @@
       } 
     }
 
-    // --- منتجات الأقسام ---
+    // --- حفظ منتجات الأقسام ---
     function saveCategoryProduct() {
       const categoryId = document.getElementById('productCategorySelect').value;
       const name = document.getElementById('newProdName').value.trim();
@@ -396,9 +486,8 @@
       const img = cleanImageUrl(document.getElementById('newProdImgUrl').value);
       const editIndex = parseInt(document.getElementById('editProdIndex').value);
 
-      if(!categoryId) return alert('يرجى اختيار القسم أولاً من القائمة!');
-      if(!name || isNaN(price)) return alert('أدخل اسم المنتج والسعر بشكل صحيح!');
-      if(price <= 0) return alert('السعر يجب أن يكون أكبر من صفر!');
+      if(!categoryId) return alert('يرجى اختيار القسم أولاً!');
+      if(!name || isNaN(price) || price <= 0) return alert('أدخل اسم المنتج وسعراً صحيحاً!');
 
       if (editIndex === -1) {
         catProductsData.push({ id: 'prod_' + Date.now(), categoryId, name, price, img });
@@ -420,7 +509,7 @@
       document.getElementById('newProdPrice').value = prod.price;
       document.getElementById('newProdImgUrl').value = prod.img || '';
       document.getElementById('editProdIndex').value = i;
-      document.getElementById('prodCardTitle').innerText = '✏️ تعديل منتج القسم';
+      document.getElementById('prodCardTitle').innerText = '✏️ تعديل المنتج';
       document.getElementById('prodSubmitBtn').innerText = 'حفظ التعديل';
       document.getElementById('prodSubmitBtn').classList.add('edit-mode');
       document.getElementById('prodCancelBtn').style.display = 'block';
@@ -447,15 +536,14 @@
       }
     }
 
-    // --- الأكثر مبيعاً ---
+    // --- حفظ الأكثر مبيعاً ---
     function saveTrending() {
       const name = document.getElementById('newTrendName').value.trim();
       const price = parseFloat(document.getElementById('newTrendPrice').value);
       const img = cleanImageUrl(document.getElementById('newTrendImgUrl').value);
       const editIndex = parseInt(document.getElementById('editTrendIndex').value);
 
-      if(!name || isNaN(price)) return alert('أدخل اسم المنتج والسعر بشكل صحيح!');
-      if(price <= 0) return alert('السعر يجب أن يكون أكبر من صفر!');
+      if(!name || isNaN(price) || price <= 0) return alert('أدخل بيانات المنتج بدقة!');
 
       if (editIndex === -1) {
         trendingData.push({ id: 't' + Date.now(), name, price, img });
@@ -500,29 +588,41 @@
       } 
     }
 
-    // --- العروض المتحركة مع العداد التنازلي التلقائي ---
+    // --- حفظ العروض المتطورة ---
     function saveOffer() {
       const tag = document.getElementById('newOfferTag').value.trim();
       const title = document.getElementById('newOfferTitle').value.trim();
       const subtitle = document.getElementById('newOfferSub').value.trim();
       const img = cleanImageUrl(document.getElementById('newOfferImgUrl').value);
-      const daysInput = parseInt(document.getElementById('newOfferDays').value) || 3;
+
+      const days = parseInt(document.getElementById('offerDays').value) || 0;
+      const hours = parseInt(document.getElementById('offerHours').value) || 0;
+      const minutes = parseInt(document.getElementById('offerMinutes').value) || 0;
+
+      const targetType = document.getElementById('offerTargetSelect').value;
+      const targetCategoryId = document.getElementById('targetCategorySelect').value;
+      const targetProductId = document.getElementById('targetProductSelect').value;
       const editIndex = parseInt(document.getElementById('editOfferIndex').value);
 
       if(!tag || !title) return alert('أدخل شارة وعنوان العرض!');
+      if(days === 0 && hours === 0 && minutes === 0) return alert('يجب تحديد وقت انتهاء (أيام أو ساعات أو دقائق على الأقل)!');
 
-      // حساب وقت الانتهاء الدقيق (الوقت الحالي + عدد الأيام المحددة)
-      const endTime = Date.now() + (daysInput * 24 * 60 * 60 * 1000);
+      if(targetType === 'category' && !targetCategoryId) return alert('برجاء اختيار القسم المستهدف!');
+      if(targetType === 'product' && !targetProductId) return alert('برجاء اختيار المنتج المستهدف!');
+
+      const totalMs = (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
+      const endTime = Date.now() + totalMs;
+
+      const offerObj = {
+        id: editIndex !== -1 ? offersData[editIndex].id : 'o' + Date.now(),
+        tag, title, subtitle, img, endTime,
+        targetType, targetCategoryId, targetProductId
+      };
 
       if (editIndex === -1) {
-        offersData.push({ id: 'o' + Date.now(), tag, title, subtitle, img, endTime });
+        offersData.push(offerObj);
       } else {
-        offersData[editIndex].tag = tag;
-        offersData[editIndex].title = title;
-        offersData[editIndex].subtitle = subtitle;
-        offersData[editIndex].img = img;
-        // إذا لم يغير المستخدم وقت الانتهاء بشكل جذري، نحتفظ بالوقت القديم أو نحدثه بناءً على الإدخال الجديد
-        offersData[editIndex].endTime = endTime;
+        offersData[editIndex] = offerObj;
         resetOfferForm();
       }
       saveAndSync();
@@ -534,9 +634,25 @@
       document.getElementById('newOfferTitle').value = offer.title;
       document.getElementById('newOfferSub').value = offer.subtitle || '';
       document.getElementById('newOfferImgUrl').value = offer.img || '';
-      
-      let remainingDays = Math.ceil((offer.endTime - Date.now()) / (1000 * 60 * 60 * 24));
-      document.getElementById('newOfferDays').value = remainingDays > 0 ? remainingDays : 1;
+
+      const diffMs = offer.endTime - Date.now();
+      if(diffMs > 0) {
+        const d = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        document.getElementById('offerDays').value = d;
+        document.getElementById('offerHours').value = h;
+        document.getElementById('offerMinutes').value = m;
+      } else {
+        document.getElementById('offerDays').value = 0;
+        document.getElementById('offerHours').value = 0;
+        document.getElementById('offerMinutes').value = 30;
+      }
+
+      document.getElementById('offerTargetSelect').value = offer.targetType || 'store';
+      handleOfferTargetChange();
+      if(offer.targetType === 'category') document.getElementById('targetCategorySelect').value = offer.targetCategoryId || '';
+      if(offer.targetType === 'product') document.getElementById('targetProductSelect').value = offer.targetProductId || '';
 
       document.getElementById('editOfferIndex').value = i;
       document.getElementById('offerCardTitle').innerText = '✏️ تعديل العرض';
@@ -551,9 +667,13 @@
       document.getElementById('newOfferTitle').value = '';
       document.getElementById('newOfferSub').value = '';
       document.getElementById('newOfferImgUrl').value = '';
-      document.getElementById('newOfferDays').value = '3';
+      document.getElementById('offerDays').value = 1;
+      document.getElementById('offerHours').value = 0;
+      document.getElementById('offerMinutes').value = 0;
+      document.getElementById('offerTargetSelect').value = 'store';
+      handleOfferTargetChange();
       document.getElementById('editOfferIndex').value = -1;
-      document.getElementById('offerCardTitle').innerText = '➕ إضافة عرض جديد مع عداد تنازلي';
+      document.getElementById('offerCardTitle').innerText = '➕ إضافة عرض جديد مع عداد تنازلي وربط توجيه';
       document.getElementById('offerSubmitBtn').innerText = 'إضافة العرض وتفعيل العداد';
       document.getElementById('offerSubmitBtn').classList.remove('edit-mode');
       document.getElementById('offerCancelBtn').style.display = 'none';
@@ -567,7 +687,7 @@
       } 
     }
 
-    // --- التواصل ---
+    // --- وسائل التواصل ---
     function saveSocialLinks() {
       socialData = {
         wa: document.getElementById('socialWa').value.trim(),
@@ -588,8 +708,8 @@
       localStorage.setItem('crystal_trending', JSON.stringify(trendingData));
       localStorage.setItem('crystal_social', JSON.stringify(socialData));
       
-      document.querySelectorAll('input[type="text"]:not([id^="social"]), input[type="number"]').forEach(input => {
-        if (!input.id.includes('Index') && input.id !== 'newOfferDays') input.value = '';
+      document.querySelectorAll('input[type="text"]:not([id^="social"]), input[type="number"]:not([id^="offer"])').forEach(input => {
+        if (!input.id.includes('Index')) input.value = '';
       });
       
       renderAdminLists();
