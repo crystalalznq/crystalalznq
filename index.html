@@ -494,7 +494,6 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 </button>
 </div>
 </div>
-</div>
 
 <script>
 const defaultCategories = [
@@ -748,21 +747,28 @@ slider.onmouseleave = startAutoSlider;
 
 activeOffers.forEach((offer, idx) => {
 let actionButtonHtml = '';
-// إظهار زر التصفح فقط إذا لم يكن العرض عاماً (أي يتبع لقسم أو منتج معين)
+
+// إظهار الزر فقط إذا كان العرض مرتبطاً بقسم أو منتج
 if (offer.targetType && offer.targetType !== 'general') {
-actionButtonHtml = `<button class="slide-action-btn" onclick="handleOfferAction('${offer.title}')">تصفح العرض 👈</button>`;
+    actionButtonHtml = `
+        <button class="slide-action-btn"
+            onclick="handleOfferAction('${offer.title}')">
+            تصفح العرض 👈
+        </button>`;
 }
 
 slider.innerHTML += `
 <div class="slide" id="slide-${offer.id}">
-<div class="slide-content">
-<span class="badge-discount">${offer.tag}</span>
-<div class="slide-title">${offer.title}</div>
-<div class="slide-sub">${offer.subtitle}</div>
-<div class="countdown-timer" id="timer-${offer.id}">${offer.endTime ? 'جاري حساب الوقت...' : '📢 عرض مستمر'}</div>
-${actionButtonHtml}
-</div>
-${offer.img ? `<img src="${offer.img}" alt="${offer.title}" class="slide-img" onerror="this.style.display='none'">` : ''}
+    <div class="slide-content">
+        <span class="badge-discount">${offer.tag}</span>
+        <div class="slide-title">${offer.title}</div>
+        <div class="slide-sub">${offer.subtitle}</div>
+        <div class="countdown-timer" id="timer-${offer.id}">
+            ${offer.endTime ? 'جاري حساب الوقت...' : '📢 عرض مستمر'}
+        </div>
+        ${actionButtonHtml}
+    </div>
+    ${offer.img ? `<img src="${offer.img}" alt="${offer.title}" class="slide-img" onerror="this.style.display='none'">` : ''}
 </div>`;
 dotsContainer.innerHTML += `<div class="dot-indicator ${idx === 0 ? 'active' : ''}" onclick="scrollToSlide(${idx})"></div>`;
 });
