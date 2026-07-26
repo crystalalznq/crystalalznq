@@ -404,7 +404,7 @@
       </div>
     </div>
 
-    <!-- 2. نافذة الشروط واسم المستلم فقط -->
+    <!-- 2. نافذة الشروط واسم المستلم معدلة -->
     <div class="modal-overlay" id="rulesModalOverlay">
       <div class="modal-card">
         <div class="modal-header">
@@ -412,11 +412,11 @@
           <button class="close-modal-btn" onclick="toggleRulesModal(false)">✕</button>
         </div>
 
-        <!-- خانة الاسم فقط -->
+        <!-- خانة الاسم مع التعديل المطلوب -->
         <div class="customer-info-box">
           <div class="form-group">
-            <label for="custName">👤 اسم حضرتك الكامل (المستلم):</label>
-            <input type="text" id="custName" placeholder="مثال: أستاذة أمنية علي" oninput="validateForm()">
+            <label for="custName">👤 اسم حضرتك (المستلم):</label>
+            <input type="text" id="custName" placeholder="مثال: الأستاذ محمد سالم / علياء قمرون" oninput="validateForm()">
           </div>
         </div>
 
@@ -479,7 +479,6 @@
       }
     }
 
-    /* التحقق من وجود الاسم والموافقة على الشروط فقط */
     function validateForm() {
       const name = document.getElementById("custName").value.trim();
       const checked = document.getElementById("acceptRulesCheckbox").checked;
@@ -566,7 +565,6 @@
       totalText.innerText = `💰 الإجمالي الكلي: ${total} جنيه`;
     }
 
-    /* نص الواتساب شامل اسم المستلم */
     function checkoutWhatsApp() {
       const custName = document.getElementById("custName").value.trim();
 
