@@ -55,10 +55,15 @@
     .action-btn.purple-btn { background: var(--purple-accent); }
     .cancel-edit-btn { background: #64748b; margin-top: 5px; display: none; }
 
-    .admin-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid var(--border-gray); border-radius: 10px; margin-bottom: 8px; background: #fff; gap: 10px; }
-    .admin-list-item img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: #f8fafc; }
+    /* تصميم عرض المنتجات مرتبة داخل الأقسام في لوحة التحكم */
+    .admin-category-group { border: 1px solid var(--border-gray); border-radius: 12px; margin-bottom: 12px; overflow: hidden; background: #fafafa; }
+    .admin-category-group-header { background: #f1f5f9; padding: 10px 12px; font-size: 13px; font-weight: 800; color: var(--admin-dark); border-bottom: 1px solid var(--border-gray); display: flex; justify-content: space-between; align-items: center; }
+    .admin-category-group-body { padding: 8px; }
+
+    .admin-list-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--border-gray); border-radius: 8px; margin-bottom: 6px; background: #fff; gap: 8px; }
+    .admin-list-item img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: #f8fafc; }
     .admin-item-info { flex: 1; min-width: 0; overflow: hidden; }
-    .admin-item-info h5 { font-size: 13px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .admin-item-info h5 { font-size: 12px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
     .admin-item-info p { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
     .item-actions { display: flex; gap: 4px; flex-shrink: 0; }
@@ -119,7 +124,7 @@
         <button class="action-btn cancel-edit-btn" id="prodCancelBtn" onclick="resetProductForm()">إلغاء التعديل</button>
       </div>
       <div class="admin-card">
-        <div class="admin-card-title">📦 المنتجات المضافة داخل الأقسام</div>
+        <div class="admin-card-title">📦 المنتجات مرتبة داخل أقسامها</div>
         <div id="adminCatProductsList"></div>
       </div>
     </div>
@@ -191,7 +196,6 @@
       if(tabId === 'tabCatProducts') updateCategoryDropdown();
     }
 
-    // دالة استخراج وتطهير رابط الصورة
     function cleanImageUrl(rawInput) {
       let input = rawInput.trim();
       if (!input) return '';
@@ -212,7 +216,7 @@
     }
 
     function renderAdminLists() {
-      updateCategoryDropdown(); // تحديث القائمة المنسدلة تلقائياً مع كل عملية حفظ
+      updateCategoryDropdown();
 
       // 1. الأقسام الرئيسية
       const catList = document.getElementById('adminCategoriesList');
@@ -233,27 +237,55 @@
       });
       catList.innerHTML = catHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد أقسام مضافة بعد</p>';
 
-      // 2. منتجات الأقسام
+      // 2. منتجات الأقسام (مرتبة داخل كل قسم على حدة)
       const prodList = document.getElementById('adminCatProductsList');
       let prodHtml = '';
-      catProductsData.forEach((prod, index) => {
-        const parentCat = categoriesData.find(c => c.id === prod.categoryId);
-        const catName = parentCat ? parentCat.name : 'قسم محذوف';
-        prodHtml += `
-          <div class="admin-list-item">
-            ${prod.img ? `<img src="${prod.img}" onerror="this.style.display='none'">` : ''}
-            <div class="admin-item-info">
-              <h5>${escapeHtml(prod.name)} <span style="font-size:10px; color:#0284c7;">(${escapeHtml(catName)})</span></h5>
-              <p>${prod.price} ج.م</p>
+
+      if (categoriesData.length === 0) {
+        prodHtml = '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">أضف أقساماً رئيسية أولاً</p>';
+      } else {
+        categoriesData.forEach(cat => {
+          // جلب المنتجات التابعة للقسم الحالي فقط
+          const productsInThisCat = catProductsData.filter(p => p.categoryId === cat.id);
+
+          prodHtml += `
+            <div class="admin-category-group">
+              <div class="admin-category-group-header">
+                <span>📁 ${escapeHtml(cat.name)}</span>
+                <span style="font-size: 11px; background: #e2e8f0; padding: 2px 6px; border-radius: 6px;">${productsInThisCat.length} منتج</span>
+              </div>
+              <div class="admin-category-group-body">
+          `;
+
+          if (productsInThisCat.length === 0) {
+            prodHtml += `<p style="font-size: 11px; color: #94a3b8; text-align: center; padding: 6px;">لا توجد منتجات في هذا القسم بعد</p>`;
+          } else {
+            productsInThisCat.forEach(prod => {
+              // نحتاج معرفة الـ index الحقيقي للمنتج في المصفوفة الأساسية `catProductsData` لتسهيل التعديل والحذف
+              const originalIndex = catProductsData.findIndex(p => p.id === prod.id);
+              prodHtml += `
+                <div class="admin-list-item">
+                  ${prod.img ? `<img src="${prod.img}" onerror="this.style.display='none'">` : ''}
+                  <div class="admin-item-info">
+                    <h5>${escapeHtml(prod.name)}</h5>
+                    <p>${prod.price} ج.م</p>
+                  </div>
+                  <div class="item-actions">
+                    <button class="mini-btn btn-edit" onclick="editCategoryProduct(${originalIndex})">تعديل</button>
+                    <button class="mini-btn btn-delete" onclick="deleteCategoryProduct(${originalIndex}, '${escapeHtml(prod.name)}')">حذف</button>
+                  </div>
+                </div>
+              `;
+            });
+          }
+
+          prodHtml += `
+              </div>
             </div>
-            <div class="item-actions">
-              <button class="mini-btn btn-edit" onclick="editCategoryProduct(${index})">تعديل</button>
-              <button class="mini-btn btn-delete" onclick="deleteCategoryProduct(${index}, '${escapeHtml(prod.name)}')">حذف</button>
-            </div>
-          </div>
-        `;
-      });
-      prodList.innerHTML = prodHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد منتجات داخل الأقسام بعد</p>';
+          `;
+        });
+      }
+      prodList.innerHTML = prodHtml;
 
       // 3. الأكثر مبيعاً
       const trendList = document.getElementById('adminTrendingList');
@@ -352,8 +384,12 @@
     }
 
     function deleteCategory(i, name) { 
-      if(confirm(`هل أنت متأكد من حذف القسم "${name}"؟`)) { 
+      if(confirm(`هل أنت متأكد من حذف القسم "${name}" وكل المنتجات التابعة ليه؟`)) { 
+        const catId = categoriesData[i].id;
+        // حذف القسم نفسه
         categoriesData.splice(i, 1); 
+        // حذف المنتجات المرتبطة به كمان عشان ما يبقاش فيه منتجات يتيمة
+        catProductsData = catProductsData.filter(p => p.categoryId !== catId);
         resetCategoryForm();
         saveAndSync(); 
       } 
