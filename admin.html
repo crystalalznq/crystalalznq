@@ -27,6 +27,7 @@
       padding: 15px;
       border-radius: 16px;
       box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      overflow: hidden; /* لمنع أي خروج للعناصر عن الحدود */
     }
 
     .admin-header { background: var(--admin-dark); color: #fff; padding: 15px; border-radius: 14px; margin-bottom: 15px; text-align: center; }
@@ -42,18 +43,20 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .admin-card { background: #fff; border: 1px solid var(--border-gray); border-radius: 14px; padding: 15px; margin-bottom: 15px; }
+    .admin-card { background: #fff; border: 1px solid var(--border-gray); border-radius: 14px; padding: 15px; margin-bottom: 15px; width: 100%; }
     .admin-card-title { font-size: 14px; font-weight: 800; color: var(--admin-dark); margin-bottom: 12px; border-bottom: 2px solid var(--orange-bg); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
 
-    .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; width: 100%; }
     .form-group label { font-size: 12px; font-weight: bold; color: #334155; }
-    .form-group input, .form-group select { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; background: #fff; }
+    .form-group input, .form-group select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; background: #fff; }
 
-    .checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border-gray); cursor: pointer; }
-    .checkbox-group input { width: 16px; height: 16px; accent-color: var(--orange-btn); cursor: pointer; }
-    .checkbox-group label { font-size: 12px; font-weight: bold; color: #1e293b; cursor: pointer; }
+    .checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border-gray); cursor: pointer; width: 100%; user-select: none; }
+    .checkbox-group input { width: 16px; height: 16px; accent-color: var(--orange-btn); cursor: pointer; flex-shrink: 0; }
+    .checkbox-group label { font-size: 12px; font-weight: bold; color: #1e293b; cursor: pointer; flex: 1; }
 
-    .time-inputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    /* شبكة المدخلات بضبط كامل للأبعاد لتجنب الخروج عن الصفحة */
+    .time-inputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+    .time-inputs-grid input { width: 100%; text-align: center; padding: 8px 4px; font-size: 12px; }
 
     .action-btn { background: var(--primary-blue); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
     .action-btn.edit-mode { background: var(--success-green); }
@@ -64,7 +67,7 @@
     .admin-category-group-header { background: #f1f5f9; padding: 10px 12px; font-size: 13px; font-weight: 800; color: var(--admin-dark); border-bottom: 1px solid var(--border-gray); display: flex; justify-content: space-between; align-items: center; }
     .admin-category-group-body { padding: 8px; }
 
-    .admin-list-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--border-gray); border-radius: 8px; margin-bottom: 6px; background: #fff; gap: 8px; }
+    .admin-list-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--border-gray); border-radius: 8px; margin-bottom: 6px; background: #fff; gap: 8px; width: 100%; }
     .admin-list-item.expired-item { background: #fff5f5; border-color: #fecaca; }
     .admin-list-item img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: #f8fafc; }
     .admin-item-info { flex: 1; min-width: 0; overflow: hidden; }
@@ -160,13 +163,13 @@
         <div class="form-group"><label>الوصف الفرعي:</label><input type="text" id="newOfferSub" placeholder="مثال: لفترة محدودة جداً"></div>
         <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق رابط الصورة هنا" autocomplete="off"></div>
         
-        <!-- تفعيل/إلغاء وقت انتهاء العرض -->
-        <div class="checkbox-group" onclick="toggleTimerCheckbox()">
-          <input type="checkbox" id="hasTimerCheckbox" onchange="handleTimerToggle()">
+        <!-- تفعيل/إلغاء وقت انتهاء العرض (مربوط بدالة آمنة تمنع التهنيج) -->
+        <div class="checkbox-group" id="timerBoxWrapper">
+          <input type="checkbox" id="hasTimerCheckbox">
           <label for="hasTimerCheckbox">تفعيل عداد تنازلي ووقت انتهاء للعرض (اختياري)</label>
         </div>
 
-        <!-- حقول الوقت (تظهر فقط عند تفعيل العداد) -->
+        <!-- حقول الوقت (تظهر وتختفي بسلاسة داخل الحدود) -->
         <div class="form-group" id="timerInputsContainer" style="display: none;">
           <label>⏳ مدة العرض (أيام، ساعات، دقائق):</label>
           <div class="time-inputs-grid">
@@ -180,7 +183,7 @@
         <div class="form-group">
           <label>🔗 توجيه الزر عند الضغط:</label>
           <select id="offerTargetSelect" onchange="handleOfferTargetChange()">
-            <option value="store">عرض عام بالموقع</option>
+            <option value="store">عام (بدون زر تصفح)</option>
             <option value="category">قسم محدد</option>
             <option value="product">منتج محدد (بالتدرج)</option>
           </select>
@@ -248,6 +251,25 @@
     let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || [];
     let socialData = JSON.parse(localStorage.getItem('crystal_social')) || {};
 
+    // ربط الأحداث عند تحميل المستند لتجنب التهنيج نهائياً
+    document.addEventListener("DOMContentLoaded", () => {
+      const timerBox = document.getElementById('timerBoxWrapper');
+      const timerCheckbox = document.getElementById('hasTimerCheckbox');
+
+      if (timerBox && timerCheckbox) {
+        timerBox.addEventListener('click', (e) => {
+          if (e.target !== timerCheckbox) {
+            timerCheckbox.checked = !timerCheckbox.checked;
+          }
+          handleTimerToggle();
+        });
+        timerCheckbox.addEventListener('change', () => {
+          handleTimerToggle();
+        });
+      }
+      renderAdminLists();
+    });
+
     function switchAdminTab(tabId, event) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -277,7 +299,6 @@
     }
 
     function updateOfferTargetDropdowns() {
-      // 1. أقسام زر (قسم محدد)
       const catSelect = document.getElementById('targetCategorySelect');
       let catOpts = '<option value="">-- اختر القسم --</option>';
       categoriesData.forEach(cat => {
@@ -285,7 +306,6 @@
       });
       catSelect.innerHTML = catOpts;
 
-      // 2. تدرج زر (منتجات -> اختر القسم أولاً)
       const filterCatSelect = document.getElementById('targetProdFilterCat');
       let filterCatOpts = '<option value="">-- اختر القسم --</option>';
       categoriesData.forEach(cat => {
@@ -310,15 +330,10 @@
       prodSelect.innerHTML = prodOpts;
     }
 
-    function toggleTimerCheckbox() {
-      const cb = document.getElementById('hasTimerCheckbox');
-      cb.checked = !cb.checked;
-      handleTimerToggle();
-    }
-
     function handleTimerToggle() {
       const hasTimer = document.getElementById('hasTimerCheckbox').checked;
-      document.getElementById('timerInputsContainer').style.display = hasTimer ? 'block' : 'none';
+      const container = document.getElementById('timerInputsContainer');
+      container.style.display = hasTimer ? 'block' : 'none';
     }
 
     function handleOfferTargetChange() {
@@ -421,13 +436,16 @@
       let offerHtml = '';
       activeOffers.forEach((offer) => {
         const originalIndex = offersData.findIndex(o => o.id === offer.id);
-        let timeDesc = '♾️ عرض مستمر (بدون وقت)';
+        let timeDesc = '♾️ عرض عام (بدون زر تصفح وبدون وقت)';
+        if(offer.targetType === 'category') timeDesc = '📁 موجه لقسم محدد';
+        if(offer.targetType === 'product') timeDesc = '📦 موجه لمنتج محدد';
+
         if(offer.hasTimer) {
           const diffMs = offer.endTime - now;
           const d = Math.floor(diffMs / (1000 * 60 * 60 * 24));
           const h = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-          timeDesc = `⏳ متبقي: ${d} يوم و ${h} ساعة و ${m} دقيقة`;
+          timeDesc += ` | ⏳ متبقي: ${d}ي ${h}س ${m}د`;
         }
 
         offerHtml += `
@@ -785,8 +803,6 @@
       
       renderAdminLists();
     }
-
-    renderAdminLists();
   </script>
 </body>
 </html>
