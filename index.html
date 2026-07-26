@@ -63,6 +63,32 @@
       border-radius: 10px;
     }
 
+    /* تصميم العناوين الفاصلة بالخطوط الزرقاء والنقط */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 25px 20px 15px;
+    }
+    .section-divider .line {
+      flex: 1;
+      height: 1px;
+      background-color: #cbd5e1;
+    }
+    .section-divider .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #0284c7;
+    }
+    .section-divider .title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+
     /* سلايدر العروض */
     .slider-wrapper { padding: 15px 20px 5px; }
     .slider-container {
@@ -100,6 +126,27 @@
     .slide-title { font-size: 20px; font-weight: 900; color: #1e293b; }
     .slide-sub { font-size: 14px; font-weight: 700; color: #475569; }
 
+    /* نقاط مؤشر العروض */
+    .slider-dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .dot-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #cbd5e1;
+      transition: all 0.3s ease;
+    }
+    .dot-indicator.active {
+      background-color: var(--orange-btn);
+      width: 20px;
+      border-radius: 10px;
+    }
+
     /* البحث */
     .search-box { padding: 10px 20px; }
     .search-input-inner { position: relative; }
@@ -115,7 +162,6 @@
     .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
 
     /* شبكة الأقسام */
-    .section-header { text-align: center; margin: 15px 0; font-size: 16px; font-weight: 800; color: #0f172a; }
     .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; }
     .cat-item {
       background: #ffffff;
@@ -133,11 +179,10 @@
 
     /* قسم التواصل أسفل الصفحة لوحده */
     .social-section-bottom {
-      margin: 30px 20px 20px;
+      margin: 10px 20px 20px;
       padding: 15px;
       text-align: center;
     }
-    .social-title { font-size: 13px; font-weight: 800; color: #64748b; margin-bottom: 12px; }
     
     .social-icons-container {
       display: flex;
@@ -210,9 +255,10 @@
       </button>
     </header>
 
-    <!-- سلايدر العروض -->
+    <!-- سلايدر العروض والنقط -->
     <div class="slider-wrapper">
       <div class="slider-container" id="offerSlider"></div>
+      <div class="slider-dots" id="sliderDots"></div>
     </div>
 
     <!-- البحث -->
@@ -223,12 +269,28 @@
       </div>
     </div>
 
-    <div class="section-header">تصفح الأقسام الرئيسية</div>
+    <!-- فاصل الأقسام -->
+    <div class="section-divider">
+      <div class="line"></div>
+      <div class="dot"></div>
+      <div class="title">تصفح الأقسام</div>
+      <div class="dot"></div>
+      <div class="line"></div>
+    </div>
+
     <div class="categories-grid" id="categoriesGrid"></div>
 
-    <!-- أيقونات التواصل لوحدها تحت خالص -->
+    <!-- فاصل تواصل معنا -->
+    <div class="section-divider">
+      <div class="line"></div>
+      <div class="dot"></div>
+      <div class="title">تواصل معنا</div>
+      <div class="dot"></div>
+      <div class="line"></div>
+    </div>
+
+    <!-- أيقونات التواصل -->
     <div class="social-section-bottom">
-      <div class="social-title">تواصل معنا</div>
       <div class="social-icons-container">
         <!-- واتساب -->
         <a href="https://wa.me/201227492921" target="_blank" class="social-icon-btn icon-wa" title="واتساب">
@@ -373,8 +435,11 @@
 
     function renderSlider(offers) {
       const slider = document.getElementById("offerSlider");
+      const dotsContainer = document.getElementById("sliderDots");
       slider.innerHTML = "";
-      offers.forEach(offer => {
+      dotsContainer.innerHTML = "";
+
+      offers.forEach((offer, idx) => {
         slider.innerHTML += `
           <div class="slide">
             <span class="badge-discount">${offer.tag}</span>
@@ -382,21 +447,41 @@
             <div class="slide-sub">${offer.subtitle}</div>
           </div>
         `;
+        dotsContainer.innerHTML += `<div class="dot-indicator ${idx === 0 ? 'active' : ''}"></div>`;
       });
     }
 
-    // تشغيل السلايدر ليلف تلقائيًا كل 3 ثواني
+    function updateActiveDot(activeIndex) {
+      const dots = document.querySelectorAll("#sliderDots .dot-indicator");
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle("active", idx === activeIndex);
+      });
+    }
+
     function startAutoSlider() {
       const slider = document.getElementById("offerSlider");
       setInterval(() => {
-        if (!slider) return;
-        const maxScroll = slider.scrollWidth - slider.clientWidth;
-        if (Math.abs(slider.scrollLeft) >= maxScroll - 5) {
+        if (!slider || offersData.length === 0) return;
+        const width = slider.clientWidth;
+        const currentScroll = Math.abs(slider.scrollLeft);
+        const maxScroll = slider.scrollWidth - width;
+
+        let nextIndex = Math.round(currentScroll / width) + 1;
+
+        if (currentScroll >= maxScroll - 5) {
           slider.scrollTo({ left: 0, behavior: 'smooth' });
+          updateActiveDot(0);
         } else {
-          slider.scrollBy({ left: -slider.clientWidth, behavior: 'smooth' });
+          slider.scrollTo({ left: - (nextIndex * width), behavior: 'smooth' });
+          updateActiveDot(nextIndex);
         }
       }, 3000);
+
+      slider.addEventListener('scroll', () => {
+        const width = slider.clientWidth;
+        const activeIndex = Math.round(Math.abs(slider.scrollLeft) / width);
+        updateActiveDot(activeIndex);
+      });
     }
 
     document.getElementById("searchInput").addEventListener("input", function(e) {
