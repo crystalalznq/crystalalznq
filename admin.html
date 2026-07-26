@@ -3,122 +3,562 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة تحكم كرستال الزنقة</title>
+  <title>كرستال الزنقة - المتجر ولوحة التحكم الشاملة</title>
   <style>
     :root {
-      --primary: #0284c7;
-      --danger: #ef4444;
-      --success: #22c55e;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --border: #e2e8f0;
-      --text: #0f172a;
+      --orange-btn: #d9531e;
+      --orange-bg: #fdf5ef;
+      --text-dark: #1e293b;
+      --border-gray: #e2e8f0;
+      --primary-blue: #0284c7;
+      --admin-dark: #0f172a;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+    body { background-color: #f1f5f9; color: var(--text-dark); direction: rtl; display: flex; justify-content: center; }
 
-    .admin-container { width: 100%; max-width: 600px; }
+    /* شريط التبديل العلوي بين المتجر واللوحة */
+    .view-switcher-bar {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      background: var(--admin-dark);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      padding: 8px;
+      z-index: 9999;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .switch-btn {
+      background: #334155;
+      color: #fff;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .switch-btn.active {
+      background: var(--orange-btn);
+    }
 
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      min-height: 100vh;
+      padding-top: 45px;
+      padding-bottom: 40px;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* CSS المتجر الرئيسي */
     .header {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      margin-bottom: 20px;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      border-bottom: 1px solid var(--border-gray);
+      position: sticky;
+      top: 45px;
+      z-index: 100;
+    }
+
+    .brand-banner-logo { height: 40px; width: auto; object-fit: contain; }
+
+    .header-cart-btn {
+      background: var(--orange-bg);
+      border: 1px solid #fed7aa;
+      padding: 8px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: var(--orange-btn);
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .header-cart-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .cart-badge-count {
+      background: var(--orange-btn);
+      color: #fff;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    .section-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 20px 20px 15px;
+    }
+    .section-divider .line { flex: 1; height: 1px; background-color: #cbd5e1; }
+    .section-divider .dot { width: 6px; height: 6px; border-radius: 50%; background-color: #0284c7; }
+    .section-divider .title { font-size: 15px; font-weight: 800; color: #0f172a; white-space: nowrap; }
+
+    /* سلايدر العروض */
+    .slider-wrapper { padding: 15px 20px 5px; }
+    .slider-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      border-radius: 16px;
+      scrollbar-width: none;
+    }
+    .slider-container::-webkit-scrollbar { display: none; }
+
+    .slide {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      border-radius: 16px;
+      padding: 16px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .slide-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .slide-img { width: 95px; height: 95px; object-fit: cover; border-radius: 12px; border: 2px solid #ffffff; flex-shrink: 0; }
+    .badge-discount { background: var(--orange-btn); color: #fff; font-size: 11px; font-weight: bold; padding: 2px 10px; border-radius: 10px; width: fit-content; margin-bottom: 6px; }
+    .slide-title { font-size: 18px; font-weight: 900; color: #1e293b; }
+    .slide-sub { font-size: 13px; font-weight: 700; color: #475569; margin-top: 2px; }
+
+    .slider-dots { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 8px; }
+    .dot-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: #cbd5e1; transition: all 0.3s ease; }
+    .dot-indicator.active { background-color: var(--orange-btn); width: 20px; border-radius: 10px; }
+
+    /* الأكثر مبيعاً */
+    .trending-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 10px; scrollbar-width: none; }
+    .trending-scroll-container::-webkit-scrollbar { display: none; }
+    .trending-card { flex: 0 0 140px; background: #fff; border: 1px solid var(--border-gray); border-radius: 14px; padding: 10px; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
+    .trending-card img { width: 100%; height: 100px; object-fit: cover; border-radius: 10px; }
+    .trending-badge { position: absolute; top: 15px; right: 15px; background: #ef4444; color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; }
+    .trending-title { font-size: 12px; font-weight: 800; color: #1e293b; margin: 6px 0 2px; }
+    .trending-price { font-size: 11px; font-weight: 700; color: var(--orange-btn); }
+    .add-trending-btn { width: 100%; margin-top: 6px; background: var(--orange-bg); color: var(--orange-btn); border: 1px solid #fed7aa; border-radius: 8px; padding: 5px; font-size: 11px; font-weight: 800; cursor: pointer; }
+
+    /* البحث والأقسام */
+    .search-box { padding: 10px 20px; }
+    .search-input-inner { position: relative; }
+    .search-input-inner input { width: 100%; padding: 12px 45px 12px 15px; border-radius: 25px; border: 1px solid var(--border-gray); background: #f8fafc; outline: none; font-size: 14px; }
+    .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+
+    .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; flex-grow: 1; }
+    .cat-item { background: #ffffff; border: 1px solid var(--border-gray); border-radius: 14px; overflow: hidden; text-align: center; padding-bottom: 10px; cursor: pointer; }
+    .cat-item img { width: 100%; height: 95px; object-fit: cover; background: #f1f5f9; }
+    .cat-item h4 { font-size: 13px; font-weight: 800; color: #1e293b; margin-top: 8px; }
+    .cat-item span { font-size: 11px; color: #94a3b8; }
+
+    /* التواصل والفوتر */
+    .social-compact-card { margin: 30px 20px 10px; background: #f8fafc; border: 1px solid var(--border-gray); border-radius: 14px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+    .social-mini-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; gap: 3px; }
+    .social-mini-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+    .social-label { font-size: 10px; font-weight: 700; color: #475569; }
+    .btn-wa { background: #25d366; } .btn-phone { background: #0284c7; } .btn-landline { background: #64748b; } .btn-tiktok { background: #000; } .btn-fb { background: #1877f2; } .btn-insta { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+    .social-mini-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+    .security-footer { text-align: center; padding: 15px 20px 5px; font-size: 11px; color: #94a3b8; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .security-badge { color: #16a34a; font-weight: 700; font-size: 11px; }
+
+    /* النوافذ المنبثقة للسلة والشروط */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; justify-content: center; align-items: flex-end; }
+    .modal-overlay.active { display: flex; }
+    .modal-card { width: 100%; max-width: 480px; background: #fff; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; max-height: 88vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .close-modal-btn { background: #f1f5f9; border: none; font-size: 18px; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
+
+    .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-gray); }
+    .cart-item-controls { display: flex; align-items: center; gap: 8px; }
+    .qty-btn { width: 26px; height: 26px; border: 1px solid var(--border-gray); background: #f8fafc; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .delete-item-btn { background: #fee2e2; color: #ef4444; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+
+    .delivery-options { margin: 15px 0; display: flex; flex-direction: column; gap: 10px; }
+    .delivery-title { font-size: 13px; font-weight: 800; color: #1e293b; }
+    .delivery-grid { display: flex; gap: 10px; }
+    .delivery-btn { flex: 1; border: 1.5px solid var(--border-gray); border-radius: 12px; padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; }
+    .delivery-btn.active { border-color: var(--orange-btn); background: var(--orange-bg); color: var(--orange-btn); }
+    .delivery-btn-title { font-size: 12px; font-weight: 800; margin-bottom: 3px; }
+    .delivery-btn-sub { font-size: 10px; opacity: 0.8; }
+
+    .customer-info-box { background: #f8fafc; border: 1px solid var(--border-gray); border-radius: 12px; padding: 12px; margin-bottom: 15px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+    .form-group label { font-size: 12px; font-weight: bold; color: #334155; }
+    .form-group input { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; }
+
+    .rules-list { background: #f8fafc; border: 1px solid var(--border-gray); border-radius: 12px; padding: 12px; font-size: 12px; color: #334155; line-height: 1.6; margin-bottom: 15px; }
+    .rules-list li { margin-bottom: 6px; list-style-position: inside; }
+
+    .accept-checkbox-wrapper { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: bold; color: #1e293b; margin: 10px 0 15px; background: #fff7ed; padding: 12px; border-radius: 10px; border: 1px dashed #fdba74; }
+    .accept-checkbox-wrapper input { width: 18px; height: 18px; accent-color: var(--orange-btn); cursor: pointer; }
+
+    .checkout-btn { width: 100%; background: #25d366; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 14px; cursor: pointer; text-align: center; }
+    .checkout-btn:disabled { background: #cbd5e1 !important; color: #94a3b8 !important; cursor: not-allowed; }
+
+    /* ========================================== */
+    /* CSS لوحة التحكم الإدارية (ADMIN DASHBOARD) */
+    /* ========================================== */
+    .admin-panel-wrapper {
+      display: none;
+      padding: 15px;
+      background: #f8fafc;
+      min-height: 100vh;
+    }
+    .admin-panel-wrapper.active { display: block; }
+
+    .admin-header {
+      background: var(--admin-dark);
+      color: #fff;
+      padding: 15px;
+      border-radius: 14px;
+      margin-bottom: 15px;
       text-align: center;
     }
-    .header h1 { font-size: 20px; color: var(--primary); margin-bottom: 5px; }
+    .admin-header h2 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .admin-header p { font-size: 11px; opacity: 0.8; }
 
-    .card {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      margin-bottom: 20px;
+    /* تبويبات لوحة التحكم */
+    .admin-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin-bottom: 15px;
+      scrollbar-width: none;
+    }
+    .admin-tabs::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      flex: 0 0 auto;
+      padding: 8px 14px;
+      background: #e2e8f0;
+      color: #334155;
+      border: none;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: var(--orange-btn);
+      color: #fff;
     }
 
-    .card-title {
-      font-size: 16px; font-weight: bold; margin-bottom: 15px;
-      border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .admin-card {
+      background: #fff;
+      border: 1px solid var(--border-gray);
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .admin-card-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--admin-dark);
+      margin-bottom: 12px;
+      border-bottom: 2px solid var(--orange-bg);
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #475569; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 13px; }
-
-    .btn { width: 100%; padding: 11px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; }
-    .btn-primary { background: var(--primary); color: #fff; }
-
-    .list-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px; border: 1px solid var(--border); border-radius: 8px;
-      margin-bottom: 8px; background: #fafafa;
+    .action-btn {
+      background: var(--primary-blue);
+      color: #fff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 5px;
     }
-    .list-item-img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
-    .delete-btn { background: #fee2e2; color: var(--danger); border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .action-btn.delete { background: #ef4444; }
+    .action-btn.edit { background: #eab308; }
 
-    .toast {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: var(--success); color: #fff; padding: 10px 20px;
-      border-radius: 20px; font-size: 13px; font-weight: bold; display: none;
+    .admin-list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border: 1px solid var(--border-gray);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: #fff;
     }
+    .admin-list-item img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
+    .admin-item-info { flex: 1; margin: 0 10px; }
+    .admin-item-info h5 { font-size: 13px; color: #1e293b; }
+    .admin-item-info p { font-size: 11px; color: #64748b; }
+    .admin-item-actions { display: flex; gap: 5px; }
+    .mini-btn { padding: 4px 8px; font-size: 10px; border-radius: 6px; border: none; cursor: pointer; color: #fff; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <div class="admin-container">
-    
-    <div class="header">
-      <h1>⚙️ لوحة تحكم المتجر</h1>
-      <p>من هنا تقدر تضيف وتعدل الأقسام والعروض اللي بتظهر للزبائن</p>
+  <!-- شريط التحكم العلوي المباشر -->
+  <div class="view-switcher-bar">
+    <button class="switch-btn active" id="btnShowStore" onclick="switchView('store')">🛍️ معاينة المتجر</button>
+    <button class="switch-btn" id="btnShowAdmin" onclick="switchView('admin')">⚙️ لوحة التحكم الشاملة</button>
+  </div>
+
+  <div class="app-container">
+
+    <!-- ============================================== -->
+    <!-- 1. واجهة المتجر الرئيسية (STORE FRONTEND)      -->
+    <!-- ============================================== -->
+    <div id="storeView">
+      <header class="header">
+        <img src="https://raw.githubusercontent.com/crystalalznq/crystalalznq/refs/heads/main/IMG_%D9%A2%D9%A0%D9%A2%D9%A6%D9%A0%D9%A7%D9%A2%D9%A6_%D9%A0%D9%A2%D9%A4%D9%A5%D9%A3%D9%A7.png" class="brand-banner-logo" alt="كرستال الزنقة">
+        <button class="header-cart-btn" onclick="toggleCartModal(true)">
+          <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          <span>السلة</span>
+          <span class="cart-badge-count" id="headerCartCount">0</span>
+        </button>
+      </header>
+
+      <!-- سلايدر العروض -->
+      <div class="slider-wrapper">
+        <div class="slider-container" id="offerSlider"></div>
+        <div class="slider-dots" id="sliderDots"></div>
+      </div>
+
+      <!-- الأكثر مبيعاً -->
+      <div class="section-divider">
+        <div class="line"></div><div class="dot"></div>
+        <div class="title">✨ الأكثر مبيعاً الآن ✨</div>
+        <div class="dot"></div><div class="line"></div>
+      </div>
+      <div class="trending-scroll-container" id="trendingContainer"></div>
+
+      <!-- البحث العام -->
+      <div class="search-box">
+        <div class="search-input-inner">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="ابحثي عن قسم أو منتج تحبيه...">
+        </div>
+      </div>
+
+      <!-- الأقسام -->
+      <div class="section-divider">
+        <div class="line"></div><div class="dot"></div>
+        <div class="title">🌸 تصفح الأقسام 🌸</div>
+        <div class="dot"></div><div class="line"></div>
+      </div>
+      <div class="categories-grid" id="categoriesGrid"></div>
+
+      <!-- وسائل التواصل -->
+      <div class="social-compact-card" id="socialBox"></div>
+
+      <div class="security-footer">
+        <div class="security-badge">🔒 تسوق آمن 100% - جميع البيانات مشفرة</div>
+        <div>جميع الحقوق محفوظة © 2026 كرستال الزنقة</div>
+      </div>
     </div>
 
-    <!-- 1. إدارة الأقسام -->
-    <div class="card">
-      <div class="card-title">📁 إدارة الأقسام الرئيسية</div>
-      <form id="addCategoryForm">
-        <div class="form-group">
-          <label>اسم القسم</label>
-          <input type="text" id="catName" placeholder="مثال: خرز كريستال" required>
-        </div>
-        <div class="form-group">
-          <label>رابط صورة القسم (URL)</label>
-          <input type="url" id="catImg" placeholder="https://example.com/image.jpg" required>
-        </div>
-        <button type="submit" class="btn btn-primary">إضافة القسم +</button>
-      </form>
+    <!-- ============================================== -->
+    <!-- 2. لوحة التحكم الإدارية (ADMIN DASHBOARD)      -->
+    <!-- ============================================== -->
+    <div id="adminView" class="admin-panel-wrapper">
+      <div class="admin-header">
+        <h2>🛠️ لوحة الإدارة والتحكم الشاملة</h2>
+        <p>تحكم كامل في كافة البيانات، الصور، العروض، والمنتجات</p>
+      </div>
 
-      <div class="item-list" id="adminCategoriesList" style="margin-top:15px;"></div>
+      <!-- أزرار التبويب -->
+      <div class="admin-tabs">
+        <button class="tab-btn active" onclick="switchAdminTab('tabCategories')">🌸 الأقسام</button>
+        <button class="tab-btn" onclick="switchAdminTab('tabTrending')">🔥 الأكثر مبيعاً</button>
+        <button class="tab-btn" onclick="switchAdminTab('tabOffers')">🎁 العروض المتحركة</button>
+        <button class="tab-btn" onclick="switchAdminTab('tabSocial')">📞 وسائل التواصل</button>
+      </div>
+
+      <!-- تبويب الأقسام -->
+      <div id="tabCategories" class="tab-content active">
+        <div class="admin-card">
+          <div class="admin-card-title">➕ إضافة قسم جديد</div>
+          <div class="form-group">
+            <label>اسم القسم:</label>
+            <input type="text" id="newCatName" placeholder="مثال: أطواق هاند ميد">
+          </div>
+          <div class="form-group">
+            <label>رابط صورة القسم:</label>
+            <input type="text" id="newCatImg" placeholder="https://example.com/image.jpg">
+          </div>
+          <button class="action-btn" onclick="addNewCategory()">إضافة القسم للمتجر</button>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-title">📑 الأقسام الحالية</div>
+          <div id="adminCategoriesList"></div>
+        </div>
+      </div>
+
+      <!-- تبويب الأكثر مبيعاً -->
+      <div id="tabTrending" class="tab-content">
+        <div class="admin-card">
+          <div class="admin-card-title">➕ إضافة منتج للأكثر مبيعاً</div>
+          <div class="form-group">
+            <label>اسم المنتج:</label>
+            <input type="text" id="newTrendName" placeholder="مثال: لولي أبيض عالي الجودة">
+          </div>
+          <div class="form-group">
+            <label>السعر (جنيه):</label>
+            <input type="number" id="newTrendPrice" placeholder="50">
+          </div>
+          <div class="form-group">
+            <label>رابط صورة المنتج:</label>
+            <input type="text" id="newTrendImg" placeholder="https://example.com/item.jpg">
+          </div>
+          <button class="action-btn" onclick="addNewTrending()">إضافة المنتج</button>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-title">🔥 منتجات الأكثر مبيعاً الحالية</div>
+          <div id="adminTrendingList"></div>
+        </div>
+      </div>
+
+      <!-- تبويب العروض المتحركة -->
+      <div id="tabOffers" class="tab-content">
+        <div class="admin-card">
+          <div class="admin-card-title">➕ إضافة كارت عرض جديد للسلايدر</div>
+          <div class="form-group">
+            <label>شارة العرض (Tag):</label>
+            <input type="text" id="newOfferTag" placeholder="مثال: 💥 عرض لفترة محدودة">
+          </div>
+          <div class="form-group">
+            <label>عنوان العرض الرئيس:</label>
+            <input type="text" id="newOfferTitle" placeholder="مثال: خصم 25%">
+          </div>
+          <div class="form-group">
+            <label>الوصف الفرعي:</label>
+            <input type="text" id="newOfferSub" placeholder="مثال: على جميع أطقم الخرز">
+          </div>
+          <div class="form-group">
+            <label>رابط صورة العرض:</label>
+            <input type="text" id="newOfferImg" placeholder="https://example.com/offer.jpg">
+          </div>
+          <button class="action-btn" onclick="addNewOffer()">إضافة العرض للسلايدر</button>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-title">🎁 العروض النشطة في السلايدر</div>
+          <div id="adminOffersList"></div>
+        </div>
+      </div>
+
+      <!-- تبويب وسائل التواصل -->
+      <div id="tabSocial" class="tab-content">
+        <div class="admin-card">
+          <div class="admin-card-title">✏️ تعديل أرقام الروابط والتواصل</div>
+          <div class="form-group">
+            <label>رقم الواتساب (بدون +):</label>
+            <input type="text" id="socialWa" placeholder="201227492921">
+          </div>
+          <div class="form-group">
+            <label>رقم الموبايل:</label>
+            <input type="text" id="socialPhone" placeholder="01227492921">
+          </div>
+          <div class="form-group">
+            <label>رقم الأرضي:</label>
+            <input type="text" id="socialLandline" placeholder="031234567">
+          </div>
+          <div class="form-group">
+            <label>رابط صفحة الفيسبوك:</label>
+            <input type="text" id="socialFb" placeholder="https://facebook.com/yourpage">
+          </div>
+          <div class="form-group">
+            <label>رابط الانستجرام:</label>
+            <input type="text" id="socialInsta" placeholder="https://instagram.com/yourpage">
+          </div>
+          <div class="form-group">
+            <label>رابط التيك توك:</label>
+            <input type="text" id="socialTiktok" placeholder="https://tiktok.com/@yourpage">
+          </div>
+          <button class="action-btn" onclick="saveSocialLinks()">حفظ التعديلات فوراً</button>
+        </div>
+      </div>
+
     </div>
 
-    <!-- 2. إدارة العروض -->
-    <div class="card">
-      <div class="card-title">🏷️ إدارة شريط العروض (السلايدر)</div>
-      <form id="addOfferForm">
-        <div class="form-group">
-          <label>شارة العرض (Tag)</label>
-          <input type="text" id="offerTag" placeholder="مثال: % خصم الجمعة" required>
+    <!-- النوافذ المنبثقة للطلب والسلة -->
+    <div class="modal-overlay" id="cartModalOverlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div style="font-weight:bold;">🛒 سلة المشتريات</div>
+          <button class="close-modal-btn" onclick="toggleCartModal(false)">✕</button>
         </div>
-        <div class="form-group">
-          <label>العنوان الرئيسي للعرض</label>
-          <input type="text" id="offerTitle" placeholder="مثال: خصم 20%" required>
+        <div id="cartItemsList"></div>
+        <div class="delivery-options" id="deliveryOptionBox" style="display: none;">
+          <div class="delivery-title">📍 تحبي تستلمي إزاي؟</div>
+          <div class="delivery-grid">
+            <div class="delivery-btn active" id="btnPickup" onclick="selectDeliveryType('pickup')">
+              <div class="delivery-btn-title">🏪 تحضير في المحل</div>
+              <div class="delivery-btn-sub">توفيراً لوقتك (دفع عربون والاستلام كاش/إنستا)</div>
+            </div>
+            <div class="delivery-btn" id="btnDelivery" onclick="selectDeliveryType('delivery')">
+              <div class="delivery-btn-title">🚚 توصيل للمنزل</div>
+              <div class="delivery-btn-sub">هنستلم الطلب ونتواصل معاكي لتأكيد التفاصيل</div>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label>التفاصيل / الوصف</label>
-          <input type="text" id="offerSub" placeholder="مثال: على جميع أطقم اللولي" required>
+        <div style="margin-top: 15px;">
+          <div style="font-weight: bold;" id="cartTotalText">الإجمالي: 0 جنيه</div>
+          <button class="checkout-btn" onclick="proceedToRulesModal()">متابعة إرسال الطلب 👈</button>
         </div>
-        <button type="submit" class="btn btn-primary">إضافة العرض +</button>
-      </form>
+      </div>
+    </div>
 
-      <div class="item-list" id="adminOffersList" style="margin-top:15px;"></div>
+    <div class="modal-overlay" id="rulesModalOverlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div style="font-weight:bold; color: var(--orange-btn);">📝 اسم المستلم والشروط</div>
+          <button class="close-modal-btn" onclick="toggleRulesModal(false)">✕</button>
+        </div>
+        <div class="customer-info-box">
+          <div class="form-group">
+            <label for="custName">👤 اسم حضرتك (المستلم):</label>
+            <input type="text" id="custName" placeholder="مثال: الأستاذ محمد سالم / علياء قمرون" oninput="validateForm()">
+          </div>
+        </div>
+        <ul class="rules-list">
+          <li>✨ <b>عند التحضير بالمحل:</b> يتم تحويل عربون بسيط لتأكيد الطلب وبدء تحضيره قبل وصولك لتوفير وقتك.</li>
+          <li>🛵 <b>عند التوصيل للمنزل:</b> يتواصل معكِ الفريق لتأكيد العنوان الدقيق وموعد التسليم وتكلفة الشحن.</li>
+          <li>🔍 <b>مراجعة المنتجات:</b> يرجى التأكد من المقاسات والألوان المطلوبة من السلة قبل إتمام الإرسال.</li>
+        </ul>
+        <div class="accept-checkbox-wrapper">
+          <input type="checkbox" id="acceptRulesCheckbox" onchange="validateForm()">
+          <label for="acceptRulesCheckbox">أوافق على جميع الشروط والأحكام أعلاه 🤝</label>
+        </div>
+        <button class="checkout-btn" id="finalWaBtn" disabled onclick="checkoutWhatsApp()">
+          💬 إرسال الطلب عبر الواتساب الآن
+        </button>
+      </div>
     </div>
 
   </div>
 
-  <div class="toast" id="toastMsg">تم الحفظ بنجاح!</div>
-
   <script>
+    // ==============================================
+    // 1. البيانات الأساسية وإدارتها (State & Storage)
+    // ==============================================
     const defaultCategories = [
       { id: "1", name: "الخرز", img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
       { id: "2", name: "السلاسل", img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
@@ -126,88 +566,460 @@
     ];
 
     const defaultOffers = [
-      { id: "1", tag: "% خصومات هذا الأسبوع", title: "خصم 15%", subtitle: "على السلاسل" },
-      { id: "2", tag: "% عرض خاص", title: "خصم 20%", subtitle: "على أطقم الخرز" }
+      { id: "o1", tag: "🎁 خصومات هذا الأسبوع", title: "خصم 15%", subtitle: "على جميع تشكيلات السلاسل", img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
+      { id: "o2", tag: "🔥 عرض خاص جداً", title: "خصم 20%", subtitle: "على أطقم الخرز المميزة", img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" }
     ];
 
-    let categories = JSON.parse(localStorage.getItem('crystal_categories')) || defaultCategories;
-    let offers = JSON.parse(localStorage.getItem('crystal_offers')) || defaultOffers;
+    const defaultTrending = [
+      { id: "t1", name: "خرز كرستال شفاف 8 مل", price: 45, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
+      { id: "t2", name: "سلسلة مطلي جولد ناعم", price: 65, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
+      { id: "t3", name: "لولي طبيعي مقاس 6", price: 50, img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
+    ];
 
-    function showToast(msg) {
-      const toast = document.getElementById("toastMsg");
-      toast.innerText = msg;
-      toast.style.display = "block";
-      setTimeout(() => { toast.style.display = "none"; }, 2000);
+    const defaultSocial = {
+      wa: "201227492921",
+      phone: "01227492921",
+      landline: "031234567",
+      fb: "https://www.facebook.com",
+      insta: "https://www.instagram.com",
+      tiktok: "https://www.tiktok.com"
+    };
+
+    let categoriesData = JSON.parse(localStorage.getItem('crystal_categories')) || defaultCategories;
+    let offersData = JSON.parse(localStorage.getItem('crystal_offers')) || defaultOffers;
+    let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || defaultTrending;
+    let socialData = JSON.parse(localStorage.getItem('crystal_social')) || defaultSocial;
+
+    let cart = [];
+    let currentSlideIndex = 0;
+    let selectedDeliveryType = 'pickup';
+
+    // ==============================================
+    // 2. دالّة التبديل بين المتجر واللوحة (Switcher)
+    // ==============================================
+    function switchView(view) {
+      document.getElementById('storeView').style.display = view === 'store' ? 'block' : 'none';
+      document.getElementById('adminView').classList.toggle('active', view === 'admin');
+      document.getElementById('btnShowStore').classList.toggle('active', view === 'store');
+      document.getElementById('btnShowAdmin').classList.toggle('active', view === 'admin');
+
+      if (view === 'admin') renderAdminLists();
     }
 
-    function saveAndRender() {
-      localStorage.setItem('crystal_categories', JSON.stringify(categories));
-      localStorage.setItem('crystal_offers', JSON.stringify(offers));
-      renderAdminCategories();
-      renderAdminOffers();
+    function switchAdminTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
     }
 
-    function renderAdminCategories() {
-      const container = document.getElementById("adminCategoriesList");
-      container.innerHTML = "<h4 style='font-size:12px; margin-bottom:8px; color:#64748b;'>الأقسام الحالية:</h4>";
-      categories.forEach((cat, idx) => {
-        container.innerHTML += `
-          <div class="list-item">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <img src="${cat.img}" class="list-item-img" alt="${cat.name}">
-              <div style="font-size:13px; font-weight:bold;">${cat.name}</div>
+    // ==============================================
+    // 3. عمليات لوحة التحكم الإدارية (CRUD Actions)
+    // ==============================================
+    function renderAdminLists() {
+      // 1. قائمة الأقسام
+      const catList = document.getElementById('adminCategoriesList');
+      catList.innerHTML = '';
+      categoriesData.forEach((cat, index) => {
+        catList.innerHTML += `
+          <div class="admin-list-item">
+            <img src="${cat.img}" alt="${cat.name}">
+            <div class="admin-item-info">
+              <h5>${cat.name}</h5>
             </div>
-            <button class="delete-btn" onclick="deleteCategory(${idx})">حذف</button>
+            <div class="admin-item-actions">
+              <button class="mini-btn" style="background:#eab308" onclick="editCategory(${index})">تعديل</button>
+              <button class="mini-btn" style="background:#ef4444" onclick="deleteCategory(${index})">حذف</button>
+            </div>
           </div>
         `;
       });
-    }
 
-    function renderAdminOffers() {
-      const container = document.getElementById("adminOffersList");
-      container.innerHTML = "<h4 style='font-size:12px; margin-bottom:8px; color:#64748b;'>العروض الحالية:</h4>";
-      offers.forEach((offer, idx) => {
-        container.innerHTML += `
-          <div class="list-item">
-            <div>
-              <div style="font-size:13px; font-weight:bold;">${offer.title} - ${offer.subtitle}</div>
-              <div style="font-size:11px; color:#64748b;">${offer.tag}</div>
+      // 2. قائمة الأكثر مبيعاً
+      const trendList = document.getElementById('adminTrendingList');
+      trendList.innerHTML = '';
+      trendingData.forEach((item, index) => {
+        trendList.innerHTML += `
+          <div class="admin-list-item">
+            <img src="${item.img}" alt="${item.name}">
+            <div class="admin-item-info">
+              <h5>${item.name}</h5>
+              <p>${item.price} ج.م</p>
             </div>
-            <button class="delete-btn" onclick="deleteOffer(${idx})">حذف</button>
+            <div class="admin-item-actions">
+              <button class="mini-btn" style="background:#eab308" onclick="editTrending(${index})">تعديل</button>
+              <button class="mini-btn" style="background:#ef4444" onclick="deleteTrending(${index})">حذف</button>
+            </div>
           </div>
         `;
       });
+
+      // 3. قائمة العروض
+      const offerList = document.getElementById('adminOffersList');
+      offerList.innerHTML = '';
+      offersData.forEach((offer, index) => {
+        offerList.innerHTML += `
+          <div class="admin-list-item">
+            ${offer.img ? `<img src="${offer.img}">` : ''}
+            <div class="admin-item-info">
+              <h5>${offer.title} - (${offer.tag})</h5>
+              <p>${offer.subtitle}</p>
+            </div>
+            <div class="admin-item-actions">
+              <button class="mini-btn" style="background:#ef4444" onclick="deleteOffer(${index})">حذف</button>
+            </div>
+          </div>
+        `;
+      });
+
+      // 4. تعبئة بيانات التواصل
+      document.getElementById('socialWa').value = socialData.wa || '';
+      document.getElementById('socialPhone').value = socialData.phone || '';
+      document.getElementById('socialLandline').value = socialData.landline || '';
+      document.getElementById('socialFb').value = socialData.fb || '';
+      document.getElementById('socialInsta').value = socialData.insta || '';
+      document.getElementById('socialTiktok').value = socialData.tiktok || '';
     }
 
-    document.getElementById("addCategoryForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      categories.push({ id: Date.now().toString(), name: document.getElementById("catName").value, img: document.getElementById("catImg").value });
-      saveAndRender();
-      showToast("تمت إضافة القسم بنجاح!");
-      this.reset();
-    });
+    // --- إدارة الأقسام ---
+    function addNewCategory() {
+      const name = document.getElementById('newCatName').value.trim();
+      const img = document.getElementById('newCatImg').value.trim();
+      if(!name || !img) return alert('الرجاء إدخال الاسم ورابط الصورة أولاً!');
 
-    document.getElementById("addOfferForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      offers.push({ id: Date.now().toString(), tag: document.getElementById("offerTag").value, title: document.getElementById("offerTitle").value, subtitle: document.getElementById("offerSub").value });
-      saveAndRender();
-      showToast("تمت إضافة العرض بنجاح!");
-      this.reset();
-    });
-
+      categoriesData.push({ id: Date.now().toString(), name, img });
+      saveAndSync();
+      document.getElementById('newCatName').value = '';
+      document.getElementById('newCatImg').value = '';
+    }
+    function editCategory(index) {
+      const newName = prompt('تعديل اسم القسم:', categoriesData[index].name);
+      const newImg = prompt('تعديل رابط الصورة:', categoriesData[index].img);
+      if(newName && newImg) {
+        categoriesData[index].name = newName;
+        categoriesData[index].img = newImg;
+        saveAndSync();
+      }
+    }
     function deleteCategory(index) {
-      categories.splice(index, 1);
-      saveAndRender();
-      showToast("تم حذف القسم");
+      if(confirm('هل أنت متأكد من حذف هذا القسم؟')) {
+        categoriesData.splice(index, 1);
+        saveAndSync();
+      }
     }
 
+    // --- إدارة الأكثر مبيعاً ---
+    function addNewTrending() {
+      const name = document.getElementById('newTrendName').value.trim();
+      const price = parseFloat(document.getElementById('newTrendPrice').value);
+      const img = document.getElementById('newTrendImg').value.trim();
+
+      if(!name || isNaN(price) || !img) return alert('الرجاء استكمال كافة بيانات المنتج بشكل صحيح!');
+
+      trendingData.push({ id: 't' + Date.now(), name, price, img });
+      saveAndSync();
+      document.getElementById('newTrendName').value = '';
+      document.getElementById('newTrendPrice').value = '';
+      document.getElementById('newTrendImg').value = '';
+    }
+    function editTrending(index) {
+      const newName = prompt('تعديل اسم المنتج:', trendingData[index].name);
+      const newPrice = prompt('تعديل السعر:', trendingData[index].price);
+      const newImg = prompt('تعديل صورة المنتج:', trendingData[index].img);
+      if(newName && newPrice && newImg) {
+        trendingData[index].name = newName;
+        trendingData[index].price = parseFloat(newPrice);
+        trendingData[index].img = newImg;
+        saveAndSync();
+      }
+    }
+    function deleteTrending(index) {
+      if(confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+        trendingData.splice(index, 1);
+        saveAndSync();
+      }
+    }
+
+    // --- إدارة العروض ---
+    function addNewOffer() {
+      const tag = document.getElementById('newOfferTag').value.trim();
+      const title = document.getElementById('newOfferTitle').value.trim();
+      const subtitle = document.getElementById('newOfferSub').value.trim();
+      const img = document.getElementById('newOfferImg').value.trim();
+
+      if(!tag || !title) return alert('يرجى ملء الشارة والعنوان الرئيسي للعرض على الأقل!');
+
+      offersData.push({ id: 'o' + Date.now(), tag, title, subtitle, img });
+      saveAndSync();
+      document.getElementById('newOfferTag').value = '';
+      document.getElementById('newOfferTitle').value = '';
+      document.getElementById('newOfferSub').value = '';
+      document.getElementById('newOfferImg').value = '';
+    }
     function deleteOffer(index) {
-      offers.splice(index, 1);
-      saveAndRender();
-      showToast("تم حذف العرض");
+      if(confirm('هل تريد إزالة هذا العرض من السلايدر؟')) {
+        offersData.splice(index, 1);
+        saveAndSync();
+      }
     }
 
-    saveAndRender();
+    // --- حفظ التواصل ---
+    function saveSocialLinks() {
+      socialData = {
+        wa: document.getElementById('socialWa').value.trim(),
+        phone: document.getElementById('socialPhone').value.trim(),
+        landline: document.getElementById('socialLandline').value.trim(),
+        fb: document.getElementById('socialFb').value.trim(),
+        insta: document.getElementById('socialInsta').value.trim(),
+        tiktok: document.getElementById('socialTiktok').value.trim()
+      };
+      saveAndSync();
+      alert('✨ تم حفظ وتحديث جميع روابط وسائل التواصل بنجاح!');
+    }
+
+    // دالة التزامن والحفظ اللحظي
+    function saveAndSync() {
+      localStorage.setItem('crystal_categories', JSON.stringify(categoriesData));
+      localStorage.setItem('crystal_offers', JSON.stringify(offersData));
+      localStorage.setItem('crystal_trending', JSON.stringify(trendingData));
+      localStorage.setItem('crystal_social', JSON.stringify(socialData));
+
+      // إعادة رسم عناصر الواجهة الرئيسية
+      displayCategories(categoriesData);
+      renderTrending(trendingData);
+      renderSlider(offersData);
+      renderSocial();
+      renderAdminLists();
+    }
+
+    // ==============================================
+    // 4. وظائف واجهة المتجر الرئيسية (Store Display)
+    // ==============================================
+    function displayCategories(categories) {
+      const grid = document.getElementById("categoriesGrid");
+      grid.innerHTML = "";
+      categories.forEach(cat => {
+        grid.innerHTML += `
+          <div class="cat-item">
+            <img src="${cat.img}" alt="${cat.name}">
+            <h4>${cat.name}</h4>
+            <span>تصفح الأشكال ✨</span>
+          </div>
+        `;
+      });
+    }
+
+    function renderTrending(items) {
+      const container = document.getElementById("trendingContainer");
+      container.innerHTML = "";
+      items.forEach(item => {
+        container.innerHTML += `
+          <div class="trending-card">
+            <span class="trending-badge">🔥 الأكثر طلباً</span>
+            <img src="${item.img}" alt="${item.name}">
+            <div>
+              <div class="trending-title">${item.name}</div>
+              <div class="trending-price">${item.price} ج.م</div>
+            </div>
+            <button class="add-trending-btn" onclick='addToCart(${JSON.stringify(item)})'>+ أضف للسلة</button>
+          </div>
+        `;
+      });
+    }
+
+    function renderSlider(offers) {
+      const slider = document.getElementById("offerSlider");
+      const dotsContainer = document.getElementById("sliderDots");
+      slider.innerHTML = "";
+      dotsContainer.innerHTML = "";
+
+      offers.forEach((offer, idx) => {
+        slider.innerHTML += `
+          <div class="slide">
+            <div class="slide-content">
+              <span class="badge-discount">${offer.tag}</span>
+              <div class="slide-title">${offer.title}</div>
+              <div class="slide-sub">${offer.subtitle}</div>
+            </div>
+            ${offer.img ? `<img src="${offer.img}" alt="${offer.title}" class="slide-img">` : ''}
+          </div>
+        `;
+        dotsContainer.innerHTML += `<div class="dot-indicator ${idx === 0 ? 'active' : ''}"></div>`;
+      });
+    }
+
+    function renderSocial() {
+      const box = document.getElementById("socialBox");
+      box.innerHTML = `
+        <a href="https://wa.me/${socialData.wa}" target="_blank" class="social-mini-item">
+          <div class="social-mini-btn btn-wa"><svg viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.763.459 3.486 1.332 5.003l-1.416 5.171 5.291-1.387c1.462.798 3.11 1.218 4.78 1.218h.004c5.505 0 9.988-4.478 9.989-9.985.001-2.668-1.033-5.176-2.919-7.062a9.913 9.913 0 0 0-7.071-2.942zm5.727 14.195c-.242.682-1.411 1.302-1.944 1.385-.494.077-1.139.11-1.832-.112-.423-.135-.968-.315-1.666-.616-2.935-1.268-4.849-4.26-4.996-4.455-.147-.195-1.196-1.592-1.196-3.036 0-1.444.757-2.155 1.025-2.448.268-.293.585-.366.781-.366.195 0 .39.002.56.009.182.008.427-.069.667.508.244.586.829 2.022.902 2.169.073.146.122.317.024.512-.097.195-.146.317-.292.488-.146.171-.307.382-.439.513-.146.146-.298.305-.128.597.17.293.756 1.248 1.622 2.019 1.113.992 2.052 1.301 2.345 1.447.293.146.463.122.634-.073.171-.195.731-.853.926-1.146.195-.293.39-.244.658-.146.268.098 1.706.804 2.001.951.293.146.488.219.56.341.073.122.073.707-.169 1.389z"/></svg></div>
+          <span class="social-label">واتساب</span>
+        </a>
+        <a href="tel:${socialData.phone}" class="social-mini-item">
+          <div class="social-mini-btn btn-phone"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
+          <span class="social-label">موبايل</span>
+        </a>
+        <a href="tel:${socialData.landline}" class="social-mini-item">
+          <div class="social-mini-btn btn-landline"><svg viewBox="0 0 24 24"><path d="M18.5 2h-13C4.12 2 3 3.12 3 4.5v15C3 20.88 4.12 22 5.5 22h13c1.38 0 2.5-1.12 2.5-2.5v-15C21 3.12 19.88 2 18.5 2zm-13 2h13c.28 0 .5.22.5.5v10h-14v-10c0-.28.22-.5.5-.5zm13 16h-13c-.28 0-.5-.22-.5-.5v-3h14v3c0 .28-.22.5-.5.5zm-6.5-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
+          <span class="social-label">أرضي</span>
+        </a>
+        <a href="${socialData.tiktok}" target="_blank" class="social-mini-item">
+          <div class="social-mini-btn btn-tiktok"><svg viewBox="0 0 24 24"><path d="M12.525 0h3.08c.12 1.01.657 2.41 1.512 3.256.856.845 2.01 1.27 3.383 1.35v3.165c-1.222-.056-2.42-.4-3.48-.99v6.94c0 3.32-2.69 6.01-6.01 6.01-3.32 0-6.01-2.69-6.01-6.01 0-3.32 2.69-6.01 6.01-6.01.39 0 .77.04 1.14.11v3.25c-.37-.12-.75-.18-1.14-.18-1.56 0-2.83 1.27-2.83 2.83s1.27 2.83 2.83 2.83 2.83-1.27 2.83-2.83V0z"/></svg></div>
+          <span class="social-label">تيك توك</span>
+        </a>
+        <a href="${socialData.fb}" target="_blank" class="social-mini-item">
+          <div class="social-mini-btn btn-fb"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></div>
+          <span class="social-label">فيسبوك</span>
+        </a>
+        <a href="${socialData.insta}" target="_blank" class="social-mini-item">
+          <div class="social-mini-btn btn-insta"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></div>
+          <span class="social-label">انستجرام</span>
+        </a>
+      `;
+    }
+
+    // ==============================================
+    // 5. السلة وإرسال الطلب (Cart Logic)
+    // ==============================================
+    function toggleCartModal(show) {
+      document.getElementById("cartModalOverlay").classList.toggle("active", show);
+      if (show) renderCartItems();
+    }
+    function toggleRulesModal(show) {
+      document.getElementById("rulesModalOverlay").classList.toggle("active", show);
+      if(!show) {
+        document.getElementById("acceptRulesCheckbox").checked = false;
+        document.getElementById("custName").value = "";
+        validateForm();
+      }
+    }
+    function validateForm() {
+      const name = document.getElementById("custName").value.trim();
+      const checked = document.getElementById("acceptRulesCheckbox").checked;
+      document.getElementById("finalWaBtn").disabled = !(name.length >= 2 && checked);
+    }
+    function proceedToRulesModal() {
+      if (cart.length === 0) return alert("🛒 السلة فارغة! اختاري بعض المنتجات أولاً 😊");
+      toggleCartModal(false);
+      toggleRulesModal(true);
+    }
+    function addToCart(product) {
+      const existing = cart.find(item => item.id === product.id);
+      if (existing) {
+        alert(`🌸 المنتَج دا ("${product.name}") موجود بالفعل في سلتك!`);
+      } else {
+        cart.push({ ...product, qty: 1 });
+        updateCartBadge();
+        alert(`✨ تم إضافة "${product.name}" بنجاح لسلة مشترياتك! 🛍️`);
+      }
+    }
+    function selectDeliveryType(type) {
+      selectedDeliveryType = type;
+      document.getElementById("btnPickup").classList.toggle("active", type === 'pickup');
+      document.getElementById("btnDelivery").classList.toggle("active", type === 'delivery');
+    }
+    function updateQuantity(index, delta) {
+      cart[index].qty += delta;
+      if (cart[index].qty <= 0) cart.splice(index, 1);
+      renderCartItems();
+      updateCartBadge();
+    }
+    function removeItem(index) {
+      cart.splice(index, 1);
+      renderCartItems();
+      updateCartBadge();
+    }
+    function updateCartBadge() {
+      document.getElementById("headerCartCount").innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+    }
+    function renderCartItems() {
+      const container = document.getElementById("cartItemsList");
+      const totalText = document.getElementById("cartTotalText");
+      const deliveryBox = document.getElementById("deliveryOptionBox");
+
+      if (cart.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:30px 10px; color:#94a3b8;">🛒 السلة فارغة حالياً..<br>تصفحي المنتجات وأضيفي ما يعجبك! ✨</div>`;
+        totalText.innerText = "الإجمالي: 0 جنيه";
+        deliveryBox.style.display = "none";
+        return;
+      }
+
+      deliveryBox.style.display = "block";
+      let html = "";
+      let total = 0;
+      cart.forEach((item, idx) => {
+        total += item.price * item.qty;
+        html += `
+          <div class="cart-item-row">
+            <div>
+              <div style="font-size:13px; font-weight:bold;">💎 ${item.name}</div>
+              <div style="font-size: 11px; color: #64748b;">${item.price} ج.م</div>
+            </div>
+            <div class="cart-item-controls">
+              <button class="qty-btn" onclick="updateQuantity(${idx}, -1)">-</button>
+              <span>${item.qty}</span>
+              <button class="qty-btn" onclick="updateQuantity(${idx}, 1)">+</button>
+              <button class="delete-item-btn" onclick="removeItem(${idx})">حذف</button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+      totalText.innerText = `💰 الإجمالي الكلي: ${total} جنيه`;
+    }
+    function checkoutWhatsApp() {
+      const custName = document.getElementById("custName").value.trim();
+      let deliveryText = selectedDeliveryType === 'pickup' 
+        ? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلام ✨)"
+        : "🚚 توصيل للمنزل (في انتظار التواصل لتأكيد العنوان والتفاصيل 🛵)";
+
+      let msg = "أهلاً وسهلاً كرستال الزنقة! 🌸✨\n";
+      msg += "حابب/حاببة أؤكد الطلب الجميل ده معكم: 👇\n\n";
+      msg += `👤 **اسم المستلم:** ${custName}\n\n`;
+      msg += `📍 **طريقة الاستلام:**\n${deliveryText}\n\n`;
+      msg += `📦 **قائمة المنتجات المطلوبة:**\n`;
+
+      let total = 0;
+      cart.forEach((item) => {
+        msg += `🔹 ${item.name}\n   └ العدد: ${item.qty} | السعر: ${item.price * item.qty} ج.م\n`;
+        total += item.price * item.qty;
+      });
+
+      msg += `\n💵 **المبلغ الإجمالي:** ${total} جنيه مصري`;
+      msg += `\n\n✅ (تم الاطلاع والموافقة على الشروط والأحكام الرسمية للطلب 🤝)`;
+
+      window.open(`https://wa.me/${socialData.wa}?text=${encodeURIComponent(msg)}`, '_blank');
+      toggleRulesModal(false);
+    }
+
+    // ==============================================
+    // 6. تشغيل التهيئة عند تحميل الصفحة
+    // ==============================================
+    function startAutoSlider() {
+      const slider = document.getElementById("offerSlider");
+      setInterval(() => {
+        const slides = slider.querySelectorAll(".slide");
+        if (!slides.length) return;
+        currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+        slider.scrollTo({ left: slides[currentSlideIndex].offsetLeft, behavior: 'smooth' });
+        const dots = document.querySelectorAll("#sliderDots .dot-indicator");
+        dots.forEach((dot, idx) => dot.classList.toggle("active", idx === currentSlideIndex));
+      }, 3500);
+    }
+
+    document.getElementById("searchInput").addEventListener("input", function(e) {
+      const query = e.target.value.toLowerCase().trim();
+      displayCategories(categoriesData.filter(c => c.name.toLowerCase().includes(query)));
+      renderTrending(trendingData.filter(t => t.name.toLowerCase().includes(query)));
+    });
+
+    // التهيئة البدائية
+    displayCategories(categoriesData);
+    renderTrending(trendingData);
+    renderSlider(offersData);
+    renderSocial();
+    startAutoSlider();
   </script>
 </body>
 </html>
