@@ -509,8 +509,8 @@ tag: "🎁 خصومات هذا الأسبوع",
 title: "خصم 15%",
 subtitle: "على سلسلة ستانلس ثقيلة",
 img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg",
-targetType: "product", // نوع الهدف منتج
-targetId: "p3",       // الـ ID بتاع المنتج المستهدف (مثلاً p3)
+targetType: "product",
+targetId: "p3",
 endTime: new Date().getTime() + (48 * 3600 * 1000)
 },
 {
@@ -705,7 +705,7 @@ container.innerHTML = '<p style="font-size: 13px; color: #64748b; text-align: ce
 } else {
 let html = "";
 products.forEach(item => {
-html += `<div class="cat-product-card"><img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'"><div><div class="trending-title" style="margin-top:8px;">${item.name}</div><div class="trending-price">${item.price} ج.م</div></div><button class="add-trending-btn" onclick='addToCart(${JSON.stringify(item)})'>+ أضف للسلة</button></div>`;
+html += `<div class="cat-product-card" id="product-${item.id}"><img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'"><div><div class="trending-title" style="margin-top:8px;">${item.name}</div><div class="trending-price">${item.price} ج.م</div></div><button class="add-trending-btn" onclick='addToCart(${JSON.stringify(item)})'>+ أضف للسلة</button></div>`;
 });
 container.innerHTML = html;
 }
@@ -782,21 +782,37 @@ slider.scrollTo({ left: currentSlideIndex * slideWidth, behavior: 'smooth' });
 updateDotsActiveState();
 }
 
-// دالة التوجيه للمنتج أو القسم مباشرة بدون أي رسايل تنبيه (Alert)
+// دالة التوجيه الاحترافية للمنتج وتحديد الإطار البرتقالي
 function handleOfferAction(targetType, targetId) {
-if (targetType === 'category') {
-const targetCat = initialCategories.find(c => c.id === targetId);
-if (targetCat) {
-openCategoryPage(targetCat.id, targetCat.name);
-}
-} else if (targetType === 'product') {
-// البحث عن المنتج داخل منتجات الأقسام أو المنتجات الرائجة
-let targetProduct = catProductsData.find(p => p.id === targetId) || trendingData.find(t => t.id === targetId);
-if (targetProduct) {
-// فتح القسم التابع له المنتج ونقلوه لصفحته فوراً
-openCategoryPage(targetProduct.categoryId, "المنتجات المميزة");
-}
-}
+    if (targetType === "category") {
+        const cat = initialCategories.find(c => c.id === targetId);
+        if (cat) {
+            openCategoryPage(cat.id, cat.name);
+        }
+    } else if (targetType === "product") {
+        const product = catProductsData.find(p => p.id === targetId);
+        if (!product) return;
+
+        openCategoryPage(product.categoryId,
+            initialCategories.find(c => c.id === product.categoryId)?.name || "");
+
+        setTimeout(() => {
+            const el = document.getElementById(`product-${targetId}`);
+            if (el) {
+                el.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+                el.style.transition = "0.4s";
+                el.style.boxShadow = "0 0 0 4px #f97316";
+
+                setTimeout(() => {
+                    el.style.boxShadow = "";
+                }, 2000);
+            }
+        }, 200);
+    }
 }
 
 function updateCountdowns() {
