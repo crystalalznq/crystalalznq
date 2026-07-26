@@ -364,6 +364,7 @@
     let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || defaultTrending;
 
     let cart = [];
+    let currentSlideIndex = 0;
 
     function toggleCartModal(show) {
       document.getElementById("cartModalOverlay").classList.toggle("active", show);
@@ -450,13 +451,18 @@
       grid.innerHTML = "";
       categories.forEach(cat => {
         grid.innerHTML += `
-          <div class="cat-item">
+          <div class="cat-item" onclick="openCategoryPage('${cat.id}', '${cat.name}')">
             <img src="${cat.img}" alt="${cat.name}">
             <h4>${cat.name}</h4>
             <span>تصفح الأشكال</span>
           </div>
         `;
       });
+    }
+
+    function openCategoryPage(catId, catName) {
+      // توجيه مستقبلي لصفحة القسم متضمنة شريط البحث الخاص بالقسم
+      console.log(`فتح قسم: ${catName} (ID: ${catId})`);
     }
 
     function renderTrending(items) {
@@ -502,35 +508,32 @@
       });
     }
 
+    /* إصلاح حركة سلايدر العروض التلقائي للغة العربية (RTL) */
     function startAutoSlider() {
       const slider = document.getElementById("offerSlider");
+      const slides = slider.querySelectorAll(".slide");
+      if (!slides.length) return;
+
       setInterval(() => {
-        if (!slider || offersData.length === 0) return;
-        const width = slider.clientWidth;
-        const currentScroll = Math.abs(slider.scrollLeft);
-        const maxScroll = slider.scrollWidth - width;
+        currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+        const targetSlide = slides[currentSlideIndex];
+        
+        slider.scrollTo({
+          left: targetSlide.offsetLeft,
+          behavior: 'smooth'
+        });
 
-        let nextIndex = Math.round(currentScroll / width) + 1;
-
-        if (currentScroll >= maxScroll - 5) {
-          slider.scrollTo({ left: 0, behavior: 'smooth' });
-          updateActiveDot(0);
-        } else {
-          slider.scrollTo({ left: - (nextIndex * width), behavior: 'smooth' });
-          updateActiveDot(nextIndex);
-        }
-      }, 3000);
+        updateActiveDot(currentSlideIndex);
+      }, 3500);
     }
 
     // البحث الشامل
     document.getElementById("searchInput").addEventListener("input", function(e) {
       const query = e.target.value.toLowerCase().trim();
       
-      // تصفية الأقسام
       const filteredCats = initialCategories.filter(c => c.name.toLowerCase().includes(query));
       displayCategories(filteredCats);
 
-      // تصفية الأكثر مبيعاً
       const filteredTrending = trendingData.filter(t => t.name.toLowerCase().includes(query));
       renderTrending(filteredTrending);
     });
