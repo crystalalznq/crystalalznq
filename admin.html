@@ -50,10 +50,10 @@
     .action-btn { background: var(--primary-blue); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
     
     .admin-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid var(--border-gray); border-radius: 10px; margin-bottom: 8px; background: #fff; }
-    .admin-list-item img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+    .admin-list-item img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: #eee; }
     .admin-item-info { flex: 1; margin: 0 10px; overflow: hidden; }
     .admin-item-info h5 { font-size: 13px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .admin-item-info p { font-size: 11px; color: #64748b; }
+    .admin-item-info p { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mini-btn { padding: 4px 8px; font-size: 10px; border-radius: 6px; border: none; cursor: pointer; color: #fff; font-weight: bold; background: #ef4444; flex-shrink: 0; }
 
     .back-store-link { display: block; text-align: center; margin-top: 15px; font-size: 12px; color: var(--primary-blue); text-decoration: none; font-weight: bold; }
@@ -64,7 +64,7 @@
   <div class="admin-container">
     <div class="admin-header">
       <h2>🛠️ لوحة الإدارة والتحكم</h2>
-      <p>إدارة منظمة ودقيقة لبيانات المتجر</p>
+      <p>إدارة نظيفة ومستقرة لبيانات المتجر</p>
     </div>
 
     <div class="admin-tabs">
@@ -79,7 +79,7 @@
       <div class="admin-card">
         <div class="admin-card-title">➕ إضافة قسم جديد</div>
         <div class="form-group"><label>اسم القسم:</label><input type="text" id="newCatName" placeholder="مثال: أطواق هاند ميد"></div>
-        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newCatImgUrl" placeholder="الصق رابط الصورة هنا"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newCatImgUrl" placeholder="الصق رابط الصورة هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
         <button class="action-btn" onclick="addNewCategory()">إضافة القسم</button>
       </div>
       <div class="admin-card">
@@ -94,7 +94,7 @@
         <div class="admin-card-title">➕ إضافة منتج للأكثر مبيعاً</div>
         <div class="form-group"><label>اسم المنتج:</label><input type="text" id="newTrendName" placeholder="مثال: لولي أبيض"></div>
         <div class="form-group"><label>السعر (جنيه):</label><input type="number" id="newTrendPrice" placeholder="50"></div>
-        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newTrendImgUrl" placeholder="الصق رابط الصورة هنا"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newTrendImgUrl" placeholder="الصق رابط الصورة هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
         <button class="action-btn" onclick="addNewTrending()">إضافة المنتج</button>
       </div>
       <div class="admin-card">
@@ -110,7 +110,7 @@
         <div class="form-group"><label>شارة العرض (Tag):</label><input type="text" id="newOfferTag" placeholder="مثال: خصم خاص"></div>
         <div class="form-group"><label>عنوان العرض:</label><input type="text" id="newOfferTitle" placeholder="مثال: خصم 15%"></div>
         <div class="form-group"><label>الوصف:</label><input type="text" id="newOfferSub" placeholder="مثال: على السلاسل"></div>
-        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق رابط الصورة هنا"></div>
+        <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق رابط الصورة هنا" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
         <button class="action-btn" onclick="addNewOffer()">إضافة العرض</button>
       </div>
       <div class="admin-card">
@@ -156,7 +156,7 @@
       categoriesData.forEach((cat, index) => {
         catList.innerHTML += `
           <div class="admin-list-item">
-            <img src="${cat.img}" alt="صورة">
+            <img src="${cat.img}" onerror="this.src='https://via.placeholder.com/150'">
             <div class="admin-item-info">
               <h5>${cat.name}</h5>
             </div>
@@ -171,7 +171,7 @@
       trendingData.forEach((item, index) => {
         trendList.innerHTML += `
           <div class="admin-list-item">
-            <img src="${item.img}" alt="صورة">
+            <img src="${item.img}" onerror="this.src='https://via.placeholder.com/150'">
             <div class="admin-item-info">
               <h5>${item.name}</h5>
               <p>${item.price} ج.م</p>
@@ -187,10 +187,10 @@
       offersData.forEach((offer, index) => {
         offerList.innerHTML += `
           <div class="admin-list-item">
-            <img src="${offer.img}" alt="صورة">
+            <img src="${offer.img}" onerror="this.src='https://via.placeholder.com/150'">
             <div class="admin-item-info">
               <h5>${offer.title}</h5>
-              <p>${offer.tag} - ${offer.subtitle || ''}</p>
+              <p>${offer.tag} ${offer.subtitle ? '- ' + offer.subtitle : ''}</p>
             </div>
             <button class="mini-btn" onclick="deleteOffer(${index})">حذف</button>
           </div>
@@ -215,7 +215,7 @@
       document.getElementById('newCatName').value = '';
       document.getElementById('newCatImgUrl').value = '';
     }
-    function deleteCategory(i) { if(confirm('متأكد؟')) { categoriesData.splice(i, 1); saveAndSync(); } }
+    function deleteCategory(i) { if(confirm('متأكد من الحذف؟')) { categoriesData.splice(i, 1); saveAndSync(); } }
 
     function addNewTrending() {
       const name = document.getElementById('newTrendName').value.trim();
@@ -228,7 +228,7 @@
       document.getElementById('newTrendPrice').value = '';
       document.getElementById('newTrendImgUrl').value = '';
     }
-    function deleteTrending(i) { if(confirm('متأكد؟')) { trendingData.splice(i, 1); saveAndSync(); } }
+    function deleteTrending(i) { if(confirm('متأكد من الحذف؟')) { trendingData.splice(i, 1); saveAndSync(); } }
 
     function addNewOffer() {
       const tag = document.getElementById('newOfferTag').value.trim();
@@ -243,7 +243,7 @@
       document.getElementById('newOfferSub').value = '';
       document.getElementById('newOfferImgUrl').value = '';
     }
-    function deleteOffer(i) { if(confirm('متأكد؟')) { offersData.splice(i, 1); saveAndSync(); } }
+    function deleteOffer(i) { if(confirm('متأكد من الحذف؟')) { offersData.splice(i, 1); saveAndSync(); } }
 
     function saveSocialLinks() {
       socialData = {
