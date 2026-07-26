@@ -400,7 +400,7 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 <div class="search-box">
 <div class="search-input-inner">
 <span class="search-icon">🔍</span>
-<input type="text" id="searchInput" placeholder="ابحثي عن قسم أو منتج تحبيه...">
+<input type="text" id="searchInput" placeholder="ابحثي عن قسم أو منتج تحبيه..." oninput="filterStoreContent()">
 </div>
 </div>
 
@@ -539,14 +539,14 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 <input type="text" id="newOfferSub" class="admin-input" placeholder="تفاصيل العرض الفرعية">
 <input type="text" id="newOfferImg" class="admin-input" placeholder="رابط صورة العرض (صورة URL)">
 <div style="font-size: 11px; font-weight: bold; color: #475569; margin-top:2px;">⏳ مدة انتهاء العرض (بالساعات):</div>
-<input type="number" id="newOfferHours" class="admin-input" placeholder="مثال: 48 (ساعة) أو أدخلي عدد الساعات" value="24">
+<input type="number" id="newOfferHours" class="admin-input" placeholder="مثال: 48" value="24">
 <button class="admin-btn" onclick="addNewOfferFromAdmin()">إضافة عرض جديد بالسلايدر 🚀</button>
 </div>
 
-<div class="admin-section-title" style="margin-top:20px;">📋 العروض الحالية في السلايدر (وحالة انتهائها)</div>
+<div class="admin-section-title" style="margin-top:20px;">📋 العروض الحالية في السلايدر</div>
 <div id="adminOffersList"></div>
 
-<button class="checkout-btn" style="background:#0f172a; margin-top: 15px;" onclick="toggleAdminModal(false)">إغلاق لوحة التحكم العودة للمتجر ✔</button>
+<button class="checkout-btn" style="background:#0f172a; margin-top: 15px;" onclick="toggleAdminModal(false)">إغلاق لوحة التحكم والعودة للمتجر ✔</button>
 </div>
 </div>
 
@@ -557,7 +557,6 @@ const defaultCategories = [
 { id: "3", name: "اللولي", img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
 ];
 
-// العروض الافتراضية مع حساب وقت انتهاء بالمللي ثانية (مثلاً بعد 48 ساعة من الآن)
 const defaultOffers = [
 {
 id: "off1",
@@ -565,7 +564,7 @@ tag: "🎁 خصومات هذا الأسبوع",
 title: "خصم 15%",
 subtitle: "على جميع تشكيلات السلاسل",
 img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg",
-endTime: new Date().getTime() + (48 * 3600 * 1000) // ينتهي بعد 48 ساعة
+endTime: new Date().getTime() + (48 * 3600 * 1000)
 },
 {
 id: "off2",
@@ -573,7 +572,7 @@ tag: "🔥 عرض خاص جداً",
 title: "خصم 20%",
 subtitle: "على أطقم الخرز المميزة",
 img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp",
-endTime: new Date().getTime() + (24 * 3600 * 1000) // ينتهي بعد 24 ساعة
+endTime: new Date().getTime() + (24 * 3600 * 1000)
 }
 ];
 
@@ -598,6 +597,14 @@ let catProductsData = JSON.parse(localStorage.getItem('crystal_cat_products')) |
 let cart = [];
 let currentSlideIndex = 0;
 let selectedDeliveryType = 'pickup';
+
+window.onload = function() {
+displayCategories(initialCategories);
+renderTrending(trendingData);
+renderSlider();
+updateCartBadge();
+setInterval(updateCountdowns, 1000);
+};
 
 function toggleCartModal(show) {
 document.getElementById("cartModalOverlay").classList.toggle("active", show);
@@ -634,12 +641,12 @@ toggleRulesModal(true);
 function addToCart(product) {
 const existing = cart.find(item => item.id === product.id);
 if (existing) {
-alert(`🌸 المنتَج دا ("${product.name}") موجود بالفعل في سلتك!\n\n💡 تقدري تعدلي الكمية أو تراجعي طلبك بسهولة من رمز السلة أعلى الشاشة فوق على اليسار 🛍️`);
+existing.qty += 1;
 } else {
 cart.push({ ...product, qty: 1 });
+}
 updateCartBadge();
 alert(`✨ تم إضافة "${product.name}" بنجاح لسلة مشترياتك! 🛍️`);
-}
 }
 
 function selectDeliveryType(type) {
@@ -698,7 +705,7 @@ msg += `👤 **اسم المستلم:** ${custName}\n\n`;
 msg += `📍 **طريقة الاستلام:**\n${deliveryText}\n\n`;
 msg += "📦 **قائمة المنتجات المطلوبة:**\n";
 let total = 0;
-cart.forEach((item, idx) => {
+cart.forEach((item) => {
 msg += `🔹 ${item.name}\n   └ العدد: ${item.qty} | السعر: ${item.price * item.qty} ج.م\n`;
 total += item.price * item.qty;
 });
@@ -752,7 +759,6 @@ container.innerHTML += `<div class="trending-card"><span class="trending-badge">
 });
 }
 
-// دالة العروض والسلايدر مع العداد التنازلي التلقائي وتصفية المُنتهي
 function renderSlider() {
 const slider = document.getElementById("offerSlider");
 const dotsContainer = document.getElementById("sliderDots");
@@ -760,7 +766,6 @@ slider.innerHTML = "";
 dotsContainer.innerHTML = "";
 
 const currentTime = new Date().getTime();
-//فلترة العروض النشطة فقط (التي لم ينتهي وقتها)
 const activeOffers = offersData.filter(offer => offer.endTime > currentTime);
 
 if (activeOffers.length === 0) {
@@ -785,13 +790,12 @@ dotsContainer.innerHTML += `<div class="dot-indicator ${idx === 0 ? 'active' : '
 }
 
 function handleOfferAction(offerTitle) {
-alert(`🌸 مرحباً بكِ في عرضنا المميز: (${offertitle})\n\n💡 تفضلي بزيارة الأقسام لاختيار المنتجات والاستمتاع بالخصم مباشرة! ✨`);
+alert(`🌸 مرحباً بكِ في عرضنا المميز: (${offerTitle})\n\n💡 تفضلي بزيارة الأقسام لاختيار المنتجات والاستمتاع بالخصم مباشرة! ✨`);
 }
 
-// تحديث العدادات التنازلية ثانية بثانية وإخفاء العرض تلقائياً لو انتهى
 function updateCountdowns() {
 const currentTime = new Date().getTime();
-let needsRe-render = false;
+let needsRerender = false;
 
 offersData.forEach(offer => {
 const distance = offer.endTime - currentTime;
@@ -799,9 +803,99 @@ const timerEl = document.getElementById(`timer-${offer.id}`);
 if (timerEl) {
 if (distance < 0) {
 timerEl.innerHTML = "⏳ منتهي";
-needsRe-render = true; // لو انتهى نعمل إعادة رسم للسلايدر عشان يختفي
+needsRerender = true;
 } else {
 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-const seconds = Math.floor((distance % (100Normally I can help with things like this, but I don't seem to have access to that content. You can try again or ask me for something else.
+const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+timerEl.innerHTML = `⏳ متبقي: <span>${days}ي</span> <span>${hours}س</span> <span>${minutes}د</span> <span>${seconds}ث</span>`;
+}
+}
+});
+
+if (needsRerender) {
+renderSlider();
+}
+}
+
+function filterStoreContent() {
+const query = document.getElementById("searchInput").value.trim().toLowerCase();
+if (!query) {
+displayCategories(initialCategories);
+renderTrending(trendingData);
+return;
+}
+const filteredCats = initialCategories.filter(c => c.name.toLowerCase().includes(query));
+displayCategories(filteredCats);
+
+const filteredTrending = trendingData.filter(t => t.name.toLowerCase().includes(query));
+renderTrending(filteredTrending);
+}
+
+function addNewOfferFromAdmin() {
+const tag = document.getElementById("newOfferTag").value.trim();
+const title = document.getElementById("newOfferTitle").value.trim();
+const sub = document.getElementById("newOfferSub").value.trim();
+const img = document.getElementById("newOfferImg").value.trim();
+const hours = parseFloat(document.getElementById("newOfferHours").value) || 24;
+
+if (!title) {
+alert("الرجاء كتابة عنوان العرض الرئيسي على الأقل!");
+return;
+}
+
+const newOffer = {
+id: 'off_' + Date.now(),
+tag: tag || '✨ عرض مميز',
+title: title,
+subtitle: sub || 'استمتعي بالخصم لفترة محدودة',
+img: img || '',
+endTime: new Date().getTime() + (hours * 3600 * 1000)
+};
+
+offersData.push(newOffer);
+localStorage.setItem('crystal_offers', JSON.stringify(offersData));
+renderSlider();
+renderAdminOffers();
+alert("تمت إضافة العرض بنجاح وتحديث السلايدر! 🚀");
+
+document.getElementById("newOfferTag").value = "";
+document.getElementById("newOfferTitle").value = "";
+document.getElementById("newOfferSub").value = "";
+document.getElementById("newOfferImg").value = "";
+}
+
+function renderAdminOffers() {
+const container = document.getElementById("adminOffersList");
+if (offersData.length === 0) {
+container.innerHTML = '<div style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد عروض مضافة حالياً.</div>';
+return;
+}
+
+let html = "";
+offersData.forEach((offer, idx) => {
+const isExpired = offer.endTime <= new Date().getTime();
+html += `
+<div class="admin-card-item">
+<div>
+<div><b>${offer.title}</b> (${offer.tag})</div>
+<div style="font-size: 10px; color: ${isExpired ? '#ef4444' : '#16a34a'};">${isExpired ? '⏳ منتهي تماماً' : '🟢 نشط حالياً'}</div>
+</div>
+<button class="delete-item-btn" onclick="deleteAdminOffer(${idx})">حذف</button>
+</div>
+`;
+});
+container.innerHTML = html;
+}
+
+function deleteAdminOffer(index) {
+offersData.splice(index, 1);
+localStorage.setItem('crystal_offers', JSON.stringify(offersData));
+renderSlider();
+renderAdminOffers();
+}
+</script>
+</body>
+</html>
+
