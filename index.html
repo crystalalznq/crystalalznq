@@ -518,7 +518,6 @@ title: "خصم الشحن المجاني",
 subtitle: "متاح على جميع طلبات اليوم",
 img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp",
 targetType: "general"
-// بدون endTime ليبقى العرض مستمراً دائماً
 }
 ];
 
@@ -558,7 +557,6 @@ function startAutoSlider() {
 if (sliderInterval) clearInterval(sliderInterval);
 sliderInterval = setInterval(() => {
 const slider = document.getElementById("offerSlider");
-const dots = document.querySelectorAll(".dot-indicator");
 const activeOffers = offersData.filter(offer => !offer.endTime || offer.endTime > new Date().getTime());
 
 if (activeOffers.length <= 1) return;
@@ -566,15 +564,19 @@ if (activeOffers.length <= 1) return;
 currentSlideIndex = (currentSlideIndex + 1) % activeOffers.length;
 const slideWidth = slider.clientWidth;
 slider.scrollTo({ left: currentSlideIndex * slideWidth, behavior: 'smooth' });
-
-dots.forEach((dot, idx) => {
-dot.classList.toggle("active", idx === currentSlideIndex);
-});
+updateDotsActiveState();
 }, 4000);
 }
 
 function stopAutoSlider() {
 if (sliderInterval) clearInterval(sliderInterval);
+}
+
+function updateDotsActiveState() {
+const dots = document.querySelectorAll(".dot-indicator");
+dots.forEach((dot, idx) => {
+dot.classList.toggle("active", idx === currentSlideIndex);
+});
 }
 
 function toggleCartModal(show) {
@@ -759,8 +761,16 @@ ${actionButtonHtml}
 </div>
 ${offer.img ? `<img src="${offer.img}" alt="${offer.title}" class="slide-img" onerror="this.style.display='none'">` : ''}
 </div>`;
-dotsContainer.innerHTML += `<div class="dot-indicator ${idx === 0 ? 'active' : ''}"></div>`;
+dotsContainer.innerHTML += `<div class="dot-indicator ${idx === 0 ? 'active' : ''}" onclick="scrollToSlide(${idx})"></div>`;
 });
+}
+
+function scrollToSlide(idx) {
+currentSlideIndex = idx;
+const slider = document.getElementById("offerSlider");
+const slideWidth = slider.clientWidth;
+slider.scrollTo({ left: currentSlideIndex * slideWidth, behavior: 'smooth' });
+updateDotsActiveState();
 }
 
 function handleOfferAction(offerTitle) {
