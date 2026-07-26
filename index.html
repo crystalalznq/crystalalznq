@@ -667,7 +667,7 @@ totalText.innerText = `💰 الإجمالي الكلي: ${total} جنيه`;
 function checkoutWhatsApp() {
 const custName = document.getElementById("custName").value.trim();
 let deliveryText = selectedDeliveryType === 'pickup'
-? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلام ✨)"
+? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلاستلام ✨)"
 : "🚚 توصيل للمنزل (في انتظار التواصل لتأكيد العنوان والتفاصيل 🛵)";
 let msg = "أهلاً وسهلاً كرستال الزنقة! 🌸✨\n";
 msg += "حابب/حاببة أؤكد الطلب الجميل ده معكم: 👇\n\n";
@@ -748,7 +748,8 @@ slider.onmouseleave = startAutoSlider;
 
 activeOffers.forEach((offer, idx) => {
 let actionButtonHtml = '';
-if (offer.targetType !== 'general') {
+// إظهار زر التصفح فقط إذا لم يكن العرض عاماً (أي يتبع لقسم أو منتج معين)
+if (offer.targetType && offer.targetType !== 'general') {
 actionButtonHtml = `<button class="slide-action-btn" onclick="handleOfferAction('${offer.title}')">تصفح العرض 👈</button>`;
 }
 
