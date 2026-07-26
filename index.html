@@ -3,343 +3,354 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>كرستال الزنقة - مستلزمات الإكسسوارات والهاند ميد</title>
+  <title>متجر الإكسسوارات والخرز</title>
   <style>
     :root {
-      --orange-btn: #d9531e;
-      --orange-bg: #fdf5ef;
-      --text-dark: #1e293b;
-      --border-gray: #e2e8f0;
+      --primary-color: #e91e63;
+      --secondary-color: #f48fb1;
+      --bg-color: #fff0f5;
+      --text-color: #333;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: #f1f5f9; color: var(--text-dark); direction: rtl; display: flex; justify-content: center; }
-
-    .app-container {
-      width: 100%;
-      max-width: 480px;
-      background: #ffffff;
-      min-height: 100vh;
-      padding-bottom: 80px;
-      position: relative;
-      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
     }
 
-    /* الهيدر العلوي وزر السلة */
-    .header {
+    header {
+      background-color: var(--primary-color);
+      color: white;
       padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #fff;
-      border-bottom: 1px solid var(--border-gray);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-    .brand-banner-logo { height: 40px; width: auto; object-fit: contain; }
-
-    .header-cart-btn {
-      background: var(--orange-bg);
-      border: 1px solid #fed7aa;
-      padding: 8px 14px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      color: var(--orange-btn);
-      font-weight: 800;
-      font-size: 13px;
-    }
-    .header-cart-btn svg { width: 18px; height: 18px; fill: currentColor; }
-    .cart-badge-count {
-      background: var(--orange-btn);
-      color: #fff;
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 10px;
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 15px;
     }
 
-    /* سلايدر العروض */
-    .slider-wrapper { padding: 15px 20px 5px; }
-    .slider-container {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scroll-behavior: smooth;
-      border-radius: 16px;
-      scrollbar-width: none;
+    /* --- قسم سلايدر العروض (يدعم الصور والنصوص) --- */
+    .offers-slider {
+      position: relative;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+      height: 250px;
     }
-    .slider-container::-webkit-scrollbar { display: none; }
+
+    .slides-wrapper {
+      display: flex;
+      height: 100%;
+      transition: transform 0.5s ease-in-out;
+    }
 
     .slide {
-      flex: 0 0 100%;
-      scroll-snap-align: start;
-      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
-      border-radius: 16px;
-      padding: 16px;
-      min-height: 110px;
+      min-width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* طبقة لتوضيح النص فوق الصور */
+    .slide-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: center;
-    }
-    
-    .badge-discount {
-      background: var(--orange-btn);
-      color: #fff;
-      font-size: 11px;
-      font-weight: bold;
-      padding: 2px 10px;
-      border-radius: 10px;
-      width: fit-content;
-      margin-bottom: 6px;
-    }
-    .slide-title { font-size: 20px; font-weight: 900; color: #1e293b; }
-    .slide-sub { font-size: 14px; font-weight: 700; color: #475569; }
-
-    /* البحث */
-    .search-box { padding: 10px 20px; }
-    .search-input-inner { position: relative; }
-    .search-input-inner input {
-      width: 100%;
-      padding: 12px 45px 12px 15px;
-      border-radius: 25px;
-      border: 1px solid var(--border-gray);
-      background: #f8fafc;
-      outline: none;
-      font-size: 14px;
-    }
-    .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-
-    /* شبكة الأقسام بدون أسعار */
-    .section-header { text-align: center; margin: 15px 0; font-size: 16px; font-weight: 800; color: #0f172a; }
-    .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; }
-    .cat-item {
-      background: #ffffff;
-      border: 1px solid var(--border-gray);
-      border-radius: 14px;
-      overflow: hidden;
+      color: white;
       text-align: center;
-      padding-bottom: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .slide-overlay h2 {
+      margin: 0 0 10px 0;
+      font-size: 24px;
+    }
+
+    .slide-overlay p {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    /* أزرار التحكم بالسلايدر */
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(233, 30, 99, 0.7);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 50%;
+      font-size: 18px;
+      z-index: 10;
+    }
+
+    .slider-btn:hover {
+      background: var(--primary-color);
+    }
+
+    .prev-btn { right: 10px; }
+    .next-btn { left: 10px; }
+
+    /* نقاط التنقل */
+    .slider-dots {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
       cursor: pointer;
     }
-    .cat-item img { width: 100%; height: 95px; object-fit: cover; background: #f1f5f9; }
-    .cat-item h4 { font-size: 13px; font-weight: 800; color: #1e293b; margin-top: 8px; }
-    .cat-item span { font-size: 11px; color: #94a3b8; }
 
-    /* نافذة السلة */
-    .cart-modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); z-index: 2000;
-      display: none; justify-content: center; align-items: flex-end;
-    }
-    .cart-modal-overlay.active { display: flex; }
-    .cart-modal {
-      width: 100%; max-width: 480px; background: #fff;
-      border-top-left-radius: 20px; border-top-right-radius: 20px;
-      padding: 20px; max-height: 80vh; overflow-y: auto;
-    }
-    .cart-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .close-modal-btn { background: #f1f5f9; border: none; font-size: 18px; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
-    .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-gray); }
-    .cart-item-controls { display: flex; align-items: center; gap: 8px; }
-    .qty-btn { width: 26px; height: 26px; border: 1px solid var(--border-gray); background: #f8fafc; border-radius: 6px; font-weight: bold; cursor: pointer; }
-    .delete-item-btn { background: #fee2e2; color: #ef4444; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; }
-    .checkout-wa-btn {
-      width: 100%; background: #25d366; color: white; border: none;
-      padding: 12px; border-radius: 12px; font-weight: bold; font-size: 14px;
-      cursor: pointer; display: block; text-decoration: none; margin-top: 10px; text-align: center;
+    .dot.active {
+      background: white;
+      width: 25px;
+      border-radius: 5px;
     }
 
-    /* الشريط السفلي */
-    .bottom-nav {
-      position: fixed; bottom: 0; width: 100%; max-width: 480px;
-      background: #ffffff; border-top: 1px solid var(--border-gray);
-      display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000;
+    /* --- قسم المنتجات --- */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
     }
-    .nav-link { display: flex; flex-direction: column; align-items: center; text-decoration: none; font-size: 11px; font-weight: 800; color: #94a3b8; }
-    .nav-link.active { color: #0284c7; }
-    .nav-link svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 2px; }
+
+    .product-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    /* --- قسم التواصل والروابط --- */
+    .social-section {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .social-btn {
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      color: white;
+      font-weight: bold;
+      transition: opacity 0.3s;
+    }
+
+    .social-btn:hover { opacity: 0.8; }
+    .whatsapp { background-color: #25D366; }
+    .instagram { background-color: #E1306C; }
+    .facebook { background-color: #1877F2; }
+
+    /* --- المكونات المستعادة تحت روابط التواصل --- */
+    .footer-extra {
+      border-top: 1px solid #eee;
+      margin-top: 20px;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .action-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .action-btn:hover {
+      background-color: #c2185b;
+    }
   </style>
 </head>
 <body>
 
-  <div class="app-container">
+  <header>
+    <h1>متجر الإكسسوارات والخرز HandMade</h1>
+  </header>
 
-    <header class="header">
-      <img src="https://raw.githubusercontent.com/crystalalznq/crystalalznq/refs/heads/main/IMG_%D9%A2%D9%A0%D9%A2%D9%A6%D9%A0%D9%A7%D9%A2%D9%A6_%D9%A0%D9%A2%D9%A4%D9%A5%D9%A3%D9%A7.png" class="brand-banner-logo" alt="كرستال الزنقة">
-      <button class="header-cart-btn" onclick="toggleCartModal(true)">
-        <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-        <span>السلة</span>
-        <span class="cart-badge-count" id="headerCartCount">0</span>
-      </button>
-    </header>
+  <div class="container">
+    
+    <!-- سلايدر العروض المتحرك تلقائياً ويدعم الصور -->
+    <div class="offers-slider" id="offersSlider">
+      <button class="slider-btn prev-btn" onclick="prevSlide()">&#10095;</button>
+      <button class="slider-btn next-btn" onclick="nextSlide()">&#10094;</button>
+      
+      <div class="slides-wrapper" id="slidesWrapper">
+        <!-- الشريحة الأولى: صورة + نص -->
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1611591475140-4388584ae237?auto=format&fit=crop&w=800&q=80');">
+          <div class="slide-overlay">
+            <h2>خصم 20% على جميع أطقم الخرز</h2>
+            <p>استخدم الكود: BEADS20 عند الطلب</p>
+          </div>
+        </div>
+        
+        <!-- الشريحة الثانية: صورة أخرى + نص -->
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=80');">
+          <div class="slide-overlay">
+            <h2>عرض التوصيل المجاني</h2>
+            <p>على جميع الطلبات لأكثر من 300 جنيه</p>
+          </div>
+        </div>
 
-    <div class="slider-wrapper">
-      <div class="slider-container" id="offerSlider"></div>
+        <!-- الشريحة الثالثة: صورة بدون نص عادي أو تصميم خاص -->
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80');">
+          <div class="slide-overlay">
+            <h2>تشكيلة الصيف الجديدة وصلت!</h2>
+            <p>تسوقي أحدث أشكال السلاسل والأساور</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-dots" id="sliderDots"></div>
     </div>
 
-    <div class="search-box">
-      <div class="search-input-inner">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="ابحث عن قسم...">
+    <!-- شبكة المنتجات -->
+    <div class="products-grid">
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1611591475140-4388584ae237?auto=format&fit=crop&w=300&q=80" alt="منتج">
+        <h3>طقم خرز ملون</h3>
+        <p>150 جنيه</p>
+      </div>
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=300&q=80" alt="منتج">
+        <h3>أسورة هاند ميد</h3>
+        <p>80 جنيه</p>
       </div>
     </div>
 
-    <div class="section-header">تصفح الأقسام الرئيسية</div>
-    <div class="categories-grid" id="categoriesGrid"></div>
+    <!-- قسم التواصل والأزرار الإضافية -->
+    <div class="social-section">
+      <h3>تواصل معنا مباشرة</h3>
+      <div class="social-links">
+        <a href="#" class="social-btn whatsapp">واتساب</a>
+        <a href="#" class="social-btn instagram">إنستغرام</a>
+        <a href="#" class="social-btn facebook">فيسبوك</a>
+      </div>
 
-    <!-- نافذة السلة -->
-    <div class="cart-modal-overlay" id="cartModalOverlay">
-      <div class="cart-modal">
-        <div class="cart-modal-header">
-          <div style="font-weight:bold;">🛒 سلة المشتريات</div>
-          <button class="close-modal-btn" onclick="toggleCartModal(false)">✕</button>
-        </div>
-        <div id="cartItemsList"></div>
-        <div style="margin-top: 15px;">
-          <div style="font-weight: bold;" id="cartTotalText">الإجمالي: 0 جنيه</div>
-          <a href="#" class="checkout-wa-btn" onclick="checkoutWhatsApp(event)">إرسال الطلب عبر الواتساب ←</a>
-        </div>
+      <!-- الأزرار والعناصر التي تم إعادتها تحت روابط التواصل -->
+      <div class="footer-extra">
+        <button class="action-btn" onclick="alert('سيتم فتح نموذج تقييم المتجر')">⭐ تقييم المتجر</button>
+        <button class="action-btn" onclick="alert('ساعات العمل: من 10 صباحاً حتى 10 مساءً')">🕒 مواعيد العمل</button>
+        <button class="action-btn" onclick="alert('سيتم تحويلك لسياسة الاستبدال والاسترجاع')">🔄 سياسة الاسترجاع</button>
       </div>
     </div>
-
-    <nav class="bottom-nav">
-      <a href="#" class="nav-link active">
-        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> الرئيسية
-      </a>
-      <a href="#categoriesGrid" class="nav-link">
-        <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg> الأقسام
-      </a>
-    </nav>
 
   </div>
 
   <script>
-    // جلب البيانات من الذاكرة المحلية المرتبطة بـ لوحة التحكم
-    const defaultCategories = [
-      { id: "1", name: "الخرز", img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
-      { id: "2", name: "السلاسل", img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
-      { id: "3", name: "اللولي", img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
-    ];
+    // --- كود تشغيل سلايدر العروض تلقائياً ---
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const wrapper = document.getElementById('slidesWrapper');
+    const dotsContainer = document.getElementById('sliderDots');
+    let autoPlayTimer = null;
 
-    const defaultOffers = [
-      { tag: "% خصومات هذا الأسبوع", title: "خصم 15%", subtitle: "على السلاسل" },
-      { tag: "% عرض خاص", title: "خصم 20%", subtitle: "على أطقم الخرز" }
-    ];
-
-    let initialCategories = JSON.parse(localStorage.getItem('crystal_categories')) || defaultCategories;
-    let offersData = JSON.parse(localStorage.getItem('crystal_offers')) || defaultOffers;
-
-    let cart = [];
-
-    function toggleCartModal(show) {
-      document.getElementById("cartModalOverlay").classList.toggle("active", show);
-      if (show) renderCartItems();
-    }
-
-    function updateQuantity(index, delta) {
-      cart[index].qty += delta;
-      if (cart[index].qty <= 0) cart.splice(index, 1);
-      renderCartItems();
-      updateCartBadge();
-    }
-
-    function removeItem(index) {
-      cart.splice(index, 1);
-      renderCartItems();
-      updateCartBadge();
-    }
-
-    function updateCartBadge() {
-      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-      document.getElementById("headerCartCount").innerText = totalQty;
-    }
-
-    function renderCartItems() {
-      const container = document.getElementById("cartItemsList");
-      const totalText = document.getElementById("cartTotalText");
-
-      if (cart.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8;">السلة فارغة حالياً</div>`;
-        totalText.innerText = "الإجمالي: 0 جنيه";
-        return;
-      }
-
-      let html = "";
-      let total = 0;
-      cart.forEach((item, idx) => {
-        total += item.price * item.qty;
-        html += `
-          <div class="cart-item-row">
-            <div>
-              <div style="font-size:13px; font-weight:bold;">${item.name}</div>
-              <div style="font-size: 11px; color: #64748b;">${item.price} ج.م</div>
-            </div>
-            <div class="cart-item-controls">
-              <button class="qty-btn" onclick="updateQuantity(${idx}, -1)">-</button>
-              <span>${item.qty}</span>
-              <button class="qty-btn" onclick="updateQuantity(${idx}, 1)">+</button>
-              <button class="delete-item-btn" onclick="removeItem(${idx})">حذف</button>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-      totalText.innerText = `الإجمالي: ${total} جنيه`;
-    }
-
-    function checkoutWhatsApp(e) {
-      e.preventDefault();
-      if (cart.length === 0) return alert("السلة فارغة!");
-      let msg = "مرحباً، أريد طلب المنتجات التالية:\n\n";
-      let total = 0;
-      cart.forEach((item, idx) => {
-        msg += `${idx + 1}. ${item.name} | العدد: ${item.qty} | السعر: ${item.price * item.qty} ج.م\n`;
-        total += item.price * item.qty;
-      });
-      msg += `\nالإجمالي الكلي: ${total} جنيه`;
-      window.open(`https://wa.me/201227492921?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function displayCategories(categories) {
-      const grid = document.getElementById("categoriesGrid");
-      grid.innerHTML = "";
-      categories.forEach(cat => {
-        grid.innerHTML += `
-          <div class="cat-item">
-            <img src="${cat.img}" alt="${cat.name}">
-            <h4>${cat.name}</h4>
-            <span>تصفح المنتجات</span>
-          </div>
-        `;
-      });
-    }
-
-    function renderSlider(offers) {
-      const slider = document.getElementById("offerSlider");
-      slider.innerHTML = "";
-      offers.forEach(offer => {
-        slider.innerHTML += `
-          <div class="slide">
-            <span class="badge-discount">${offer.tag}</span>
-            <div class="slide-title">${offer.title}</div>
-            <div class="slide-sub">${offer.subtitle}</div>
-          </div>
-        `;
-      });
-    }
-
-    document.getElementById("searchInput").addEventListener("input", function(e) {
-      const query = e.target.value.toLowerCase().trim();
-      displayCategories(initialCategories.filter(c => c.name.toLowerCase().includes(query)));
+    // إنشاء النقاط بناءً على عدد الشرائح
+    slides.forEach((_, index) => {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      if (index === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => goToSlide(index));
+      dotsContainer.appendChild(dot);
     });
 
-    renderSlider(offersData);
-    displayCategories(initialCategories);
+    const dots = document.querySelectorAll('.dot');
+
+    function updateSlider() {
+      wrapper.style.transform = `translateX(${currentSlide * 100}%)`;
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slides.length;
+      updateSlider();
+    }
+
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+      updateSlider();
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      updateSlider();
+    }
+
+    // بدء الحركة التلقائية (تغيير كل 3 ثوانٍ)
+    function startAutoPlay() {
+      autoPlayTimer = setInterval(nextSlide, 3000);
+    }
+
+    function stopAutoPlay() {
+      clearInterval(autoPlayTimer);
+    }
+
+    // تشغيل الحركة التلقائية عند التحميل
+    startAutoPlay();
+
+    // إيقاف الحركة التلقائية عند إيقاف الماوس فوق السلايدر واستئنافها عند الابتعاد
+    const sliderElement = document.getElementById('offersSlider');
+    sliderElement.addEventListener('mouseenter', stopAutoPlay);
+    sliderElement.addEventListener('mouseleave', startAutoPlay);
   </script>
+
 </body>
 </html>
