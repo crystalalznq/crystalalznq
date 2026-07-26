@@ -65,7 +65,7 @@
       border-radius: 10px;
     }
 
-    /* تصميم العناوين الفاصلة بالخطوط الزرقاء والنقط */
+    /* تصميم العناوين الفاصلة */
     .section-divider {
       display: flex;
       align-items: center;
@@ -119,7 +119,47 @@
     .dot-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: #cbd5e1; transition: all 0.3s ease; }
     .dot-indicator.active { background-color: var(--orange-btn); width: 20px; border-radius: 10px; }
 
-    /* البحث */
+    /* قسم الأكثر مبيعاً / التريند */
+    .trending-scroll-container {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 0 20px 10px;
+      scrollbar-width: none;
+    }
+    .trending-scroll-container::-webkit-scrollbar { display: none; }
+
+    .trending-card {
+      flex: 0 0 140px;
+      background: #fff;
+      border: 1px solid var(--border-gray);
+      border-radius: 14px;
+      padding: 10px;
+      position: relative;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .trending-card img { width: 100%; height: 100px; object-fit: cover; border-radius: 10px; }
+    .trending-badge {
+      position: absolute;
+      top: 15px; right: 15px;
+      background: #ef4444; color: #fff;
+      font-size: 9px; font-weight: 800;
+      padding: 2px 6px; border-radius: 6px;
+    }
+    .trending-title { font-size: 12px; font-weight: 800; color: #1e293b; margin: 6px 0 2px; }
+    .trending-price { font-size: 11px; font-weight: 700; color: var(--orange-btn); }
+    .add-trending-btn {
+      width: 100%; margin-top: 6px;
+      background: var(--orange-bg); color: var(--orange-btn);
+      border: 1px solid #fed7aa; border-radius: 8px;
+      padding: 5px; font-size: 11px; font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* البحث الشامل */
     .search-box { padding: 10px 20px; }
     .search-input-inner { position: relative; }
     .search-input-inner input {
@@ -149,7 +189,7 @@
     .cat-item h4 { font-size: 13px; font-weight: 800; color: #1e293b; margin-top: 8px; }
     .cat-item span { font-size: 11px; color: #94a3b8; }
 
-    /* المربع الخفيف المصغر تحت خالص وبأيقونات وأسماء واضحة في سطر واحد */
+    /* المربع المصغر لوسائل التواصل */
     .social-compact-card {
       margin: 30px 20px 10px 20px;
       background: #f8fafc;
@@ -162,62 +202,20 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.03);
     }
 
-    .social-mini-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      gap: 3px;
-    }
-
-    .social-mini-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      transition: transform 0.2s ease;
-    }
-    .social-mini-item:active .social-mini-btn { transform: scale(0.9); }
+    .social-mini-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; gap: 3px; }
+    .social-mini-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+    .social-label { font-size: 10px; font-weight: 700; color: #475569; }
     
-    .social-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: #475569;
-    }
-    
-    /* ألوان الأيقونات الناعمة العصريّة */
     .btn-wa { background: #25d366; }
     .btn-phone { background: #0284c7; }
     .btn-landline { background: #64748b; }
     .btn-tiktok { background: #000000; }
     .btn-fb { background: #1877f2; }
     .btn-insta { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
-
     .social-mini-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
-    /* حقوق الملكية والأمان في الأسفل */
-    .security-footer {
-      text-align: center;
-      padding: 15px 20px 5px;
-      font-size: 11px;
-      color: #94a3b8;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-    .security-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      color: #16a34a;
-      font-weight: 700;
-      font-size: 11px;
-      margin-bottom: 2px;
-    }
+    .security-footer { text-align: center; padding: 15px 20px 5px; font-size: 11px; color: #94a3b8; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .security-badge { display: inline-flex; align-items: center; gap: 5px; color: #16a34a; font-weight: 700; font-size: 11px; }
 
     /* نافذة السلة */
     .cart-modal-overlay {
@@ -263,11 +261,22 @@
       <div class="slider-dots" id="sliderDots"></div>
     </div>
 
-    <!-- البحث -->
+    <!-- قسم الأكثر مبيعاً (التريند) -->
+    <div class="section-divider">
+      <div class="line"></div>
+      <div class="dot"></div>
+      <div class="title">🔥 الأكثر مبيعاً الآن</div>
+      <div class="dot"></div>
+      <div class="line"></div>
+    </div>
+
+    <div class="trending-scroll-container" id="trendingContainer"></div>
+
+    <!-- البحث العام في المتجر -->
     <div class="search-box">
       <div class="search-input-inner">
         <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="ابحث عن قسم...">
+        <input type="text" id="searchInput" placeholder="ابحث عن قسم أو منتج...">
       </div>
     </div>
 
@@ -282,57 +291,36 @@
 
     <div class="categories-grid" id="categoriesGrid"></div>
 
-    <!-- المربع المدمج الخفيف أسفل الشاشة يضم الأيقونات والأسماء في سطر واحد -->
+    <!-- وسائل التواصل -->
     <div class="social-compact-card">
-      <!-- واتساب -->
-      <a href="https://wa.me/201227492921" target="_blank" class="social-mini-item" title="واتساب">
-        <div class="social-mini-btn btn-wa">
-          <svg viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.763.459 3.486 1.332 5.003l-1.416 5.171 5.291-1.387c1.462.798 3.11 1.218 4.78 1.218h.004c5.505 0 9.988-4.478 9.989-9.985.001-2.668-1.033-5.176-2.919-7.062a9.913 9.913 0 0 0-7.071-2.942zm5.727 14.195c-.242.682-1.411 1.302-1.944 1.385-.494.077-1.139.11-1.832-.112-.423-.135-.968-.315-1.666-.616-2.935-1.268-4.849-4.26-4.996-4.455-.147-.195-1.196-1.592-1.196-3.036 0-1.444.757-2.155 1.025-2.448.268-.293.585-.366.781-.366.195 0 .39.002.56.009.182.008.427-.069.667.508.244.586.829 2.022.902 2.169.073.146.122.317.024.512-.097.195-.146.317-.292.488-.146.171-.307.382-.439.513-.146.146-.298.305-.128.597.17.293.756 1.248 1.622 2.019 1.113.992 2.052 1.301 2.345 1.447.293.146.463.122.634-.073.171-.195.731-.853.926-1.146.195-.293.39-.244.658-.146.268.098 1.706.804 2.001.951.293.146.488.219.56.341.073.122.073.707-.169 1.389z"/></svg>
-        </div>
+      <a href="https://wa.me/201227492921" target="_blank" class="social-mini-item">
+        <div class="social-mini-btn btn-wa"><svg viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.763.459 3.486 1.332 5.003l-1.416 5.171 5.291-1.387c1.462.798 3.11 1.218 4.78 1.218h.004c5.505 0 9.988-4.478 9.989-9.985.001-2.668-1.033-5.176-2.919-7.062a9.913 9.913 0 0 0-7.071-2.942zm5.727 14.195c-.242.682-1.411 1.302-1.944 1.385-.494.077-1.139.11-1.832-.112-.423-.135-.968-.315-1.666-.616-2.935-1.268-4.849-4.26-4.996-4.455-.147-.195-1.196-1.592-1.196-3.036 0-1.444.757-2.155 1.025-2.448.268-.293.585-.366.781-.366.195 0 .39.002.56.009.182.008.427-.069.667.508.244.586.829 2.022.902 2.169.073.146.122.317.024.512-.097.195-.146.317-.292.488-.146.171-.307.382-.439.513-.146.146-.298.305-.128.597.17.293.756 1.248 1.622 2.019 1.113.992 2.052 1.301 2.345 1.447.293.146.463.122.634-.073.171-.195.731-.853.926-1.146.195-.293.39-.244.658-.146.268.098 1.706.804 2.001.951.293.146.488.219.56.341.073.122.073.707-.169 1.389z"/></svg></div>
         <span class="social-label">واتساب</span>
       </a>
-      <!-- اتصال محمول -->
-      <a href="tel:01227492921" class="social-mini-item" title="موبايل">
-        <div class="social-mini-btn btn-phone">
-          <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-        </div>
+      <a href="tel:01227492921" class="social-mini-item">
+        <div class="social-mini-btn btn-phone"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
         <span class="social-label">موبايل</span>
       </a>
-      <!-- تليفون أرضي -->
-      <a href="tel:031234567" class="social-mini-item" title="أرضي">
-        <div class="social-mini-btn btn-landline">
-          <svg viewBox="0 0 24 24"><path d="M18.5 2h-13C4.12 2 3 3.12 3 4.5v15C3 20.88 4.12 22 5.5 22h13c1.38 0 2.5-1.12 2.5-2.5v-15C21 3.12 19.88 2 18.5 2zm-13 2h13c.28 0 .5.22.5.5v10h-14v-10c0-.28.22-.5.5-.5zm13 16h-13c-.28 0-.5-.22-.5-.5v-3h14v3c0 .28-.22.5-.5.5zm-6.5-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-        </div>
+      <a href="tel:031234567" class="social-mini-item">
+        <div class="social-mini-btn btn-landline"><svg viewBox="0 0 24 24"><path d="M18.5 2h-13C4.12 2 3 3.12 3 4.5v15C3 20.88 4.12 22 5.5 22h13c1.38 0 2.5-1.12 2.5-2.5v-15C21 3.12 19.88 2 18.5 2zm-13 2h13c.28 0 .5.22.5.5v10h-14v-10c0-.28.22-.5.5-.5zm13 16h-13c-.28 0-.5-.22-.5-.5v-3h14v3c0 .28-.22.5-.5.5zm-6.5-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
         <span class="social-label">أرضي</span>
       </a>
-      <!-- تيك توك -->
-      <a href="https://www.tiktok.com" target="_blank" class="social-mini-item" title="تيك توك">
-        <div class="social-mini-btn btn-tiktok">
-          <svg viewBox="0 0 24 24"><path d="M12.525 0h3.08c.12 1.01.657 2.41 1.512 3.256.856.845 2.01 1.27 3.383 1.35v3.165c-1.222-.056-2.42-.4-3.48-.99v6.94c0 3.32-2.69 6.01-6.01 6.01-3.32 0-6.01-2.69-6.01-6.01 0-3.32 2.69-6.01 6.01-6.01.39 0 .77.04 1.14.11v3.25c-.37-.12-.75-.18-1.14-.18-1.56 0-2.83 1.27-2.83 2.83s1.27 2.83 2.83 2.83 2.83-1.27 2.83-2.83V0z"/></svg>
-        </div>
+      <a href="https://www.tiktok.com" target="_blank" class="social-mini-item">
+        <div class="social-mini-btn btn-tiktok"><svg viewBox="0 0 24 24"><path d="M12.525 0h3.08c.12 1.01.657 2.41 1.512 3.256.856.845 2.01 1.27 3.383 1.35v3.165c-1.222-.056-2.42-.4-3.48-.99v6.94c0 3.32-2.69 6.01-6.01 6.01-3.32 0-6.01-2.69-6.01-6.01 0-3.32 2.69-6.01 6.01-6.01.39 0 .77.04 1.14.11v3.25c-.37-.12-.75-.18-1.14-.18-1.56 0-2.83 1.27-2.83 2.83s1.27 2.83 2.83 2.83 2.83-1.27 2.83-2.83V0z"/></svg></div>
         <span class="social-label">تيك توك</span>
       </a>
-      <!-- فيسبوك -->
-      <a href="https://www.facebook.com" target="_blank" class="social-mini-item" title="فيسبوك">
-        <div class="social-mini-btn btn-fb">
-          <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-        </div>
+      <a href="https://www.facebook.com" target="_blank" class="social-mini-item">
+        <div class="social-mini-btn btn-fb"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></div>
         <span class="social-label">فيسبوك</span>
       </a>
-      <!-- انستجرام -->
-      <a href="https://www.instagram.com" target="_blank" class="social-mini-item" title="انستجرام">
-        <div class="social-mini-btn btn-insta">
-          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-        </div>
+      <a href="https://www.instagram.com" target="_blank" class="social-mini-item">
+        <div class="social-mini-btn btn-insta"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></div>
         <span class="social-label">انستجرام</span>
       </a>
     </div>
 
-    <!-- نص الأمان وحقوق الملكية -->
     <div class="security-footer">
-      <div class="security-badge">
-        <span>🔒</span> تسوق آمن 100% - جميع البيانات مشفرة
-      </div>
+      <div class="security-badge">🔒 تسوق آمن 100% - جميع البيانات مشفرة</div>
       <div>جميع الحقوق محفوظة © 2026 كرستال الزنقة</div>
     </div>
 
@@ -365,14 +353,32 @@
       { tag: "% عرض خاص", title: "خصم 20%", subtitle: "على أطقم الخرز" }
     ];
 
+    const defaultTrending = [
+      { id: "t1", name: "خرز كرستال شفاف 8 مل", price: 45, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
+      { id: "t2", name: "سلسلة مطلي جولد ناعم", price: 65, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
+      { id: "t3", name: "لولي طبيعي مقاس 6", price: 50, img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
+    ];
+
     let initialCategories = JSON.parse(localStorage.getItem('crystal_categories')) || defaultCategories;
     let offersData = JSON.parse(localStorage.getItem('crystal_offers')) || defaultOffers;
+    let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || defaultTrending;
 
     let cart = [];
 
     function toggleCartModal(show) {
       document.getElementById("cartModalOverlay").classList.toggle("active", show);
       if (show) renderCartItems();
+    }
+
+    function addToCart(product) {
+      const existing = cart.find(item => item.id === product.id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...product, qty: 1 });
+      }
+      updateCartBadge();
+      alert(`تمت إضافة "${product.name}" إلى السلة!`);
     }
 
     function updateQuantity(index, delta) {
@@ -453,6 +459,24 @@
       });
     }
 
+    function renderTrending(items) {
+      const container = document.getElementById("trendingContainer");
+      container.innerHTML = "";
+      items.forEach(item => {
+        container.innerHTML += `
+          <div class="trending-card">
+            <span class="trending-badge">الأكثر طلباً</span>
+            <img src="${item.img}" alt="${item.name}">
+            <div>
+              <div class="trending-title">${item.name}</div>
+              <div class="trending-price">${item.price} ج.م</div>
+            </div>
+            <button class="add-trending-btn" onclick='addToCart(${JSON.stringify(item)})'>+ أضف للسلة</button>
+          </div>
+        `;
+      });
+    }
+
     function renderSlider(offers) {
       const slider = document.getElementById("offerSlider");
       const dotsContainer = document.getElementById("sliderDots");
@@ -496,20 +520,23 @@
           updateActiveDot(nextIndex);
         }
       }, 3000);
-
-      slider.addEventListener('scroll', () => {
-        const width = slider.clientWidth;
-        const activeIndex = Math.round(Math.abs(slider.scrollLeft) / width);
-        updateActiveDot(activeIndex);
-      });
     }
 
+    // البحث الشامل
     document.getElementById("searchInput").addEventListener("input", function(e) {
       const query = e.target.value.toLowerCase().trim();
-      displayCategories(initialCategories.filter(c => c.name.toLowerCase().includes(query)));
+      
+      // تصفية الأقسام
+      const filteredCats = initialCategories.filter(c => c.name.toLowerCase().includes(query));
+      displayCategories(filteredCats);
+
+      // تصفية الأكثر مبيعاً
+      const filteredTrending = trendingData.filter(t => t.name.toLowerCase().includes(query));
+      renderTrending(filteredTrending);
     });
 
     renderSlider(offersData);
+    renderTrending(trendingData);
     displayCategories(initialCategories);
     startAutoSlider();
   </script>
