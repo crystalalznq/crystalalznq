@@ -357,13 +357,11 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 
 <!-- المحتوى الرئيسي (الصفحة الرئيسية) -->
 <div id="homeMainContent">
-<!-- سلايدر العروض التفاعلي والعداد -->
 <div class="slider-wrapper">
 <div class="slider-container" id="offerSlider"></div>
 <div class="slider-dots" id="sliderDots"></div>
 </div>
 
-<!-- الأكثر مبيعاً -->
 <div class="section-divider">
 <div class="line"></div>
 <div class="dot"></div>
@@ -373,7 +371,6 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 </div>
 <div class="trending-scroll-container" id="trendingContainer"></div>
 
-<!-- البحث العام -->
 <div class="search-box">
 <div class="search-input-inner">
 <span class="search-icon">🔍</span>
@@ -381,7 +378,6 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 </div>
 </div>
 
-<!-- الأقسام -->
 <div class="section-divider">
 <div class="line"></div>
 <div class="dot"></div>
@@ -392,11 +388,8 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 <div class="categories-grid" id="categoriesGrid"></div>
 </div>
 
-<!-- صفحة القسم المستقلة -->
 <div class="category-page-view" id="categoryPageView">
-<button class="back-to-home-btn" onclick="backToHome()">
-⬅ العودة للرئيسية والأقسام
-</button>
+<button class="back-to-home-btn" onclick="backToHome()">⬅ العودة للرئيسية والأقسام</button>
 <div class="section-divider" style="margin-top: 5px;">
 <div class="line"></div>
 <div class="dot"></div>
@@ -407,7 +400,6 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 <div class="category-products-grid" id="categoryProductsContainer"></div>
 </div>
 
-<!-- وسائل التواصل -->
 <div class="social-compact-card">
 <a href="https://wa.me/201227492921" target="_blank" class="social-mini-item">
 <div class="social-mini-btn btn-wa"><svg viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.763.459 3.486 1.332 5.003l-1.416 5.171 5.291-1.387c1.462.798 3.11 1.218 4.78 1.218h.004c5.505 0 9.988-4.478 9.989-9.985.001-2.668-1.033-5.176-2.919-7.062a9.913 9.913 0 0 0-7.071-2.942zm5.727 14.195c-.242.682-1.411 1.302-1.944 1.385-.494.077-1.139.11-1.832-.112-.423-.135-.968-.315-1.666-.616-2.935-1.268-4.849-4.26-4.996-4.455-.147-.195-1.196-1.592-1.196-3.036 0-1.444.757-2.155 1.025-2.448.268-.293.585-.366.781-.366.195 0 .39.002.56.009.182.008.427-.069.667.508.244.586.829 2.022.902 2.169.073.146.122.317.024.512-.097.195-.146.317-.292.488-.146.171-.307.382-.439.513-.146.146-.298.305-.128.597.17.293.756 1.248 1.622 2.019 1.113.992 2.052 1.301 2.345 1.447.293.146.463.122.634-.073.171-.195.731-.853.926-1.146.195-.293.39-.244.658-.146.268.098 1.706.804 2.001.951.293.146.488.219.56.341.073.122.073.707-.169 1.389z"/></svg></div>
@@ -524,7 +516,7 @@ title: "خصم 15%",
 subtitle: "على سلسلة ستانلس ثقيلة",
 img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg",
 targetType: "product",
-targetId: "p3", // مرتبط بالـ id الخاص بـ "سلسلة ستانلس ثقيلة"
+targetId: "p3", // مطابقة تتماماً مع id المنتج p3
 endTime: new Date().getTime() + (48 * 3600 * 1000)
 },
 {
@@ -537,26 +529,41 @@ targetType: "general"
 }
 ];
 
-// دالة لتوليد ID تلقائي لمنع أي خطأ بشري أو فقدان المعرّف
+// توليد ID فريد
 function generateUniqueId(prefix = "p") {
     return prefix + "_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
 }
 
-// التأكد من أن المنتجات تحتوي على IDs صالحة ودعم التوليد التلقائي عند الحفظ
+// استرجاع البيانات مع تنظيف الـ localStorage من البيانات القديمة المعطوبة
 let initialCategories = JSON.parse(localStorage.getItem('crystal_categories')) || defaultCategories;
 let catProductsData = JSON.parse(localStorage.getItem('crystal_cat_products')) || defaultCatProducts;
-
-// فحص وتصحيح المنتجات لو وُجد منتج بدون ID
-catProductsData.forEach(p => {
-    if (!p.id) p.id = generateUniqueId("p");
-});
-
 let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || defaultTrending;
-trendingData.forEach(t => {
-    if (!t.id) t.id = generateUniqueId("t");
+let offersData = JSON.parse(localStorage.getItem('crystal_offers')) || defaultOffers;
+
+let dataUpdated = false;
+
+// فحص وإصلاح وحفظ الـ IDs الناقصة فورياً في الـ localStorage (Persistence)
+catProductsData.forEach(p => {
+    if (!p.id) {
+        p.id = generateUniqueId("p");
+        dataUpdated = true;
+    }
 });
 
-let offersData = JSON.parse(localStorage.getItem('crystal_offers')) || defaultOffers;
+trendingData.forEach(t => {
+    if (!t.id) {
+        t.id = generateUniqueId("t");
+        dataUpdated = true;
+    }
+});
+
+if (dataUpdated) {
+    localStorage.setItem('crystal_cat_products', JSON.stringify(catProductsData));
+    localStorage.setItem('crystal_trending', JSON.stringify(trendingData));
+    localStorage.setItem('crystal_categories', JSON.stringify(initialCategories));
+    localStorage.setItem('crystal_offers', JSON.stringify(offersData));
+}
+
 let cart = [];
 let selectedDeliveryType = 'pickup';
 let sliderInterval = null;
@@ -798,7 +805,6 @@ slider.scrollTo({ left: currentSlideIndex * slideWidth, behavior: 'smooth' });
 updateDotsActiveState();
 }
 
-// الدالة الآمنة للتعامل مع العروض وربطها بالمنتجات مع التنبيه أو المعالجة الذكية لو الـ ID مش موجود
 function handleOfferAction(targetType, targetId) {
     if (targetType === "category") {
         const cat = initialCategories.find(c => c.id === targetId);
@@ -808,7 +814,6 @@ function handleOfferAction(targetType, targetId) {
     } else if (targetType === "product") {
         const product = catProductsData.find(p => p.id === targetId);
         
-        // حماية تامة ضد عدم وجود المنتج المرتبط
         if (!product) {
             alert("عذراً، هذا المنتج غير متوفر حالياً أو تم تعديل معرّفه 🌸");
             return;
