@@ -80,6 +80,7 @@ scroll-snap-type: x mandatory;
 scroll-behavior: smooth;
 border-radius: 16px;
 scrollbar-width: none;
+direction: ltr; /* الحل الاحترافي لثبات الحركة على جميع المتصفحات */
 }
 .slider-container::-webkit-scrollbar { display: none; }
 .slide {
@@ -96,6 +97,7 @@ gap: 12px;
 box-sizing: border-box;
 border: 1px solid #fed7aa;
 position: relative;
+direction: rtl; /* إعادة الاتجاه للداخل ليظهر النص العربي بالشكل الصحيح */
 }
 .slide-content {
 flex: 1;
@@ -157,7 +159,7 @@ box-shadow: 0 2px 4px rgba(217, 83, 30, 0.3);
 }
 
 .slider-dots { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 8px; }
-.dot-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: #cbd5e1; transition: all 0.3s ease; }
+.dot-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: #cbd5e1; transition: all 0.3s ease; cursor: pointer; }
 .dot-indicator.active { background-color: var(--orange-btn); width: 20px; border-radius: 10px; }
 
 /* قسم الأكثر مبيعاً */
