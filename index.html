@@ -601,7 +601,7 @@ to { opacity: 0; transform: translateY(-20px); visibility: hidden; }
 </div>
 </div>
 
-<!-- 3. نافذة تفاصيل المنتج المستقلة (جديد) -->
+<!-- 3. نافذة تفاصيل المنتج المستقلة -->
 <div class="modal-overlay" id="productDetailsModalOverlay">
 <div class="modal-card" id="productDetailsModalCard">
 <!-- سيتم تعبئتها ديناميكياً -->
@@ -1145,7 +1145,7 @@ window.checkoutWhatsApp = async function() {
   }
 
   let deliveryText = selectedDeliveryType === 'pickup'
-    ? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلاستلام ✨)"
+    ? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلام ✨)"
     : "🚚 توصيل للمنزل (في انتظار التواصل لتأكيد العنوان والتفاصيل 🛵)";
   let msg = "أهلاً وسهلاً كرستال الزنقة! 🌸✨\n";
   msg += "حابب/حاببة أؤكد الطلب الجميل ده معكم: 👇\n\n";
@@ -1220,7 +1220,6 @@ function renderSlider() {
   const dotsContainer = document.getElementById("sliderDots");
   if (!slider || !dotsContainer) return;
 
-  // إعادة ضبط مؤشر السلايدر لتجنب تجاوز العدد المتاح بعد إعادة البناء
   currentSlideIndex = 0;
 
   if (liveCoupons.length === 0) {
@@ -1323,5 +1322,12 @@ window.filterStoreContent = function() {
   const filteredCats = liveCategories.filter(c => c.name.toLowerCase().includes(queryText));
   const filteredProducts = liveProducts.filter(p => p.name.toLowerCase().includes(queryText));
 
-  const homeMain = document.getElementById("homeMainContent");
-  const catView = document.getElementBy
+  displayCategories(filteredCats);
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  initStoreListeners();
+});
+</script>
+</body>
+</html>
