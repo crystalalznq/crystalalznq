@@ -1,53 +1,15 @@
 import { db } from "./firebase-config.js";
 import { 
-  collection, addDoc, getDocs, doc, deleteDoc, updateDoc, serverTimestamp, query, orderBy 
+  collection, addDoc, doc, deleteDoc, updateDoc, serverTimestamp, query, orderBy, onSnapshot 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ==================== مصفوفة تخزين صور المنتج الحالي ====================
-let activeProductImages = []; // تحتوي على روابط الصور أو نصوص Base64
-
-// دالة ضغط الصور المرفوعة من الملفات تحويلها لـ Base64
-function compressAndConvertToBase64(file, maxWidth = 800, quality = 0.7) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxWidth) {
-            width = Math.round((width * maxWidth) / height);
-            height = maxWidth;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
-        resolve(compressedBase64);
-      };
-      img.onerror = (err) => reject(err);
-    };
-    reader.onerror = (err) => reject(err);
-  });
-}
+// ==================== مصفوفة تخزين روابط صور المنتج الحالي ====================
+let activeProductImages = []; 
 
 // عرض معاينة الصور ورسم أزرار الإزالة (X)
 function renderImagePreview() {
   const previewContainer = document.getElementById("imagePreview");
+  if (!previewContainer) return;
   previewContainer.innerHTML = "";
 
   activeProductImages.forEach((imgSrc, index) => {
@@ -57,6 +19,7 @@ function renderImagePreview() {
     const img = document.createElement("img");
     img.src = imgSrc;
     img.className = "img-preview";
+    img.onerror = () => { img.src = "https://via.placeholder.com/60?text=خطأ+بالرابط"; };
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
@@ -70,40 +33,46 @@ function renderImagePreview() {
   });
 }
 
-// حذف صورة محددة باستخدام علامة (X)
 function removeImage(index) {
   activeProductImages.splice(index, 1);
   renderImagePreview();
 }
 
-// إضافة صور من المعرض
-document.getElementById("pImgFiles").addEventListener("change", async (e) => {
-  const files = e.target.files;
-  for (let file of files) {
-    try {
-      const base64Img = await compressAndConvertToBase64(file);
-      activeProductImages.push(base64Img);
-    } catch (err) {
-      console.error("خطأ في قراءة الصورة:", err);
+// إضافة روابط الصور مع التحقق من صحتها
+const addUrlBtn = document.getElementById("addUrlBtn");
+if (addUrlBtn) {
+  addUrlBtn.addEventListener("click", () => {
+    const urlInput = document.getElementById("pImgUrlInput");
+    if (!urlInput) return;
+
+    const urls = urlInput.value
+      .split(",")
+      .map(url => url.trim())
+      .filter(url => url);
+
+    if (urls.length === 0) {
+      alert("⚠️ يرجى إدخال رابط صورة صحيح!");
+      return;
     }
-  }
-  e.target.value = ""; // إعادة تعيين لتمكين اختيار صور مجدداً
-  renderImagePreview();
-});
 
-// إضافة صورة عبر رابط مباشر
-document.getElementById("addUrlBtn").addEventListener("click", () => {
-  const urlInput = document.getElementById("pImgUrlInput");
-  const urls = urlInput.value.split(',').map(u => u.trim()).filter(u => u);
+    urls.forEach(url => {
+      const isValidProtocol = url.startsWith("http://") || url.startsWith("https://");
+      const isLikelyImage = 
+        url.includes("ibb.co") || 
+        url.includes("imgur.com") || 
+        /\.(jpg|jpeg|png|webp|gif|avif)($|\?)/i.test(url);
 
-  if (urls.length > 0) {
-    urls.forEach(url => activeProductImages.push(url));
+      if (isValidProtocol && isLikelyImage) {
+        activeProductImages.push(url);
+      } else {
+        alert(`❌ الرابط التالي غير صالح أو ليس رابط صورة مباشر:\n${url}`);
+      }
+    });
+
     urlInput.value = "";
     renderImagePreview();
-  } else {
-    alert("يرجى إدخال رابط صورة صحيح!");
-  }
-});
+  });
+}
 
 // ==================== 1. إدارة المنتجات والمخزون ====================
 
@@ -113,14 +82,14 @@ const saveProdBtn = document.getElementById("saveProdBtn");
 const stockAlert = document.getElementById("stockAlert");
 const stockAlertList = document.getElementById("stockAlertList");
 
-async function loadProducts() {
-  productsList.innerHTML = '';
-  stockAlertList.innerHTML = '';
-  let hasLowStock = false;
-
-  try {
-    const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
-    const querySnapshot = await getDocs(q);
+function initProductsListener() {
+  if (!productsList) return;
+  const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+  
+  onSnapshot(q, (querySnapshot) => {
+    productsList.innerHTML = '';
+    if (stockAlertList) stockAlertList.innerHTML = '';
+    let hasLowStock = false;
 
     querySnapshot.forEach((docSnap) => {
       const p = docSnap.data();
@@ -131,28 +100,26 @@ async function loadProducts() {
 
       if (stockNum === 0) {
         stockBadge = `<span class="badge badge-out">نفذت الكمية!</span>`;
-        stockAlertList.innerHTML += `<li>المنتج <strong>${p.name}</strong> نفذ من المخزون!</li>`;
+        if (stockAlertList) stockAlertList.innerHTML += `<li>المنتج <strong>${p.name}</strong> نفذ من المخزون!</li>`;
         hasLowStock = true;
       } else if (stockNum <= 5) {
         stockBadge = `<span class="badge badge-low">متبقي ${stockNum} قطع!</span>`;
-        stockAlertList.innerHTML += `<li>المنتج <strong>${p.name}</strong> أوشك على الانتهاء (متبقي ${stockNum}).</li>`;
+        if (stockAlertList) stockAlertList.innerHTML += `<li>المنتج <strong>${p.name}</strong> أوشك على الانتهاء (متبقي ${stockNum}).</li>`;
         hasLowStock = true;
       }
 
-      stockAlert.style.display = hasLowStock ? "block" : "none";
+      if (stockAlert) stockAlert.style.display = hasLowStock ? "block" : "none";
 
       const priceDisplay = p.discountPrice 
         ? `<del style="color:#888;">${p.price}</del> ${p.discountPrice} ج`
         : `${p.price} ج`;
 
       const mainImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://via.placeholder.com/40?text=لا+صورة';
-
-      // تجهيز بيانات المنتجات للتعديل برمجياً
       const imagesJson = JSON.stringify(p.images || []).replace(/"/g, '&quot;');
 
       productsList.innerHTML += `
         <tr>
-          <td><img src="${mainImg}" width="40" height="40" style="object-fit:cover; border-radius:4px;"></td>
+          <td><img src="${mainImg}" width="40" height="40" style="object-fit:cover; border-radius:4px;" onerror="this.src='https://via.placeholder.com/40?text=خطأ'"></td>
           <td><strong>${p.name}</strong></td>
           <td>${p.category}</td>
           <td>${priceDisplay}</td>
@@ -164,61 +131,67 @@ async function loadProducts() {
         </tr>
       `;
     });
-  } catch (error) {
-    console.error("خطأ في تحميل المنتجات:", error);
-  }
+  });
 }
 
-// حفظ أو تعديل المنتج
-productForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+if (productForm) {
+  productForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  if (activeProductImages.length === 0) {
-    alert("⚠️ يرجى إضافة صورة واحدة على الأقل للمنتج سواء من المعرض أو عبر رابط!");
-    return;
-  }
-
-  saveProdBtn.disabled = true;
-  saveProdBtn.innerText = "جاري حفظ البيانات... ⏳";
-
-  const editId = document.getElementById("editProductId").value;
-
-  try {
-    const productData = {
-      name: document.getElementById("pName").value,
-      category: document.getElementById("pCategory").value,
-      stock: Number(document.getElementById("pStock").value),
-      price: Number(document.getElementById("pPrice").value),
-      discountPrice: document.getElementById("pDiscountPrice").value ? Number(document.getElementById("pDiscountPrice").value) : null,
-      images: activeProductImages,
-      colors: document.getElementById("pColors").value.split(',').map(c => c.trim()).filter(c => c),
-      sizes: document.getElementById("pSizes").value.split(',').map(s => s.trim()).filter(s => s),
-      description: document.getElementById("pDescription").value,
-      createdAt: serverTimestamp()
-    };
-
-    if (editId) {
-      await updateDoc(doc(db, "products", editId), productData);
-      alert("🎉 تم تعديل المنتج بنجاح!");
-      document.getElementById("editProductId").value = "";
-      document.getElementById("productFormTitle").innerText = "إضافة منتج جديد";
-    } else {
-      await addDoc(collection(db, "products"), productData);
-      alert("🎉 تم إضافة المنتج والصور بنجاح!");
+    if (activeProductImages.length === 0) {
+      alert("⚠️ يرجى إضافة رابط صورة واحد على الأقل للمنتج!");
+      return;
     }
 
-    productForm.reset();
-    activeProductImages = [];
-    renderImagePreview();
-    loadProducts();
+    if (saveProdBtn) {
+      saveProdBtn.disabled = true;
+      saveProdBtn.innerText = "جاري الحفظ... ⏳";
+    }
 
-  } catch (error) {
-    alert("❌ حدث خطأ أثناء الحفظ: " + error.message);
-  } finally {
-    saveProdBtn.disabled = false;
-    saveProdBtn.innerText = "حفظ المنتج والمخزون 🚀";
-  }
-});
+    const editId = document.getElementById("editProductId").value;
+
+    try {
+      // تجهيز بيانات المنتج المشتركة
+      const productData = {
+        name: document.getElementById("pName").value,
+        category: document.getElementById("pCategory").value,
+        stock: Number(document.getElementById("pStock").value),
+        price: Number(document.getElementById("pPrice").value),
+        discountPrice: document.getElementById("pDiscountPrice").value ? Number(document.getElementById("pDiscountPrice").value) : null,
+        images: activeProductImages,
+        colors: document.getElementById("pColors").value.split(',').map(c => c.trim()).filter(c => c),
+        sizes: document.getElementById("pSizes").value.split(',').map(s => s.trim()).filter(s => s),
+        description: document.getElementById("pDescription").value
+      };
+
+      if (editId) {
+        // عند التعديل: نقوم بالتحديث فقط دون المساس بـ createdAt لكي يظل الترتيب كما هو
+        await updateDoc(doc(db, "products", editId), productData);
+        alert("🎉 تم تعديل المنتج بنجاح دون تغيير ترتيبه!");
+        document.getElementById("editProductId").value = "";
+        const formTitle = document.getElementById("productFormTitle");
+        if (formTitle) formTitle.innerText = "إضافة منتج جديد";
+      } else {
+        // عند الإضافة لأول مرة: نضيف حقل createdAt ليظهر في أعلى القائمة
+        productData.createdAt = serverTimestamp();
+        await addDoc(collection(db, "products"), productData);
+        alert("🎉 تم إضافة المنتج بنجاح!");
+      }
+
+      productForm.reset();
+      activeProductImages = [];
+      renderImagePreview();
+
+    } catch (error) {
+      alert("❌ حدث خطأ: " + error.message);
+    } finally {
+      if (saveProdBtn) {
+        saveProdBtn.disabled = false;
+        saveProdBtn.innerText = "حفظ المنتج والمخزون 🚀";
+      }
+    }
+  });
+}
 
 window.editProduct = (id, name, cat, price, discount, stock, colors, sizes, desc, imagesJson) => {
   document.getElementById("editProductId").value = id;
@@ -231,21 +204,17 @@ window.editProduct = (id, name, cat, price, discount, stock, colors, sizes, desc
   document.getElementById("pSizes").value = sizes;
   document.getElementById("pDescription").value = desc;
 
-  try {
-    activeProductImages = JSON.parse(imagesJson);
-  } catch (e) {
-    activeProductImages = [];
-  }
+  try { activeProductImages = JSON.parse(imagesJson); } catch (e) { activeProductImages = []; }
   renderImagePreview();
 
-  document.getElementById("productFormTitle").innerText = "تعديل بيانات المنتج ✏️";
+  const formTitle = document.getElementById("productFormTitle");
+  if (formTitle) formTitle.innerText = "تعديل بيانات المنتج ✏️";
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 window.deleteProduct = async (id) => {
   if (confirm("هل أنت متأكد من حذف هذا المنتج؟")) {
     await deleteDoc(doc(db, "products", id));
-    loadProducts();
   }
 };
 
@@ -256,45 +225,47 @@ const catParentSelect = document.getElementById("catParent");
 const pCategorySelect = document.getElementById("pCategory");
 const categoriesList = document.getElementById("categoriesList");
 
-async function loadCategories() {
-  catParentSelect.innerHTML = '<option value="root">-- قسم رئيسي مستقل --</option>';
-  pCategorySelect.innerHTML = '<option value="">-- اختر القسم --</option>';
-  categoriesList.innerHTML = '';
+function initCategoriesListener() {
+  onSnapshot(collection(db, "categories"), (querySnapshot) => {
+    if (catParentSelect) catParentSelect.innerHTML = '<option value="root">-- قسم رئيسي مستقل --</option>';
+    if (pCategorySelect) pCategorySelect.innerHTML = '<option value="">-- اختر القسم --</option>';
+    if (categoriesList) categoriesList.innerHTML = '';
 
-  try {
-    const querySnapshot = await getDocs(collection(db, "categories"));
     querySnapshot.forEach((docSnap) => {
       const cat = docSnap.data();
       const catId = docSnap.id;
       const isSub = cat.parentId !== "root";
 
-      catParentSelect.innerHTML += `<option value="${catId}">${cat.name}</option>`;
-      pCategorySelect.innerHTML += `<option value="${cat.name}">${isSub ? '└-- ' : ''}${cat.name}</option>`;
+      if (catParentSelect) catParentSelect.innerHTML += `<option value="${catId}">${cat.name}</option>`;
+      if (pCategorySelect) pCategorySelect.innerHTML += `<option value="${cat.name}">${isSub ? '└-- ' : ''}${cat.name}</option>`;
 
-      categoriesList.innerHTML += `
-        <tr>
-          <td><strong>${cat.name}</strong></td>
-          <td>${isSub ? 'قسم فرعي' : 'قسم رئيسي'}</td>
-          <td><button class="btn-action btn-delete" onclick="deleteCategory('${catId}')">حذف</button></td>
-        </tr>
-      `;
+      if (categoriesList) {
+        categoriesList.innerHTML += `
+          <tr>
+            <td><strong>${cat.name}</strong></td>
+            <td>${isSub ? 'قسم فرعي' : 'قسم رئيسي'}</td>
+            <td><button class="btn-action btn-delete" onclick="deleteCategory('${catId}')">حذف</button></td>
+          </tr>
+        `;
+      }
     });
-  } catch (error) { console.error(error); }
+  });
 }
 
-categoryForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  await addDoc(collection(db, "categories"), {
-    name: document.getElementById("catName").value,
-    parentId: document.getElementById("catParent").value,
-    createdAt: serverTimestamp()
+if (categoryForm) {
+  categoryForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await addDoc(collection(db, "categories"), {
+      name: document.getElementById("catName").value,
+      parentId: document.getElementById("catParent").value,
+      createdAt: serverTimestamp()
+    });
+    categoryForm.reset();
   });
-  categoryForm.reset();
-  loadCategories();
-});
+}
 
 window.deleteCategory = async (id) => {
-  if (confirm("حذف هذا القسم؟")) { await deleteDoc(doc(db, "categories", id)); loadCategories(); }
+  if (confirm("حذف هذا القسم؟")) { await deleteDoc(doc(db, "categories", id)); }
 };
 
 // ==================== 3. الكوبونات والعروض ====================
@@ -302,10 +273,10 @@ window.deleteCategory = async (id) => {
 const couponForm = document.getElementById("couponForm");
 const couponsList = document.getElementById("couponsList");
 
-async function loadCoupons() {
-  couponsList.innerHTML = '';
-  try {
-    const querySnapshot = await getDocs(collection(db, "coupons"));
+function initCouponsListener() {
+  if (!couponsList) return;
+  onSnapshot(collection(db, "coupons"), (querySnapshot) => {
+    couponsList.innerHTML = '';
     querySnapshot.forEach((docSnap) => {
       const c = docSnap.data();
       const cId = docSnap.id;
@@ -319,33 +290,31 @@ async function loadCoupons() {
         </tr>
       `;
     });
-  } catch (error) { console.error(error); }
+  });
 }
 
-couponForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const codeInput = document.getElementById("cCode").value.toUpperCase().trim();
-  
-  await addDoc(collection(db, "coupons"), {
-    code: codeInput,
-    discount: Number(document.getElementById("cDiscount").value),
-    expireDate: document.getElementById("cExpireDate").value,
-    createdAt: serverTimestamp()
-  });
+if (couponForm) {
+  couponForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const codeInput = document.getElementById("cCode").value.toUpperCase().trim();
+    
+    await addDoc(collection(db, "coupons"), {
+      code: codeInput,
+      discount: Number(document.getElementById("cDiscount").value),
+      expireDate: document.getElementById("cExpireDate").value,
+      createdAt: serverTimestamp()
+    });
 
-  alert("🎉 تم إضافة الكوبون بنجاح!");
-  couponForm.reset();
-  loadCoupons();
-});
+    alert("🎉 تم إضافة الكوبون بنجاح!");
+    couponForm.reset();
+  });
+}
 
 window.deleteCoupon = async (id) => {
-  if (confirm("حذف هذا الكوبون؟")) {
-    await deleteDoc(doc(db, "coupons", id));
-    loadCoupons();
-  }
+  if (confirm("حذف هذا الكوبون؟")) { await deleteDoc(doc(db, "coupons", id)); }
 };
 
-// تشغيل القوائم عند التحميل
-loadProducts();
-loadCategories();
-loadCoupons();
+// تشغيل المستمعات اللحظية عند التحميل
+initProductsListener();
+initCategoriesListener();
+initCouponsListener();
