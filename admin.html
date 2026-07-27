@@ -352,8 +352,8 @@
         trendingData = [];
         trendSnap.forEach(doc => trendingData.push({ id: doc.id, ...doc.data() }));
 
-        // تحميل العروض
-        const offerSnap = await getDocs(collection(db, "offers"));
+        // تحميل العروض (تم التعديل لتقرأ من مجموعة coupons)
+        const offerSnap = await getDocs(collection(db, "coupons"));
         offersData = [];
         offerSnap.forEach(doc => offersData.push({ id: doc.id, ...doc.data() }));
 
@@ -558,7 +558,6 @@
     window.deleteCategory = async function(id, name) { 
       if(confirm(`هل أنت متأكد من حذف القسم "${name}"؟`)) { 
         await deleteDoc(doc(db, "categories", id));
-        // حذف منتجات القسم المرتبطة أيضاً
         const relatedProds = catProductsData.filter(p => p.categoryId === id);
         for(let p of relatedProds) {
           await deleteDoc(doc(db, "cat_products", p.id));
@@ -669,7 +668,7 @@
       } 
     }
 
-    // --- إدارة العروض والعداد ---
+    // --- إدارة العروض والعداد (مجموعة coupons) ---
     window.saveOffer = async function() {
       const tag = document.getElementById('newOfferTag').value.trim();
       const title = document.getElementById('newOfferTitle').value.trim();
@@ -704,12 +703,26 @@
       }
 
       const offerId = editId ? editId : 'o' + Date.now();
-      const offerObj = {
-        tag, title, subtitle, img, hasTimer, endTime,
-        targetType, targetCategoryId, targetProdFilterCat, targetProductId
+      
+      // هيكل البيانات المتوافق تماماً مع index.html ويحافظ على خصائص العداد والتوجيه
+      const couponData = {
+        code: tag || title,
+        discount: 10,
+        expireDate: hasTimer ? new Date(endTime).toISOString().split('T')[0] : '2026-12-31',
+        badge: tag,
+        title: title,
+        subtitle: subtitle,
+        img: img,
+        expiryDate: hasTimer ? new Date(endTime).toISOString().split('T')[0] : null,
+        hasTimer, 
+        endTime,
+        targetType, 
+        targetCategoryId, 
+        targetProdFilterCat, 
+        targetProductId
       };
 
-      await setDoc(doc(db, "offers", offerId), offerObj);
+      await setDoc(doc(db, "coupons", offerId), couponData);
       resetOfferForm();
       loadAllDataFromFirebase();
     }
@@ -717,8 +730,8 @@
     window.editOffer = function(id) {
       const offer = offersData.find(o => o.id === id);
       if(!offer) return;
-      document.getElementById('newOfferTag').value = offer.tag;
-      document.getElementById('newOfferTitle').value = offer.title;
+      document.getElementById('newOfferTag').value = offer.badge || offer.tag || '';
+      document.getElementById('newOfferTitle').value = offer.title || '';
       document.getElementById('newOfferSub').value = offer.subtitle || '';
       document.getElementById('newOfferImgUrl').value = offer.img || '';
 
@@ -783,7 +796,7 @@
 
     window.deleteOffer = async function(id, title) { 
       if(confirm(`هل أنت متأكد من حذف العرض "${title}"؟`)) { 
-        await deleteDoc(doc(db, "offers", id));
+        await deleteDoc(doc(db, "coupons", id));
         resetOfferForm();
         loadAllDataFromFirebase();
       } 
