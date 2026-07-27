@@ -488,6 +488,16 @@ to { opacity: 0; transform: translateY(-20px); visibility: hidden; }
 <div class="line"></div>
 </div>
 <div class="categories-grid" id="categoriesGrid"></div>
+
+<!-- قسم الأكثر مبيعاً (Trending) المضاف حديثاً -->
+<div class="section-divider" id="trendingDivider" style="display: none; margin-top: 25px;">
+<div class="line"></div>
+<div class="dot"></div>
+<div class="title">🔥 الأكثر مبيعاً (Trending) 🔥</div>
+<div class="dot"></div>
+<div class="line"></div>
+</div>
+<div class="categories-grid" id="trendingGrid" style="display: none; margin-bottom: 10px;"></div>
 </div>
 
 <div class="category-page-view" id="categoryPageView">
@@ -631,6 +641,7 @@ const db = getFirestore(app);
 let liveProducts = [];
 let liveCategories = [];
 let liveCoupons = [];
+let liveTrending = [];
 let cart = JSON.parse(localStorage.getItem('crystal_cart')) || [];
 let appliedCoupon = JSON.parse(localStorage.getItem('crystal_applied_coupon')) || null;
 let selectedDeliveryType = 'pickup';
@@ -686,6 +697,15 @@ function initStoreListeners() {
     }
   });
 
+  // مستمع مجموعة الأكثر مبيعاً (Trending) المضاف حديثاً
+  onSnapshot(collection(db, "trending"), (snapshot) => {
+    liveTrending = [];
+    snapshot.forEach((doc) => {
+      liveTrending.push({ id: doc.id, ...doc.data() });
+    });
+    renderTrendingSection(liveTrending);
+  });
+
   // مستمع الكوبونات والعروض
   onSnapshot(collection(db, "coupons"), (snapshot) => {
     liveCoupons = [];
@@ -701,7 +721,6 @@ function initStoreListeners() {
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
       
-      // تحديث رابط الواتساب الرقمي ورابط الإرسال
       const waLink = document.getElementById("socialWa");
       const waVal = data.wa || data.whatsapp;
       if (waLink && waVal) {
@@ -710,32 +729,27 @@ function initStoreListeners() {
         if (cleanNum) dynamicWhatsAppNumber = cleanNum;
       }
 
-      // تحديث رقم الموبايل
       const phoneLink = document.getElementById("socialPhone");
       if (phoneLink && data.phone) {
         phoneLink.href = `tel:${data.phone}`;
       }
 
-      // تحديث الرقم الأرضي
       const landlineLink = document.getElementById("socialLandline");
       if (landlineLink && (data.landline || data.phone2)) {
         landlineLink.href = `tel:${data.landline || data.phone2}`;
       }
 
-      // تحديث رابط تيك توك
       const tiktokLink = document.getElementById("socialTiktok");
       if (tiktokLink && data.tiktok) {
         tiktokLink.href = data.tiktok.startsWith('http') ? data.tiktok : `https://${data.tiktok}`;
       }
 
-      // تحديث رابط فيسبوك
       const fbLink = document.getElementById("socialFb");
       if (fbLink && (data.facebook || data.fb)) {
         const fbVal = data.facebook || data.fb;
         fbLink.href = fbVal.startsWith('http') ? fbVal : `https://${fbVal}`;
       }
 
-      // تحديث رابط انستجرام
       const instaLink = document.getElementById("socialInsta");
       if (instaLink && (data.instagram || data.insta)) {
         const instaVal = data.instagram || data.insta;
@@ -786,6 +800,90 @@ window.displayCategories = function(categories) {
     catDiv.appendChild(h4El);
     catDiv.appendChild(spanEl);
     grid.appendChild(catDiv);
+  });
+};
+
+// دالة عرض قسم الأكثر مبيعاً (Trending)
+window.renderTrendingSection = function(trendingList) {
+  const divider = document.getElementById("trendingDivider");
+  const grid = document.getElementById("trendingGrid");
+  if (!divider || !grid) return;
+
+  if (!trendingList || trendingList.length === 0) {
+    divider.style.display = "none";
+    grid.style.display = "none";
+    return;
+  }
+
+  divider.style.display = "flex";
+  grid.style.display = "grid";
+  grid.innerHTML = "";
+
+  trendingList.forEach(item => {
+    const itemImg = item.img && item.img.trim() !== "" ? item.img : DEFAULT_IMAGE;
+    const itemName = item.name || "منتج مميز";
+    const itemPrice = item.price !== undefined ? Number(item.price) : 0;
+    
+    let targetProduct = {
+      id: item.productId || item.id,
+      name: itemName,
+      price: itemPrice,
+      stock: 1
+    };
+
+    if (item.productId) {
+      const foundReal = liveProducts.find(p => p.id === item.productId);
+      if (foundReal) {
+        targetProduct.id = foundReal.id;
+        targetProduct.name = foundReal.name;
+        targetProduct.price = foundReal.discountPrice ? Number(foundReal.discountPrice) : Number(foundReal.price);
+        targetProduct.stock = foundReal.stock !== undefined ? Number(foundReal.stock) : 1;
+      }
+    }
+
+    const isOutOfStock = targetProduct.stock === 0;
+
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'cat-item';
+
+    const imgEl = document.createElement('img');
+    imgEl.src = itemImg;
+    imgEl.alt = itemName;
+    imgEl.loading = "lazy";
+    imgEl.onerror = function() { this.src = DEFAULT_IMAGE; };
+    if (item.productId) {
+      imgEl.style.cursor = 'pointer';
+      imgEl.onclick = () => openProductDetailsModal(item.productId);
+    }
+
+    const h4El = document.createElement('h4');
+    h4El.textContent = itemName;
+    if (item.productId) {
+      h4El.style.cursor = 'pointer';
+      h4El.onclick = () => openProductDetailsModal(item.productId);
+    }
+
+    const priceSpan = document.createElement('span');
+    priceSpan.style.display = 'block';
+    priceSpan.style.color = 'var(--orange-btn)';
+    priceSpan.style.fontWeight = 'bold';
+    priceSpan.style.marginTop = '4px';
+    priceSpan.textContent = `${itemPrice} ج.م`;
+
+    const btnEl = document.createElement('button');
+    btnEl.className = isOutOfStock ? "add-trending-btn out-of-stock" : "add-trending-btn";
+    btnEl.style.margin = "8px auto 0";
+    btnEl.style.width = "85%";
+    btnEl.textContent = isOutOfStock ? "❌ نفذت الكمية" : "🛒 أضف للسلة";
+    if (!isOutOfStock) {
+      btnEl.onclick = () => addToCartObject(targetProduct);
+    }
+
+    cardDiv.appendChild(imgEl);
+    cardDiv.appendChild(h4El);
+    cardDiv.appendChild(priceSpan);
+    cardDiv.appendChild(btnEl);
+    grid.appendChild(cardDiv);
   });
 };
 
@@ -1243,89 +1341,4 @@ window.checkoutWhatsApp = async function() {
     msg += `\n🏷️ **كوبون الخصم المطبق:** ${appliedCoupon.code} (خصم: ${discountAmount} ج.م)`;
   }
 
-  let finalTotal = Math.max(0, subtotal - discountAmount);
-  msg += `\n\n💵 **المبلغ الإجمالي النهائي:** ${finalTotal} جنيه مصري`;
-  msg += "\n\n✅ (تم الاطلاع والموافقة على الشروط والأحكام الرسمية للطلب 🤝)";
-  msg += "\n\nفي انتظار ردكم وتأكيد الطلب.. شكراً لكم! 💐";
-
-  window.open(`https://wa.me/${dynamicWhatsAppNumber}?text=${encodeURIComponent(msg)}`, '_blank');
-  toggleRulesModal(false);
-  cart = [];
-  appliedCoupon = null;
-  localStorage.removeItem('crystal_cart');
-  localStorage.removeItem('crystal_applied_coupon');
-  updateCartBadge();
-  window.showToast("تم إرسال الطلب بنجاح! 🚀", "success");
-};
-
-function startAutoSlider() {
-  if (sliderInterval) clearInterval(sliderInterval);
-  if (liveCoupons.length <= 1) return;
-  sliderInterval = setInterval(() => {
-    const slider = document.getElementById("offerSlider");
-    if (!slider) return;
-    const slides = slider.querySelectorAll(".slide");
-    if (slides.length <= 1) return;
-    currentSlideIndex = (currentSlideIndex + 1) % slides.length;
-    slider.scrollTo({ left: currentSlideIndex * slider.clientWidth, behavior: 'smooth' });
-    updateDotsActiveState();
-  }, 4000);
-}
-
-window.scrollToSlide = function(idx) {
-  currentSlideIndex = idx;
-  const slider = document.getElementById("offerSlider");
-  if (!slider) return;
-  slider.scrollTo({ left: currentSlideIndex * slider.clientWidth, behavior: 'smooth' });
-  updateDotsActiveState();
-};
-
-function updateDotsActiveState() {
-  const dots = document.querySelectorAll(".dot-indicator");
-  dots.forEach((dot, idx) => {
-    dot.classList.toggle("active", idx === currentSlideIndex);
-  });
-}
-
-function renderSlider() {
-  const slider = document.getElementById("offerSlider");
-  const dotsContainer = document.getElementById("sliderDots");
-  if (!slider || !dotsContainer) return;
-
-  currentSlideIndex = 0;
-
-  if (liveCoupons.length === 0) {
-    slider.innerHTML = `
-      <div class="slide">
-        <div class="slide-content">
-          <span class="badge-discount">🎁 عروض كرستال الزنقة</span>
-          <div class="slide-title">تشكيلة جديدة كلياً</div>
-          <div class="slide-sub">تصفحي الأقسام واكتشفي أحدث الإكسسوارات</div>
-          <div class="countdown-timer">📢 متوفر الآن</div>
-        </div>
-        <img src="${DEFAULT_IMAGE}" class="slide-img" loading="lazy" onerror="this.src='${DEFAULT_IMAGE}'">
-      </div>`;
-    dotsContainer.innerHTML = `<div class="dot-indicator active"></div>`;
-    return;
-  }
-
-  let slidesHtml = "";
-  let dotsHtml = "";
-
-  liveCoupons.forEach((coupon, idx) => {
-    const activeClass = idx === 0 ? "active" : "";
-    const couponImg = coupon.img && coupon.img.trim() !== "" ? coupon.img : DEFAULT_IMAGE;
-    const badgeText = coupon.badge || "🎁 عرض خاص";
-    const titleText = coupon.title || "تشكيلة جديدة";
-    const subText = coupon.subtitle || "تصفحي الأقسام واكتشفي أحدث الإكسسوارات";
-    
-    const expiryAttr = coupon.expiryDate ? `data-expiry="${coupon.expiryDate}"` : "";
-
-    slidesHtml += `
-      <div class="slide">
-        <div class="slide-content">
-          <span class="badge-discount">${badgeText}</span>
-          <div class="slide-title">${titleText}</div>
-          <div class="slide-sub">${subText}</div>
-          <div class="countdown-timer" ${expiryAttr}>
-            ⏳ ينتهي خلال: <span class="hours">00</span>:<span class="minutes">00</
+  let finalTotal = Mat
