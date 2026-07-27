@@ -162,44 +162,6 @@ box-shadow: 0 2px 4px rgba(217, 83, 30, 0.3);
 .dot-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: #cbd5e1; transition: all 0.3s ease; cursor: pointer; }
 .dot-indicator.active { background-color: var(--orange-btn); width: 20px; border-radius: 10px; }
 
-/* قسم الأكثر مبيعاً */
-.trending-scroll-container {
-display: flex;
-gap: 12px;
-overflow-x: auto;
-padding: 0 20px 10px;
-scrollbar-width: none;
-}
-.trending-scroll-container::-webkit-scrollbar { display: none; }
-.trending-card {
-flex: 0 0 140px;
-background: #fff;
-border: 1px solid var(--border-gray);
-border-radius: 14px;
-padding: 10px;
-position: relative;
-box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-}
-.trending-card img { width: 100%; height: 100px; object-fit: cover; border-radius: 10px; }
-.trending-badge {
-position: absolute;
-top: 15px; right: 15px;
-background: #ef4444; color: #fff;
-font-size: 9px; font-weight: 800;
-padding: 2px 6px; border-radius: 6px;
-}
-.trending-title { font-size: 12px; font-weight: 800; color: #1e293b; margin: 6px 0 2px; }
-.trending-price { font-size: 11px; font-weight: 700; color: var(--orange-btn); }
-.add-trending-btn {
-width: 100%; margin-top: 6px;
-background: var(--orange-bg); color: var(--orange-btn);
-border: 1px solid #fed7aa; border-radius: 8px;
-padding: 5px; font-size: 11px; font-weight: 800;
-cursor: pointer;
-}
 /* البحث الشامل */
 .search-box { padding: 10px 20px; }
 .search-input-inner { position: relative; }
@@ -213,6 +175,7 @@ outline: none;
 font-size: 14px;
 }
 .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+
 /* شبكة الأقسام */
 .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; flex-grow: 1; }
 .cat-item {
@@ -274,6 +237,15 @@ width: 100%;
 height: 120px;
 object-fit: cover;
 border-radius: 10px;
+}
+.trending-title { font-size: 12px; font-weight: 800; color: #1e293b; margin: 6px 0 2px; }
+.trending-price { font-size: 11px; font-weight: 700; color: var(--orange-btn); }
+.add-trending-btn {
+width: 100%; margin-top: 6px;
+background: var(--orange-bg); color: var(--orange-btn);
+border: 1px solid #fed7aa; border-radius: 8px;
+padding: 5px; font-size: 11px; font-weight: 800;
+cursor: pointer;
 }
 
 /* وسائل التواصل */
@@ -361,15 +333,6 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 <div class="slider-container" id="offerSlider"></div>
 <div class="slider-dots" id="sliderDots"></div>
 </div>
-
-<div class="section-divider">
-<div class="line"></div>
-<div class="dot"></div>
-<div class="title">✨ الأكثر مبيعاً الآن ✨</div>
-<div class="dot"></div>
-<div class="line"></div>
-</div>
-<div class="trending-scroll-container" id="trendingContainer"></div>
 
 <div class="search-box">
 <div class="search-input-inner">
@@ -487,403 +450,335 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 </div>
 </div>
 
-<script>
-const defaultCategories = [
-{ id: "1", name: "الخرز", img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
-{ id: "2", name: "السلاسل", img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
-{ id: "3", name: "اللولي", img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
-];
+<!-- سكربت الربط الحي مع Firebase Firestore -->
+<script type="module">
+import { db } from "./firebase-config.js";
+import { collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const defaultCatProducts = [
-{ id: "p1", categoryId: "1", name: "خرز كرستال ملون", price: 40, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
-{ id: "p2", categoryId: "1", name: "خرز تفسيرة تركي", price: 35, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
-{ id: "p3", categoryId: "2", name: "سلسلة ستانلس ثقيلة", price: 75, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
-{ id: "p4", categoryId: "2", name: "سلسلة فضي بناتي", price: 55, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
-{ id: "p5", categoryId: "3", name: "لولي زجاجي فاخر", price: 45, img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
-];
-
-const defaultTrending = [
-{ id: "t1", name: "خرز كرستال شفاف 8 مل", price: 45, img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" },
-{ id: "t2", name: "سلسلة مطلي جولد ناعم", price: 65, img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg" },
-{ id: "t3", name: "لولي طبيعي مقاس 6", price: 50, img: "https://i.ibb.co/h117dx0S/FB-IMG-1726841760650.jpg" }
-];
-
-const defaultOffers = [
-{
-id: "off1",
-tag: "🎁 خصومات هذا الأسبوع",
-title: "خصم 15%",
-subtitle: "على سلسلة ستانلس ثقيلة",
-img: "https://i.ibb.co/DH6pHZkL/1718558808temp199348012151161184.jpg",
-targetType: "product",
-targetId: "p3", // مطابقة تتماماً مع id المنتج p3
-endTime: new Date().getTime() + (48 * 3600 * 1000)
-},
-{
-id: "off2",
-tag: "🔥 عرض عام لكل المحل",
-title: "خصم الشحن المجاني",
-subtitle: "متاح على جميع طلبات اليوم",
-img: "https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp",
-targetType: "general"
-}
-];
-
-// توليد ID فريد
-function generateUniqueId(prefix = "p") {
-    return prefix + "_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-}
-
-// استرجاع البيانات مع تنظيف الـ localStorage من البيانات القديمة المعطوبة
-let initialCategories = JSON.parse(localStorage.getItem('crystal_categories')) || defaultCategories;
-let catProductsData = JSON.parse(localStorage.getItem('crystal_cat_products')) || defaultCatProducts;
-let trendingData = JSON.parse(localStorage.getItem('crystal_trending')) || defaultTrending;
-let offersData = JSON.parse(localStorage.getItem('crystal_offers')) || defaultOffers;
-
-let dataUpdated = false;
-
-// فحص وإصلاح وحفظ الـ IDs الناقصة فورياً في الـ localStorage (Persistence)
-catProductsData.forEach(p => {
-    if (!p.id) {
-        p.id = generateUniqueId("p");
-        dataUpdated = true;
-    }
-});
-
-trendingData.forEach(t => {
-    if (!t.id) {
-        t.id = generateUniqueId("t");
-        dataUpdated = true;
-    }
-});
-
-if (dataUpdated) {
-    localStorage.setItem('crystal_cat_products', JSON.stringify(catProductsData));
-    localStorage.setItem('crystal_trending', JSON.stringify(trendingData));
-    localStorage.setItem('crystal_categories', JSON.stringify(initialCategories));
-    localStorage.setItem('crystal_offers', JSON.stringify(offersData));
-}
-
-let cart = [];
+let liveProducts = [];
+let liveCategories = [];
+let liveCoupons = [];
+let cart = JSON.parse(localStorage.getItem('crystal_cart')) || [];
 let selectedDeliveryType = 'pickup';
 let sliderInterval = null;
 let currentSlideIndex = 0;
 
-window.onload = function() {
-displayCategories(initialCategories);
-renderTrending(trendingData);
-renderSlider();
-updateCartBadge();
-setInterval(updateCountdowns, 1000);
-startAutoSlider();
+// الاستماع اللحظي للبيانات من Firestore
+function initStoreListeners() {
+  // 1. المنتجات
+  const productsQuery = query(collection(db, "products"), orderBy("createdAt", "desc"));
+  onSnapshot(productsQuery, (snapshot) => {
+    liveProducts = [];
+    snapshot.forEach((doc) => {
+      liveProducts.push({ id: doc.id, ...doc.data() });
+    });
+    // إذا كنا في صفحة قسم مفتوح، نقوم بتحديث المنتجات المعروضة فوراً
+    const activeCatId = window.currentOpenCategoryId;
+    if (activeCatId) {
+      const activeCatName = window.currentOpenCategoryName;
+      openCategoryPage(activeCatId, activeCatName);
+    }
+  });
+
+  // 2. الأقسام
+  onSnapshot(collection(db, "categories"), (snapshot) => {
+    liveCategories = [];
+    snapshot.forEach((doc) => {
+      liveCategories.push({ id: doc.id, ...doc.data() });
+    });
+    displayCategories(liveCategories);
+  });
+
+  // 3. الكوبونات
+  onSnapshot(collection(db, "coupons"), (snapshot) => {
+    liveCoupons = [];
+    snapshot.forEach((doc) => {
+      liveCoupons.push({ id: doc.id, ...doc.data() });
+    });
+  });
+
+  renderSlider();
+  updateCartBadge();
+  startAutoSlider();
+  setInterval(updateCountdowns, 1000);
+}
+
+// عرض الأقسام
+window.displayCategories = function(categories) {
+  const grid = document.getElementById("categoriesGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  
+  if (categories.length === 0) {
+    grid.innerHTML = '<p style="text-align:center; color:#94a3b8; grid-column:span 3; padding:20px;">لا توجد أقسام مضافة حالياً.</p>';
+    return;
+  }
+
+  categories.forEach(cat => {
+    const catImg = cat.img || 'https://via.placeholder.com/100?text=قسم';
+    grid.innerHTML += `
+      <div class="cat-item" onclick="openCategoryPage('${cat.id}', '${cat.name}')">
+        <img src="${catImg}" alt="${cat.name}" onerror="this.src='https://via.placeholder.com/100?text=خطأ'">
+        <h4>${cat.name}</h4>
+        <span>تصفح الأشكال ✨</span>
+      </div>`;
+  });
+};
+
+// فتح صفحة القسم وعرض منتجاته الحية
+window.openCategoryPage = function(catId, catName) {
+  window.currentOpenCategoryId = catId;
+  window.currentOpenCategoryName = catName;
+
+  const products = liveProducts.filter(p => p.category === catName);
+  const container = document.getElementById("categoryProductsContainer");
+  const titleEl = document.getElementById("selectedCatTitle");
+  if (titleEl) titleEl.innerText = `📦 منتجات قسم: ${catName}`;
+
+  if (!container) return;
+
+  if (products.length === 0) {
+    container.innerHTML = '<p style="font-size: 13px; color: #64748b; text-align: center; grid-column: span 2; padding: 30px;">عذراً، لا توجد منتجات مضافة في هذا القسم حالياً 🌸</p>';
+  } else {
+    let html = "";
+    products.forEach(item => {
+      const mainImg = (item.images && item.images.length > 0) ? item.images[0] : 'https://via.placeholder.com/120?text=لا+صورة';
+      const priceDisplay = item.discountPrice ? `<del>${item.price}</del> ${item.discountPrice} ج.م` : `${item.price} ج.م`;
+      
+      const itemForCart = {
+        id: item.id,
+        name: item.name,
+        price: item.discountPrice ? Number(item.discountPrice) : Number(item.price)
+      };
+
+      html += `
+        <div class="cat-product-card" id="product-${item.id}">
+          <img src="${mainImg}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/120?text=خطأ'">
+          <div>
+            <div class="trending-title" style="margin-top:8px;">${item.name}</div>
+            <div class="trending-price">${priceDisplay}</div>
+          </div>
+          <button class="add-trending-btn" onclick='window.addToCartObject(${JSON.stringify(itemForCart)})'>+ أضف للسلة</button>
+        </div>`;
+    });
+    container.innerHTML = html;
+  }
+
+  const homeMain = document.getElementById("homeMainContent");
+  const catView = document.getElementById("categoryPageView");
+  if (homeMain) homeMain.style.display = "none";
+  if (catView) catView.classList.add("active");
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.backToHome = function() {
+  window.currentOpenCategoryId = null;
+  window.currentOpenCategoryName = null;
+  const homeMain = document.getElementById("homeMainContent");
+  const catView = document.getElementById("categoryPageView");
+  if (catView) catView.classList.remove("active");
+  if (homeMain) homeMain.style.display = "block";
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.addToCartObject = function(product) {
+  const existing = cart.find(item => item.id === product.id);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
+  localStorage.setItem('crystal_cart', JSON.stringify(cart));
+  updateCartBadge();
+  alert(`✨ تم إضافة "${product.name}" بنجاح لسلة مشترياتك! 🛍️`);
+};
+
+window.updateCartBadge = function() {
+  const badge = document.getElementById("headerCartCount");
+  if (badge) {
+    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+    badge.innerText = totalQty;
+  }
+};
+
+window.toggleCartModal = function(show) {
+  const modal = document.getElementById("cartModalOverlay");
+  if (modal) modal.classList.toggle("active", show);
+  if (show) renderCartItems();
+};
+
+window.toggleRulesModal = function(show) {
+  const modal = document.getElementById("rulesModalOverlay");
+  if (modal) modal.classList.toggle("active", show);
+  if (!show) {
+    const cb = document.getElementById("acceptRulesCheckbox");
+    const nameInput = document.getElementById("custName");
+    if (cb) cb.checked = false;
+    if (nameInput) nameInput.value = "";
+    validateForm();
+  }
+};
+
+window.selectDeliveryType = function(type) {
+  selectedDeliveryType = type;
+  const btnP = document.getElementById("btnPickup");
+  const btnD = document.getElementById("btnDelivery");
+  if (btnP) btnP.classList.toggle("active", type === 'pickup');
+  if (btnD) btnD.classList.toggle("active", type === 'delivery');
+};
+
+window.updateQuantity = function(index, delta) {
+  cart[index].qty += delta;
+  if (cart[index].qty <= 0) cart.splice(index, 1);
+  localStorage.setItem('crystal_cart', JSON.stringify(cart));
+  renderCartItems();
+  updateCartBadge();
+};
+
+window.removeItem = function(index) {
+  cart.splice(index, 1);
+  localStorage.setItem('crystal_cart', JSON.stringify(cart));
+  renderCartItems();
+  updateCartBadge();
+};
+
+window.renderCartItems = function() {
+  const container = document.getElementById("cartItemsList");
+  const totalText = document.getElementById("cartTotalText");
+  const deliveryBox = document.getElementById("deliveryOptionBox");
+  if (!container) return;
+
+  if (cart.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:30px 10px; color:#94a3b8;">🛒 السلة فارغة حالياً..<br>تصفحي المنتجات وأضيفي ما يعجبك! ✨</div>';
+    if (totalText) totalText.innerText = "الإجمالي: 0 جنيه";
+    if (deliveryBox) deliveryBox.style.display = "none";
+    return;
+  }
+  if (deliveryBox) deliveryBox.style.display = "block";
+  let html = "";
+  let total = 0;
+  cart.forEach((item, idx) => {
+    total += item.price * item.qty;
+    html += `
+      <div class="cart-item-row">
+        <div>
+          <div style="font-size:13px; font-weight:bold;">💎 ${item.name}</div>
+          <div style="font-size: 11px; color: #64748b;">${item.price} ج.م</div>
+        </div>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="updateQuantity(${idx}, -1)">-</button>
+          <span>${item.qty}</span>
+          <button class="qty-btn" onclick="updateQuantity(${idx}, 1)">+</button>
+          <button class="delete-item-btn" onclick="removeItem(${idx})">حذف</button>
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html;
+  if (totalText) totalText.innerText = `💰 الإجمالي الكلي: ${total} جنيه`;
+};
+
+window.proceedToRulesModal = function() {
+  if (cart.length === 0) return alert("🛒 السلة فارغة! اختاري بعض المنتجات أولاً 😊");
+  toggleCartModal(false);
+  toggleRulesModal(true);
+};
+
+window.validateForm = function() {
+  const nameEl = document.getElementById("custName");
+  const cbEl = document.getElementById("acceptRulesCheckbox");
+  const btnEl = document.getElementById("finalWaBtn");
+  if (!nameEl || !cbEl || !btnEl) return;
+  const name = nameEl.value.trim();
+  const checked = cbEl.checked;
+  btnEl.disabled = !(name.length >= 2 && checked);
+};
+
+window.checkoutWhatsApp = function() {
+  const nameEl = document.getElementById("custName");
+  const custName = nameEl ? nameEl.value.trim() : "عميل";
+  let deliveryText = selectedDeliveryType === 'pickup'
+    ? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلام ✨)"
+    : "🚚 توصيل للمنزل (في انتظار التواصل لتأكيد العنوان والتفاصيل 🛵)";
+  let msg = "أهلاً وسهلاً كرستال الزنقة! 🌸✨\n";
+  msg += "حابب/حاببة أؤكد الطلب الجميل ده معكم: 👇\n\n";
+  msg += `👤 **اسم المستلم:** ${custName}\n\n`;
+  msg += `📍 **طريقة الاستلام:**\n${deliveryText}\n\n`;
+  msg += "📦 **قائمة المنتجات المطلوبة:**\n";
+  let total = 0;
+  cart.forEach((item) => {
+    msg += `🔹 ${item.name}\n   └ العدد: ${item.qty} | السعر: ${item.price * item.qty} ج.م\n`;
+    total += item.price * item.qty;
+  });
+  msg += `\n💵 **المبلغ الإجمالي:** ${total} جنيه مصري`;
+  msg += "\n\n✅ (تم الاطلاع والموافقة على الشروط والأحكام الرسمية للطلب 🤝)";
+  msg += "\n\nفي انتظار ردكم وتأكيد الطلب.. شكراً لكم! 💐";
+  window.open(`https://wa.me/201227492921?text=${encodeURIComponent(msg)}`, '_blank');
+  toggleRulesModal(false);
+  cart = [];
+  localStorage.removeItem('crystal_cart');
+  updateCartBadge();
 };
 
 function startAutoSlider() {
-if (sliderInterval) clearInterval(sliderInterval);
-sliderInterval = setInterval(() => {
-const slider = document.getElementById("offerSlider");
-const activeOffers = offersData.filter(offer => !offer.endTime || offer.endTime > new Date().getTime());
-
-if (activeOffers.length <= 1) return;
-
-currentSlideIndex = (currentSlideIndex + 1) % activeOffers.length;
-const slideWidth = slider.clientWidth;
-slider.scrollTo({ left: currentSlideIndex * slideWidth, behavior: 'smooth' });
-updateDotsActiveState();
-}, 4000);
+  if (sliderInterval) clearInterval(sliderInterval);
+  sliderInterval = setInterval(() => {
+    const slider = document.getElementById("offerSlider");
+    if (!slider) return;
+    const slides = slider.querySelectorAll(".slide");
+    if (slides.length <= 1) return;
+    currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+    slider.scrollTo({ left: currentSlideIndex * slider.clientWidth, behavior: 'smooth' });
+    updateDotsActiveState();
+  }, 4000);
 }
 
-function stopAutoSlider() {
-if (sliderInterval) clearInterval(sliderInterval);
-}
+window.scrollToSlide = function(idx) {
+  currentSlideIndex = idx;
+  const slider = document.getElementById("offerSlider");
+  if (!slider) return;
+  slider.scrollTo({ left: currentSlideIndex * slider.clientWidth, behavior: 'smooth' });
+  updateDotsActiveState();
+};
 
 function updateDotsActiveState() {
-const dots = document.querySelectorAll(".dot-indicator");
-dots.forEach((dot, idx) => {
-dot.classList.toggle("active", idx === currentSlideIndex);
-});
-}
-
-function toggleCartModal(show) {
-document.getElementById("cartModalOverlay").classList.toggle("active", show);
-if (show) renderCartItems();
-}
-
-function toggleRulesModal(show) {
-document.getElementById("rulesModalOverlay").classList.toggle("active", show);
-if(!show) {
-document.getElementById("acceptRulesCheckbox").checked = false;
-document.getElementById("custName").value = "";
-validateForm();
-}
-}
-
-function validateForm() {
-const name = document.getElementById("custName").value.trim();
-const checked = document.getElementById("acceptRulesCheckbox").checked;
-const isValid = name.length >= 2 && checked;
-document.getElementById("finalWaBtn").disabled = !isValid;
-}
-
-function proceedToRulesModal() {
-if (cart.length === 0) return alert("🛒 السلة فارغة! اختاري بعض المنتجات أولاً 😊");
-toggleCartModal(false);
-toggleRulesModal(true);
-}
-
-function addToCart(product) {
-const existing = cart.find(item => item.id === product.id);
-if (existing) {
-existing.qty += 1;
-} else {
-cart.push({ ...product, qty: 1 });
-}
-updateCartBadge();
-alert(`✨ تم إضافة "${product.name}" بنجاح لسلة مشترياتك! 🛍️`);
-}
-
-function selectDeliveryType(type) {
-selectedDeliveryType = type;
-document.getElementById("btnPickup").classList.toggle("active", type === 'pickup');
-document.getElementById("btnDelivery").classList.toggle("active", type === 'delivery');
-}
-
-function updateQuantity(index, delta) {
-cart[index].qty += delta;
-if (cart[index].qty <= 0) cart.splice(index, 1);
-renderCartItems();
-updateCartBadge();
-}
-
-function removeItem(index) {
-cart.splice(index, 1);
-renderCartItems();
-updateCartBadge();
-}
-
-function updateCartBadge() {
-const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-document.getElementById("headerCartCount").innerText = totalQty;
-}
-
-function renderCartItems() {
-const container = document.getElementById("cartItemsList");
-const totalText = document.getElementById("cartTotalText");
-const deliveryBox = document.getElementById("deliveryOptionBox");
-if (cart.length === 0) {
-container.innerHTML = '<div style="text-align:center; padding:30px 10px; color:#94a3b8;">🛒 السلة فارغة حالياً..<br>تصفحي المنتجات وأضيفي ما يعجبك! ✨</div>';
-totalText.innerText = "الإجمالي: 0 جنيه";
-deliveryBox.style.display = "none";
-return;
-}
-deliveryBox.style.display = "block";
-let html = "";
-let total = 0;
-cart.forEach((item, idx) => {
-total += item.price * item.qty;
-html += `<div class="cart-item-row"><div><div style="font-size:13px; font-weight:bold;">💎 ${item.name}</div><div style="font-size: 11px; color: #64748b;">${item.price} ج.م</div></div><div class="cart-item-controls"><button class="qty-btn" onclick="updateQuantity(${idx}, -1)">-</button><span>${item.qty}</span><button class="qty-btn" onclick="updateQuantity(${idx}, 1)">+</button><button class="delete-item-btn" onclick="removeItem(${idx})">حذف</button></div></div>`;
-});
-container.innerHTML = html;
-totalText.innerText = `💰 الإجمالي الكلي: ${total} جنيه`;
-}
-
-function checkoutWhatsApp() {
-const custName = document.getElementById("custName").value.trim();
-let deliveryText = selectedDeliveryType === 'pickup'
-? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلام ✨)"
-: "🚚 توصيل للمنزل (في انتظار التواصل لتأكيد العنوان والتفاصيل 🛵)";
-let msg = "أهلاً وسهلاً كرستال الزنقة! 🌸✨\n";
-msg += "حابب/حاببة أؤكد الطلب الجميل ده معكم: 👇\n\n";
-msg += `👤 **اسم المستلم:** ${custName}\n\n`;
-msg += `📍 **طريقة الاستلام:**\n${deliveryText}\n\n`;
-msg += "📦 **قائمة المنتجات المطلوبة:**\n";
-let total = 0;
-cart.forEach((item) => {
-msg += `🔹 ${item.name}\n   └ العدد: ${item.qty} | السعر: ${item.price * item.qty} ج.م\n`;
-total += item.price * item.qty;
-});
-msg += `\n💵 **المبلغ الإجمالي:** ${total} جنيه مصري`;
-msg += "\n\n✅ (تم الاطلاع والموافقة على الشروط والأحكام الرسمية للطلب 🤝)";
-msg += "\n\nفي انتظار ردكم وتأكيد الطلب.. شكراً لكم! 💐";
-window.open(`https://wa.me/201227492921?text=${encodeURIComponent(msg)}`, '_blank');
-toggleRulesModal(false);
-}
-
-function displayCategories(categories) {
-const grid = document.getElementById("categoriesGrid");
-grid.innerHTML = "";
-categories.forEach(cat => {
-grid.innerHTML += `<div class="cat-item" onclick="openCategoryPage('${cat.id}', '${cat.name}')"><img src="${cat.img}" alt="${cat.name}" onerror="this.style.display='none'"><h4>${cat.name}</h4><span>تصفح الأشكال ✨</span></div>`;
-});
-}
-
-function openCategoryPage(catId, catName) {
-const products = catProductsData.filter(p => p.categoryId === catId);
-const container = document.getElementById("categoryProductsContainer");
-const titleEl = document.getElementById("selectedCatTitle");
-titleEl.innerText = `📦 منتجات قسم: ${catName}`;
-
-if (products.length === 0) {
-container.innerHTML = '<p style="font-size: 13px; color: #64748b; text-align: center; grid-column: span 2; padding: 30px;">عذراً، لا توجد منتجات مضافة في هذا القسم حالياً 🌸</p>';
-} else {
-let html = "";
-products.forEach(item => {
-html += `<div class="cat-product-card" id="product-${item.id}"><img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'"><div><div class="trending-title" style="margin-top:8px;">${item.name}</div><div class="trending-price">${item.price} ج.م</div></div><button class="add-trending-btn" onclick='addToCart(${JSON.stringify(item)})'>+ أضف للسلة</button></div>`;
-});
-container.innerHTML = html;
-}
-
-document.getElementById("homeMainContent").style.display = "none";
-document.getElementById("categoryPageView").classList.add("active");
-window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function backToHome() {
-document.getElementById("categoryPageView").classList.remove("active");
-document.getElementById("homeMainContent").style.display = "block";
-window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function renderTrending(items) {
-const container = document.getElementById("trendingContainer");
-container.innerHTML = "";
-items.forEach(item => {
-container.innerHTML += `<div class="trending-card"><span class="trending-badge">🔥 الأكثر طلباً</span><img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'"><div><div class="trending-title">${item.name}</div><div class="trending-price">${item.price} ج.م</div></div><button class="add-trending-btn" onclick='addToCart(${JSON.stringify(item)})'>+ أضف للسلة</button></div>`;
-});
+  const dots = document.querySelectorAll(".dot-indicator");
+  dots.forEach((dot, idx) => {
+    dot.classList.toggle("active", idx === currentSlideIndex);
+  });
 }
 
 function renderSlider() {
-const slider = document.getElementById("offerSlider");
-const dotsContainer = document.getElementById("sliderDots");
-slider.innerHTML = "";
-dotsContainer.innerHTML = "";
+  const slider = document.getElementById("offerSlider");
+  const dotsContainer = document.getElementById("sliderDots");
+  if (!slider || !dotsContainer) return;
 
-const currentTime = new Date().getTime();
-const activeOffers = offersData.filter(offer => !offer.endTime || offer.endTime > currentTime);
-
-if (activeOffers.length === 0) {
-slider.innerHTML = '<div class="slide" style="justify-content:center; text-align:center;"><div class="slide-title" style="font-size:14px; color:#64748b;">لا توجد عروض نشطة حالياً.. تابعينا قريباً! ✨</div></div>';
-return;
+  slider.innerHTML = `
+    <div class="slide">
+      <div class="slide-content">
+        <span class="badge-discount">🎁 عروض كرستال الزنقة</span>
+        <div class="slide-title">تشكيلة جديدة كلياً</div>
+        <div class="slide-sub">تصفحي الأقسام واكتشفي أحدث الإكسسوارات</div>
+        <div class="countdown-timer">📢 متوفر الآن</div>
+      </div>
+      <img src="https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" class="slide-img">
+    </div>`;
+  dotsContainer.innerHTML = `<div class="dot-indicator active"></div>`;
 }
 
-slider.onmouseenter = stopAutoSlider;
-slider.onmouseleave = startAutoSlider;
+function updateCountdowns() {}
 
-activeOffers.forEach((offer, idx) => {
-let actionButtonHtml = '';
+window.filterStoreContent = function() {
+  const queryText = document.getElementById("searchInput").value.trim().toLowerCase();
+  if (!queryText) {
+    displayCategories(liveCategories);
+    return;
+  }
+  const filteredCats = liveCategories.filter(c => c.name.toLowerCase().includes(queryText));
+  displayCategories(filteredCats);
+};
 
-if (offer.targetType && offer.targetType !== 'general') {
-    actionButtonHtml = `
-        <button class="slide-action-btn"
-            onclick="handleOfferAction('${offer.targetType}', '${offer.targetId}')">
-            تصفح العرض 👈
-        </button>`;
-}
-
-slider.innerHTML += `
-<div class="slide" id="slide-${offer.id}">
-    <div class="slide-content">
-        <span class="badge-discount">${offer.tag}</span>
-        <div class="slide-title">${offer.title}</div>
-        <div class="slide-sub">${offer.subtitle}</div>
-        <div class="countdown-timer" id="timer-${offer.id}">
-            ${offer.endTime ? 'جاري حساب الوقت...' : '📢 عرض مستمر'}
-        </div>
-        ${actionButtonHtml}
-    </div>
-    ${offer.img ? `<img src="${offer.img}" alt="${offer.title}" class="slide-img" onerror="this.style.display='none'">` : ''}
-</div>`;
-dotsContainer.innerHTML += `<div class="dot-indicator ${idx === 0 ? 'active' : ''}" onclick="scrollToSlide(${idx})"></div>`;
-});
-}
-
-function scrollToSlide(idx) {
-currentSlideIndex = idx;
-const slider = document.getElementById("offerSlider");
-const slideWidth = slider.clientWidth;
-slider.scrollTo({ left: currentSlideIndex * slideWidth, behavior: 'smooth' });
-updateDotsActiveState();
-}
-
-function handleOfferAction(targetType, targetId) {
-    if (targetType === "category") {
-        const cat = initialCategories.find(c => c.id === targetId);
-        if (cat) {
-            openCategoryPage(cat.id, cat.name);
-        }
-    } else if (targetType === "product") {
-        const product = catProductsData.find(p => p.id === targetId);
-        
-        if (!product) {
-            alert("عذراً، هذا المنتج غير متوفر حالياً أو تم تعديل معرّفه 🌸");
-            return;
-        }
-
-        openCategoryPage(product.categoryId,
-            initialCategories.find(c => c.id === product.categoryId)?.name || "");
-
-        setTimeout(() => {
-            const el = document.getElementById(`product-${targetId}`);
-            if (el) {
-                el.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
-
-                el.style.transition = "0.4s";
-                el.style.boxShadow = "0 0 0 4px #f97316";
-
-                setTimeout(() => {
-                    el.style.boxShadow = "";
-                }, 2000);
-            }
-        }, 200);
-    }
-}
-
-function updateCountdowns() {
-const currentTime = new Date().getTime();
-let needsRerender = false;
-
-offersData.forEach(offer => {
-const timerEl = document.getElementById(`timer-${offer.id}`);
-if (timerEl) {
-if (!offer.endTime) {
-timerEl.innerHTML = "📢 عرض مستمر";
-return;
-}
-const distance = offer.endTime - currentTime;
-if (distance < 0) {
-timerEl.innerHTML = "⏳ منتهي";
-needsRerender = true;
-} else {
-const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-timerEl.innerHTML = `⏳ متبقي: <span>${days}ي</span> <span>${hours}س</span> <span>${minutes}د</span> <span>${seconds}ث</span>`;
-}
-}
-});
-
-if (needsRerender) {
-renderSlider();
-}
-}
-
-function filterStoreContent() {
-const query = document.getElementById("searchInput").value.trim().toLowerCase();
-if (!query) {
-displayCategories(initialCategories);
-renderTrending(trendingData);
-return;
-}
-const filteredCats = initialCategories.filter(c => c.name.toLowerCase().includes(query));
-displayCategories(filteredCats);
-
-const filteredTrending = trendingData.filter(t => t.name.toLowerCase().includes(query));
-renderTrending(filteredTrending);
-}
+// بدء تشغيل المتجر
+initStoreListeners();
 </script>
 </body>
 </html>
