@@ -59,6 +59,7 @@ font-size: 11px;
 padding: 2px 7px;
 border-radius: 10px;
 }
+
 /* عناوين الفواصل */
 .section-divider {
 display: flex;
@@ -127,7 +128,6 @@ margin-bottom: 6px;
 .slide-title { font-size: 17px; font-weight: 900; color: #1e293b; }
 .slide-sub { font-size: 12px; font-weight: 700; color: #475569; margin-top: 2px; }
 
-/* تصميم العداد التنازلي داخل السلايدر */
 .countdown-timer {
 display: flex;
 gap: 6px;
@@ -142,21 +142,6 @@ width: fit-content;
 align-items: center;
 }
 .countdown-timer span { background: #ea580c; color: #fff; padding: 1px 4px; border-radius: 4px; font-size: 10px; }
-
-.slide-action-btn {
-margin-top: 8px;
-background: var(--orange-btn);
-color: white;
-border: none;
-padding: 5px 12px;
-border-radius: 8px;
-font-size: 11px;
-font-weight: 800;
-cursor: pointer;
-width: fit-content;
-text-decoration: none;
-box-shadow: 0 2px 4px rgba(217, 83, 30, 0.3);
-}
 
 .slider-dots { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 8px; }
 .dot-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: #cbd5e1; transition: all 0.3s ease; cursor: pointer; }
@@ -176,7 +161,7 @@ font-size: 14px;
 }
 .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
 
-/* شبكة الأقسام */
+/* شبكة الأقسام والنتائج */
 .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; flex-grow: 1; }
 .cat-item {
 background: #ffffff;
@@ -237,8 +222,36 @@ width: 100%;
 height: 120px;
 object-fit: cover;
 border-radius: 10px;
+cursor: pointer;
 }
-.trending-title { font-size: 12px; font-weight: 800; color: #1e293b; margin: 6px 0 2px; }
+
+/* تنسيق معرض الصور المصغرة داخل كارت المنتج */
+.product-thumbs {
+display: flex;
+gap: 4px;
+margin-top: 6px;
+overflow-x: auto;
+scrollbar-width: none;
+}
+.product-thumbs::-webkit-scrollbar { display: none; }
+.product-thumb {
+width: 30px;
+height: 30px;
+object-fit: cover;
+border-radius: 4px;
+border: 1px solid var(--border-gray);
+cursor: pointer;
+opacity: 0.6;
+transition: 0.2s;
+}
+.product-thumb.active {
+border-color: var(--orange-btn);
+opacity: 1;
+transform: scale(1.05);
+}
+
+.trending-title { font-size: 12px; font-weight: 800; color: #1e293b; margin: 6px 0 2px; cursor: pointer; }
+.trending-title:hover { color: var(--primary-blue); }
 .trending-price { font-size: 11px; font-weight: 700; color: var(--orange-btn); }
 .add-trending-btn {
 width: 100%; margin-top: 6px;
@@ -247,8 +260,14 @@ border: 1px solid #fed7aa; border-radius: 8px;
 padding: 5px; font-size: 11px; font-weight: 800;
 cursor: pointer;
 }
+.add-trending-btn.out-of-stock {
+background: #f1f5f9 !important;
+color: #94a3b8 !important;
+border: 1px solid #cbd5e1 !important;
+cursor: not-allowed !important;
+}
 
-/* وسائل التواصل */
+/* وسائل التواصل والفوتر */
 .social-compact-card {
 margin: 30px 20px 10px 20px;
 background: #f8fafc;
@@ -288,11 +307,87 @@ padding: 20px; max-height: 88vh; overflow-y: auto;
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .close-modal-btn { background: #f1f5f9; border: none; font-size: 18px; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
 
+/* نافذة تفاصيل المنتج المستقلة */
+.product-details-img {
+width: 100%;
+height: 220px;
+object-fit: cover;
+border-radius: 12px;
+margin-bottom: 12px;
+border: 1px solid var(--border-gray);
+}
+.product-details-info {
+display: flex;
+flex-direction: column;
+gap: 10px;
+font-size: 13px;
+color: #334155;
+margin-bottom: 15px;
+}
+.product-details-info h3 {
+font-size: 18px;
+font-weight: 900;
+color: #1e293b;
+}
+
 /* عناصر السلة والنماذج */
 .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-gray); }
 .cart-item-controls { display: flex; align-items: center; gap: 8px; }
 .qty-btn { width: 26px; height: 26px; border: 1px solid var(--border-gray); background: #f8fafc; border-radius: 6px; font-weight: bold; cursor: pointer; }
 .delete-item-btn { background: #fee2e2; color: #ef4444; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+
+.coupon-section {
+background: #f8fafc;
+border: 1px dashed #cbd5e1;
+border-radius: 12px;
+padding: 12px;
+margin: 15px 0;
+}
+.coupon-input-group {
+display: flex;
+gap: 8px;
+margin-top: 6px;
+}
+.coupon-input-group input {
+flex: 1;
+padding: 8px 12px;
+border: 1px solid var(--border-gray);
+border-radius: 8px;
+outline: none;
+font-size: 12px;
+text-transform: uppercase;
+}
+.coupon-apply-btn {
+background: var(--primary-blue);
+color: #fff;
+border: none;
+padding: 8px 14px;
+border-radius: 8px;
+font-weight: bold;
+font-size: 12px;
+cursor: pointer;
+}
+.applied-coupon-badge {
+display: flex;
+justify-content: space-between;
+align-items: center;
+background: #ecfdf5;
+border: 1px solid #a7f3d0;
+color: #065f46;
+padding: 8px 12px;
+border-radius: 8px;
+font-size: 12px;
+margin-top: 8px;
+font-weight: bold;
+}
+.remove-coupon-btn {
+background: none;
+border: none;
+color: #ef4444;
+cursor: pointer;
+font-size: 12px;
+font-weight: bold;
+}
 
 .delivery-options { margin: 15px 0; display: flex; flex-direction: column; gap: 10px; }
 .delivery-title { font-size: 13px; font-weight: 800; color: #1e293b; }
@@ -314,12 +409,56 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 .accept-checkbox-wrapper input { width: 18px; height: 18px; accent-color: var(--orange-btn); cursor: pointer; }
 .checkout-btn { width: 100%; background: #25d366; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 14px; cursor: pointer; display: block; text-decoration: none; text-align: center; transition: all 0.3s ease; }
 .checkout-btn:disabled { background: #cbd5e1 !important; color: #94a3b8 !important; cursor: not-allowed; }
+
+/* تصميم Toast Notification الاحترافي */
+#toast-container {
+position: fixed;
+top: 20px;
+left: 50%;
+transform: translateX(-50%);
+z-index: 9999;
+display: flex;
+flex-direction: column;
+gap: 10px;
+align-items: center;
+pointer-events: none;
+width: 90%;
+max-width: 400px;
+}
+.toast-msg {
+background: #1e293b;
+color: #fff;
+padding: 12px 20px;
+border-radius: 12px;
+font-size: 13px;
+font-weight: 700;
+box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+display: flex;
+align-items: center;
+gap: 10px;
+pointer-events: auto;
+animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+border-right: 4px solid var(--orange-btn);
+}
+.toast-msg.success { border-right-color: #22c55e; }
+.toast-msg.error { border-right-color: #ef4444; }
+@keyframes slideDown {
+from { opacity: 0; transform: translateY(-20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOut {
+from { opacity: 1; transform: translateY(0); }
+to { opacity: 0; transform: translateY(-20px); visibility: hidden; }
+}
 </style>
 </head>
 <body>
+<!-- حاوية الإشعارات -->
+<div id="toast-container"></div>
+
 <div class="app-container">
 <header class="header">
-<img src="https://raw.githubusercontent.com/crystalalznq/crystalalznq/refs/heads/main/IMG_%D9%A2%D9%A0%D9%A2%D9%A6%D9%A0%D9%A7%D9%A2%D9%A6_%D9%A0%D9%A2%D9%A4%D9%A5%D9%A3%D9%A7.png" class="brand-banner-logo" alt="كرستال الزنقة">
+<img src="https://raw.githubusercontent.com/crystalalznq/crystalalznq/refs/heads/main/IMG_%D9%A2%D9%A0%D9%A2%D9%A6%D9%A0%D9%A7%D9%A2%D9%A6_%D9%A0%D9%A2%D9%A4%D9%A5%D9%A3%D9%A7.png" class="brand-banner-logo" alt="كرستال الزنقة" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&auto=format&fit=crop&q=60'">
 <button class="header-cart-btn" onclick="toggleCartModal(true)">
 <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
 <span>السلة</span>
@@ -402,6 +541,18 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 <button class="close-modal-btn" onclick="toggleCartModal(false)">✕</button>
 </div>
 <div id="cartItemsList"></div>
+
+<div class="coupon-section" id="couponSectionBox">
+<div style="font-size: 12px; font-weight: bold; color: #334155;">🏷️ هل لديك كوبون خصم؟</div>
+<div id="couponInputArea">
+<div class="coupon-input-group">
+<input type="text" id="couponCodeInput" placeholder="اكتبي كود الكوبون هنا..">
+<button class="coupon-apply-btn" onclick="applyCoupon()">تطبيق</button>
+</div>
+</div>
+<div id="appliedCouponArea" style="display: none;"></div>
+</div>
+
 <div class="delivery-options" id="deliveryOptionBox" style="display: none;">
 <div class="delivery-title">📍 تحبي تستلمي إزاي؟</div>
 <div class="delivery-grid">
@@ -450,29 +601,55 @@ padding: 10px; background: #f8fafc; cursor: pointer; text-align: center; transit
 </div>
 </div>
 
-<!-- سكربت الربط الحي مع Firebase Firestore -->
+<!-- 3. نافذة تفاصيل المنتج المستقلة (جديد) -->
+<div class="modal-overlay" id="productDetailsModalOverlay">
+<div class="modal-card" id="productDetailsModalCard">
+<!-- سيتم تعبئتها ديناميكياً -->
+</div>
+</div>
+
+<!-- سكربت الربط الحي مع Firebase Firestore (آمن ضد XSS ومع نظام Toast) -->
 <script type="module">
 import { db } from "./firebase-config.js";
-import { collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let liveProducts = [];
 let liveCategories = [];
 let liveCoupons = [];
 let cart = JSON.parse(localStorage.getItem('crystal_cart')) || [];
+let appliedCoupon = JSON.parse(localStorage.getItem('crystal_applied_coupon')) || null;
 let selectedDeliveryType = 'pickup';
 let sliderInterval = null;
 let currentSlideIndex = 0;
 
-// الاستماع اللحظي للبيانات من Firestore
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&auto=format&fit=crop&q=60';
+
+window.showToast = function(message, type = 'success') {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `toast-msg ${type}`;
+  
+  let icon = '✨';
+  if (type === 'error') icon = '❌';
+  if (type === 'info') icon = '💡';
+
+  toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+};
+
 function initStoreListeners() {
-  // 1. المنتجات
   const productsQuery = query(collection(db, "products"), orderBy("createdAt", "desc"));
   onSnapshot(productsQuery, (snapshot) => {
     liveProducts = [];
     snapshot.forEach((doc) => {
       liveProducts.push({ id: doc.id, ...doc.data() });
     });
-    // إذا كنا في صفحة قسم مفتوح، نقوم بتحديث المنتجات المعروضة فوراً
     const activeCatId = window.currentOpenCategoryId;
     if (activeCatId) {
       const activeCatName = window.currentOpenCategoryName;
@@ -480,30 +657,30 @@ function initStoreListeners() {
     }
   });
 
-  // 2. الأقسام
   onSnapshot(collection(db, "categories"), (snapshot) => {
     liveCategories = [];
     snapshot.forEach((doc) => {
       liveCategories.push({ id: doc.id, ...doc.data() });
     });
-    displayCategories(liveCategories);
+    const queryText = document.getElementById("searchInput") ? document.getElementById("searchInput").value.trim() : "";
+    if (!queryText) {
+      displayCategories(liveCategories);
+    }
   });
 
-  // 3. الكوبونات
   onSnapshot(collection(db, "coupons"), (snapshot) => {
     liveCoupons = [];
     snapshot.forEach((doc) => {
       liveCoupons.push({ id: doc.id, ...doc.data() });
     });
+    renderSlider();
+    startAutoSlider();
   });
 
-  renderSlider();
   updateCartBadge();
-  startAutoSlider();
   setInterval(updateCountdowns, 1000);
 }
 
-// عرض الأقسام
 window.displayCategories = function(categories) {
   const grid = document.getElementById("categoriesGrid");
   if (!grid) return;
@@ -515,53 +692,184 @@ window.displayCategories = function(categories) {
   }
 
   categories.forEach(cat => {
-    const catImg = cat.img || 'https://via.placeholder.com/100?text=قسم';
-    grid.innerHTML += `
-      <div class="cat-item" onclick="openCategoryPage('${cat.id}', '${cat.name}')">
-        <img src="${catImg}" alt="${cat.name}" onerror="this.src='https://via.placeholder.com/100?text=خطأ'">
-        <h4>${cat.name}</h4>
-        <span>تصفح الأشكال ✨</span>
-      </div>`;
+    const catImg = cat.img && cat.img.trim() !== "" ? cat.img : DEFAULT_IMAGE;
+    
+    const catDiv = document.createElement('div');
+    catDiv.className = 'cat-item';
+    catDiv.onclick = () => openCategoryPage(cat.id, cat.name);
+
+    const imgEl = document.createElement('img');
+    imgEl.src = catImg;
+    imgEl.alt = cat.name;
+    imgEl.loading = "lazy";
+    imgEl.onerror = function() { this.src = DEFAULT_IMAGE; };
+
+    const h4El = document.createElement('h4');
+    h4El.textContent = cat.name;
+
+    const spanEl = document.createElement('span');
+    spanEl.textContent = 'تصفح الأشكال ✨';
+
+    catDiv.appendChild(imgEl);
+    catDiv.appendChild(h4El);
+    catDiv.appendChild(spanEl);
+    grid.appendChild(catDiv);
   });
 };
 
-// فتح صفحة القسم وعرض منتجاته الحية
+window.changeProductImage = function(productId, imgUrl, thumbElement) {
+  const imgElement = document.getElementById(`main-img-${productId}`);
+  if (imgElement) {
+    imgElement.src = imgUrl;
+  }
+  const card = document.getElementById(`product-${productId}`);
+  if (card) {
+    card.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+    thumbElement.classList.add('active');
+  }
+};
+
+window.openProductDetailsModal = function(productId) {
+  const product = liveProducts.find(p => p.id === productId);
+  if (!product) return;
+
+  const modalOverlay = document.getElementById("productDetailsModalOverlay");
+  const modalCard = document.getElementById("productDetailsModalCard");
+  if (!modalOverlay || !modalCard) return;
+
+  const images = (product.images && product.images.length > 0) ? product.images : [DEFAULT_IMAGE];
+  const mainImg = images[0];
+  const stockCount = product.stock !== undefined ? Number(product.stock) : 1;
+  const isOutOfStock = stockCount === 0;
+
+  modalCard.innerHTML = `
+    <div class="modal-header">
+      <div style="font-weight:bold; color:var(--primary-blue);">📦 تفاصيل المنتج</div>
+      <button class="close-modal-btn" onclick="toggleProductDetailsModal(false)">✕</button>
+    </div>
+    <img src="${mainImg}" class="product-details-img" id="modal-main-img" onerror="this.src='${DEFAULT_IMAGE}'">
+    ${images.length > 1 ? `
+      <div class="product-thumbs" style="margin-bottom: 15px; justify-content: center;">
+        ${images.map((img, idx) => `
+          <img src="${img}" class="product-thumb ${idx === 0 ? 'active' : ''}" style="width:45px; height:45px;" onclick="document.getElementById('modal-main-img').src='${img}'; this.parentElement.querySelectorAll('.product-thumb').forEach(t=>t.classList.remove('active')); this.classList.add('active');" loading="lazy">
+        `).join('')}
+      </div>
+    ` : ''}
+    <div class="product-details-info">
+      <h3>${product.name}</h3>
+      <div style="font-size: 15px; font-weight: 800; color: var(--orange-btn);">
+        ${product.discountPrice ? `<del style="color:#94a3b8; font-size:12px;">${product.price} ج.م</del> ${product.discountPrice} ج.م` : `${product.price} ج.م`}
+      </div>
+      <div><b>القسم:</b> ${product.category || 'عام'}</div>
+      <div><b>المقاسات المتاحة:</b> ${product.size || product.sizes || 'غير متوفر'}</div>
+      <div><b>الألوان المتاحة:</b> ${product.color || product.colors || 'غير متوفر'}</div>
+      <div><b>الوصف:</b> ${product.description || 'لا يوجد وصف إضافي لهذا المنتج.'}</div>
+      <div><b>المتوفر بالمخزون:</b> ${isOutOfStock ? '<span style="color:#ef4444; font-weight:bold;">نفذت الكمية</span>' : `<span style="color:#16a34a; font-weight:bold;">${stockCount} قطعة</span>`}</div>
+    </div>
+    <button class="${isOutOfStock ? 'add-trending-btn out-of-stock' : 'add-trending-btn'}" style="padding: 10px; font-size: 13px;" ${isOutOfStock ? 'disabled' : ''} onclick="addToCartObject({id: '${product.id}', name: '${product.name.replace(/'/g, "\\'")}', price: ${product.discountPrice ? product.discountPrice : product.price}, stock: ${stockCount}}); toggleProductDetailsModal(false);">
+      ${isOutOfStock ? '❌ نفذت الكمية' : '🛒 أضف للسلة الآن'}
+    </button>
+  `;
+
+  modalOverlay.classList.add("active");
+};
+
+window.toggleProductDetailsModal = function(show) {
+  const modal = document.getElementById("productDetailsModalOverlay");
+  if (modal) modal.classList.toggle("active", show);
+};
+
 window.openCategoryPage = function(catId, catName) {
   window.currentOpenCategoryId = catId;
   window.currentOpenCategoryName = catName;
 
   const products = liveProducts.filter(p => p.category === catName);
+  renderProductGrid(products, `📦 منتجات القسم: ${catName}`);
+};
+
+window.renderProductGrid = function(products, sectionTitleText) {
   const container = document.getElementById("categoryProductsContainer");
   const titleEl = document.getElementById("selectedCatTitle");
-  if (titleEl) titleEl.innerText = `📦 منتجات قسم: ${catName}`;
+  if (titleEl) titleEl.innerText = sectionTitleText;
 
   if (!container) return;
+  container.innerHTML = "";
 
   if (products.length === 0) {
-    container.innerHTML = '<p style="font-size: 13px; color: #64748b; text-align: center; grid-column: span 2; padding: 30px;">عذراً، لا توجد منتجات مضافة في هذا القسم حالياً 🌸</p>';
+    container.innerHTML = '<p style="font-size: 13px; color: #64748b; text-align: center; grid-column: span 2; padding: 30px;">عذراً، لا توجد منتجات مطابقة حالياً 🌸</p>';
   } else {
-    let html = "";
     products.forEach(item => {
-      const mainImg = (item.images && item.images.length > 0) ? item.images[0] : 'https://via.placeholder.com/120?text=لا+صورة';
-      const priceDisplay = item.discountPrice ? `<del>${item.price}</del> ${item.discountPrice} ج.م` : `${item.price} ج.م`;
+      const images = (item.images && item.images.length > 0) ? item.images : [DEFAULT_IMAGE];
+      const mainImg = images[0];
       
       const itemForCart = {
         id: item.id,
         name: item.name,
-        price: item.discountPrice ? Number(item.discountPrice) : Number(item.price)
+        price: item.discountPrice ? Number(item.discountPrice) : Number(item.price),
+        stock: item.stock !== undefined ? Number(item.stock) : 1
       };
 
-      html += `
-        <div class="cat-product-card" id="product-${item.id}">
-          <img src="${mainImg}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/120?text=خطأ'">
-          <div>
-            <div class="trending-title" style="margin-top:8px;">${item.name}</div>
-            <div class="trending-price">${priceDisplay}</div>
-          </div>
-          <button class="add-trending-btn" onclick='window.addToCartObject(${JSON.stringify(itemForCart)})'>+ أضف للسلة</button>
-        </div>`;
+      const isOutOfStock = itemForCart.stock === 0;
+
+      const cardDiv = document.createElement('div');
+      cardDiv.className = 'cat-product-card';
+      cardDiv.id = `product-${item.id}`;
+
+      const innerDiv = document.createElement('div');
+
+      const imgEl = document.createElement('img');
+      imgEl.id = `main-img-${item.id}`;
+      imgEl.src = mainImg;
+      imgEl.alt = item.name;
+      imgEl.loading = "lazy";
+      imgEl.onerror = function() { this.src = DEFAULT_IMAGE; };
+      imgEl.onclick = () => openProductDetailsModal(item.id);
+      innerDiv.appendChild(imgEl);
+
+      if (images.length > 1) {
+        const thumbsDiv = document.createElement('div');
+        thumbsDiv.className = 'product-thumbs';
+        images.forEach((imgUrl, idx) => {
+          const thumbImg = document.createElement('img');
+          thumbImg.src = imgUrl;
+          thumbImg.className = `product-thumb ${idx === 0 ? 'active' : ''}`;
+          thumbImg.loading = "lazy";
+          thumbImg.onclick = (e) => window.changeProductImage(item.id, imgUrl, e.currentTarget);
+          thumbsDiv.appendChild(thumbImg);
+        });
+        innerDiv.appendChild(thumbsDiv);
+      }
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'trending-title';
+      titleEl.textContent = item.name;
+      titleEl.onclick = () => openProductDetailsModal(item.id);
+      innerDiv.appendChild(titleEl);
+
+      const priceEl = document.createElement('div');
+      priceEl.className = 'trending-price';
+      if (item.discountPrice) {
+        const delEl = document.createElement('del');
+        delEl.textContent = `${item.price}`;
+        priceEl.appendChild(delEl);
+        priceEl.append(` ${item.discountPrice} ج.م`);
+      } else {
+        priceEl.textContent = `${item.price} ج.م`;
+      }
+      innerDiv.appendChild(priceEl);
+
+      cardDiv.appendChild(innerDiv);
+
+      const btnEl = document.createElement('button');
+      btnEl.className = isOutOfStock ? "add-trending-btn out-of-stock" : "add-trending-btn";
+      btnEl.textContent = isOutOfStock ? "❌ نفذت الكمية" : "+ أضف للسلة";
+      if (!isOutOfStock) {
+        btnEl.onclick = () => window.addToCartObject(itemForCart);
+      }
+      cardDiv.appendChild(btnEl);
+
+      container.appendChild(cardDiv);
     });
-    container.innerHTML = html;
   }
 
   const homeMain = document.getElementById("homeMainContent");
@@ -582,6 +890,11 @@ window.backToHome = function() {
 };
 
 window.addToCartObject = function(product) {
+  if (product.stock === 0) {
+    window.showToast("عذراً، هذا المنتج نفذ من المخزون ولا يمكن طلبه.", "error");
+    return;
+  }
+
   const existing = cart.find(item => item.id === product.id);
   if (existing) {
     existing.qty += 1;
@@ -590,7 +903,7 @@ window.addToCartObject = function(product) {
   }
   localStorage.setItem('crystal_cart', JSON.stringify(cart));
   updateCartBadge();
-  alert(`✨ تم إضافة "${product.name}" بنجاح لسلة مشترياتك! 🛍️`);
+  window.showToast(`تم إضافة "${product.name}" بنجاح للسلة! 🛍️`, "success");
 };
 
 window.updateCartBadge = function() {
@@ -642,43 +955,163 @@ window.removeItem = function(index) {
   updateCartBadge();
 };
 
+window.applyCoupon = function() {
+  const inputEl = document.getElementById("couponCodeInput");
+  if (!inputEl) return;
+  const code = inputEl.value.trim().toUpperCase();
+  if (!code) {
+    window.showToast("يرجى كتابة كود الكوبون أولاً!", "error");
+    return;
+  }
+
+  const foundCoupon = liveCoupons.find(c => (c.code || "").toUpperCase() === code);
+  
+  if (!foundCoupon) {
+    window.showToast("عذراً، هذا الكوبون غير صحيح أو منتهي الصلاحية!", "error");
+    return;
+  }
+
+  appliedCoupon = foundCoupon;
+  localStorage.setItem('crystal_applied_coupon', JSON.stringify(appliedCoupon));
+  renderCartItems();
+  window.showToast(`تم تطبيق الكوبون "${foundCoupon.code}" بنجاح! 🎉`, "success");
+};
+
+window.removeCoupon = function() {
+  appliedCoupon = null;
+  localStorage.removeItem('crystal_applied_coupon');
+  renderCartItems();
+  window.showToast("تم إزالة الكوبون.", "info");
+};
+
 window.renderCartItems = function() {
   const container = document.getElementById("cartItemsList");
   const totalText = document.getElementById("cartTotalText");
   const deliveryBox = document.getElementById("deliveryOptionBox");
+  const couponSectionBox = document.getElementById("couponSectionBox");
+  const inputArea = document.getElementById("couponInputArea");
+  const appliedArea = document.getElementById("appliedCouponArea");
+  
   if (!container) return;
+  container.innerHTML = "";
 
   if (cart.length === 0) {
     container.innerHTML = '<div style="text-align:center; padding:30px 10px; color:#94a3b8;">🛒 السلة فارغة حالياً..<br>تصفحي المنتجات وأضيفي ما يعجبك! ✨</div>';
     if (totalText) totalText.innerText = "الإجمالي: 0 جنيه";
     if (deliveryBox) deliveryBox.style.display = "none";
+    if (couponSectionBox) couponSectionBox.style.display = "none";
     return;
   }
+
   if (deliveryBox) deliveryBox.style.display = "block";
-  let html = "";
-  let total = 0;
+  if (couponSectionBox) couponSectionBox.style.display = "block";
+
+  if (appliedCoupon) {
+    if (inputArea) inputArea.style.display = "none";
+    if (appliedArea) {
+      appliedArea.style.display = "flex";
+      appliedArea.innerHTML = "";
+      
+      const spanEl = document.createElement('span');
+      spanEl.innerHTML = `🏷️ كوبون مفعل: <b>${appliedCoupon.code}</b> (${appliedCoupon.discountValue || ''} خصم)`;
+      
+      const rmBtn = document.createElement('button');
+      rmBtn.className = 'remove-coupon-btn';
+      rmBtn.onclick = removeCoupon;
+      rmBtn.textContent = 'إزالة';
+
+      appliedArea.appendChild(spanEl);
+      appliedArea.appendChild(rmBtn);
+    }
+  } else {
+    if (inputArea) inputArea.style.display = "block";
+    if (appliedArea) {
+      appliedArea.style.display = "none";
+      appliedArea.innerHTML = "";
+    }
+    const codeInput = document.getElementById("couponCodeInput");
+    if (codeInput) codeInput.value = "";
+  }
+
+  let subtotal = 0;
   cart.forEach((item, idx) => {
-    total += item.price * item.qty;
-    html += `
-      <div class="cart-item-row">
-        <div>
-          <div style="font-size:13px; font-weight:bold;">💎 ${item.name}</div>
-          <div style="font-size: 11px; color: #64748b;">${item.price} ج.م</div>
-        </div>
-        <div class="cart-item-controls">
-          <button class="qty-btn" onclick="updateQuantity(${idx}, -1)">-</button>
-          <span>${item.qty}</span>
-          <button class="qty-btn" onclick="updateQuantity(${idx}, 1)">+</button>
-          <button class="delete-item-btn" onclick="removeItem(${idx})">حذف</button>
-        </div>
-      </div>`;
+    subtotal += item.price * item.qty;
+
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'cart-item-row';
+
+    const infoDiv = document.createElement('div');
+    const nameEl = document.createElement('div');
+    nameEl.style.fontSize = '13px';
+    nameEl.style.fontWeight = 'bold';
+    nameEl.textContent = `💎 ${item.name}`;
+
+    const priceEl = document.createElement('div');
+    priceEl.style.fontSize = '11px';
+    priceEl.style.color = '#64748b';
+    priceEl.textContent = `${item.price} ج.م`;
+
+    infoDiv.appendChild(nameEl);
+    infoDiv.appendChild(priceEl);
+
+    const controlsDiv = document.createElement('div');
+    controlsDiv.className = 'cart-item-controls';
+
+    const minusBtn = document.createElement('button');
+    minusBtn.className = 'qty-btn';
+    minusBtn.onclick = () => updateQuantity(idx, -1);
+    minusBtn.textContent = '-';
+
+    const qtySpan = document.createElement('span');
+    qtySpan.textContent = item.qty;
+
+    const plusBtn = document.createElement('button');
+    plusBtn.className = 'qty-btn';
+    plusBtn.onclick = () => updateQuantity(idx, 1);
+    plusBtn.textContent = '+';
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'delete-item-btn';
+    delBtn.onclick = () => removeItem(idx);
+    delBtn.textContent = 'حذف';
+
+    controlsDiv.appendChild(minusBtn);
+    controlsDiv.appendChild(qtySpan);
+    controlsDiv.appendChild(plusBtn);
+    controlsDiv.appendChild(delBtn);
+
+    rowDiv.appendChild(infoDiv);
+    rowDiv.appendChild(controlsDiv);
+    container.appendChild(rowDiv);
   });
-  container.innerHTML = html;
-  if (totalText) totalText.innerText = `💰 الإجمالي الكلي: ${total} جنيه`;
+
+  let discountAmount = 0;
+  if (appliedCoupon) {
+    const val = Number(appliedCoupon.discountValue) || 0;
+    if (appliedCoupon.discountType === 'percentage' || String(appliedCoupon.discountValue).includes('%')) {
+      const percentage = Number(String(appliedCoupon.discountValue).replace('%', '')) || val;
+      discountAmount = (subtotal * percentage) / 100;
+    } else {
+      discountAmount = val;
+    }
+  }
+
+  let finalTotal = Math.max(0, subtotal - discountAmount);
+
+  if (totalText) {
+    if (appliedCoupon) {
+      totalText.innerHTML = `💰 المجموع: <del style="color:#94a3b8; font-size:11px;">${subtotal} ج.م</del> | بعد الخصم: <span style="color:var(--orange-btn);">${finalTotal} جنيه</span>`;
+    } else {
+      totalText.innerText = `💰 الإجمالي الكلي: ${subtotal} جنيه`;
+    }
+  }
 };
 
 window.proceedToRulesModal = function() {
-  if (cart.length === 0) return alert("🛒 السلة فارغة! اختاري بعض المنتجات أولاً 😊");
+  if (cart.length === 0) {
+    window.showToast("السلة فارغة! اختاري بعض المنتجات أولاً 😊", "error");
+    return;
+  }
   toggleCartModal(false);
   toggleRulesModal(true);
 };
@@ -693,34 +1126,69 @@ window.validateForm = function() {
   btnEl.disabled = !(name.length >= 2 && checked);
 };
 
-window.checkoutWhatsApp = function() {
+window.checkoutWhatsApp = async function() {
   const nameEl = document.getElementById("custName");
   const custName = nameEl ? nameEl.value.trim() : "عميل";
+
+  try {
+    for (const item of cart) {
+      const productRef = doc(db, "products", item.id);
+      const productSnap = await getDoc(productRef);
+      if (productSnap.exists()) {
+        const currentStock = Number(productSnap.data().stock) || 0;
+        const newStock = Math.max(0, currentStock - item.qty);
+        await updateDoc(productRef, { stock: newStock });
+      }
+    }
+  } catch (error) {
+    console.error("خطأ أثناء تحديث وخصم المخزون: ", error);
+  }
+
   let deliveryText = selectedDeliveryType === 'pickup'
-    ? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلام ✨)"
+    ? "🏪 تحضير في المحل (دفع عربون والباقي كاش/إنستا عند الاستلاستلام ✨)"
     : "🚚 توصيل للمنزل (في انتظار التواصل لتأكيد العنوان والتفاصيل 🛵)";
   let msg = "أهلاً وسهلاً كرستال الزنقة! 🌸✨\n";
   msg += "حابب/حاببة أؤكد الطلب الجميل ده معكم: 👇\n\n";
   msg += `👤 **اسم المستلم:** ${custName}\n\n`;
   msg += `📍 **طريقة الاستلام:**\n${deliveryText}\n\n`;
   msg += "📦 **قائمة المنتجات المطلوبة:**\n";
-  let total = 0;
+  
+  let subtotal = 0;
   cart.forEach((item) => {
     msg += `🔹 ${item.name}\n   └ العدد: ${item.qty} | السعر: ${item.price * item.qty} ج.م\n`;
-    total += item.price * item.qty;
+    subtotal += item.price * item.qty;
   });
-  msg += `\n💵 **المبلغ الإجمالي:** ${total} جنيه مصري`;
+
+  let discountAmount = 0;
+  if (appliedCoupon) {
+    const val = Number(appliedCoupon.discountValue) || 0;
+    if (appliedCoupon.discountType === 'percentage' || String(appliedCoupon.discountValue).includes('%')) {
+      const percentage = Number(String(appliedCoupon.discountValue).replace('%', '')) || val;
+      discountAmount = (subtotal * percentage) / 100;
+    } else {
+      discountAmount = val;
+    }
+    msg += `\n🏷️ **كوبون الخصم المطبق:** ${appliedCoupon.code} (خصم: ${discountAmount} ج.م)`;
+  }
+
+  let finalTotal = Math.max(0, subtotal - discountAmount);
+  msg += `\n\n💵 **المبلغ الإجمالي النهائي:** ${finalTotal} جنيه مصري`;
   msg += "\n\n✅ (تم الاطلاع والموافقة على الشروط والأحكام الرسمية للطلب 🤝)";
   msg += "\n\nفي انتظار ردكم وتأكيد الطلب.. شكراً لكم! 💐";
+
   window.open(`https://wa.me/201227492921?text=${encodeURIComponent(msg)}`, '_blank');
   toggleRulesModal(false);
   cart = [];
+  appliedCoupon = null;
   localStorage.removeItem('crystal_cart');
+  localStorage.removeItem('crystal_applied_coupon');
   updateCartBadge();
+  window.showToast("تم إرسال الطلب بنجاح! 🚀", "success");
 };
 
 function startAutoSlider() {
   if (sliderInterval) clearInterval(sliderInterval);
+  if (liveCoupons.length <= 1) return;
   sliderInterval = setInterval(() => {
     const slider = document.getElementById("offerSlider");
     if (!slider) return;
@@ -752,33 +1220,108 @@ function renderSlider() {
   const dotsContainer = document.getElementById("sliderDots");
   if (!slider || !dotsContainer) return;
 
-  slider.innerHTML = `
-    <div class="slide">
-      <div class="slide-content">
-        <span class="badge-discount">🎁 عروض كرستال الزنقة</span>
-        <div class="slide-title">تشكيلة جديدة كلياً</div>
-        <div class="slide-sub">تصفحي الأقسام واكتشفي أحدث الإكسسوارات</div>
-        <div class="countdown-timer">📢 متوفر الآن</div>
-      </div>
-      <img src="https://i.ibb.co/6Rs3MZLZ/e7f71a17-b60d-4e0d-a74a-78bac99f5547-1.webp" class="slide-img">
-    </div>`;
-  dotsContainer.innerHTML = `<div class="dot-indicator active"></div>`;
+  // إعادة ضبط مؤشر السلايدر لتجنب تجاوز العدد المتاح بعد إعادة البناء
+  currentSlideIndex = 0;
+
+  if (liveCoupons.length === 0) {
+    slider.innerHTML = `
+      <div class="slide">
+        <div class="slide-content">
+          <span class="badge-discount">🎁 عروض كرستال الزنقة</span>
+          <div class="slide-title">تشكيلة جديدة كلياً</div>
+          <div class="slide-sub">تصفحي الأقسام واكتشفي أحدث الإكسسوارات</div>
+          <div class="countdown-timer">📢 متوفر الآن</div>
+        </div>
+        <img src="${DEFAULT_IMAGE}" class="slide-img" loading="lazy" onerror="this.src='${DEFAULT_IMAGE}'">
+      </div>`;
+    dotsContainer.innerHTML = `<div class="dot-indicator active"></div>`;
+    return;
+  }
+
+  let slidesHtml = "";
+  let dotsHtml = "";
+
+  liveCoupons.forEach((coupon, idx) => {
+    const activeClass = idx === 0 ? "active" : "";
+    const couponImg = coupon.img && coupon.img.trim() !== "" ? coupon.img : DEFAULT_IMAGE;
+    const badgeText = coupon.badge || "🎁 عرض خاص";
+    const titleText = coupon.title || "تشكيلة جديدة";
+    const subText = coupon.subtitle || "تصفحي الأقسام واكتشفي أحدث الإكسسوارات";
+    
+    const expiryAttr = coupon.expiryDate ? `data-expiry="${coupon.expiryDate}"` : "";
+
+    slidesHtml += `
+      <div class="slide">
+        <div class="slide-content">
+          <span class="badge-discount">${badgeText}</span>
+          <div class="slide-title">${titleText}</div>
+          <div class="slide-sub">${subText}</div>
+          <div class="countdown-timer" ${expiryAttr}>
+            ⏳ ينتهي خلال: <span class="hours">00</span>:<span class="minutes">00</span>:<span class="seconds">00</span>
+          </div>
+        </div>
+        <img src="${couponImg}" class="slide-img" loading="lazy" onerror="this.src='${DEFAULT_IMAGE}'">
+      </div>`;
+
+    dotsHtml += `<div class="dot-indicator ${activeClass}" onclick="window.scrollToSlide(${idx})"></div>`;
+  });
+
+  slider.innerHTML = slidesHtml;
+  dotsContainer.innerHTML = dotsHtml;
 }
 
-function updateCountdowns() {}
+function updateCountdowns() {
+  const timers = document.querySelectorAll(".countdown-timer[data-expiry]");
+  timers.forEach(timer => {
+    const expiryStr = timer.getAttribute("data-expiry");
+    const expiryTime = new Date(expiryStr).getTime();
+    const now = new Date().getTime();
+    const distance = expiryTime - now;
+
+    const hoursEl = timer.querySelector(".hours");
+    const minsEl = timer.querySelector(".minutes");
+    const secsEl = timer.querySelector(".seconds");
+
+    if (distance < 0) {
+      if (hoursEl) hoursEl.innerText = "00";
+      if (minsEl) minsEl.innerText = "00";
+      if (secsEl) secsEl.innerText = "00";
+      return;
+    }
+
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    if (hoursEl) hoursEl.innerText = String(hours).padStart(2, '0');
+    if (minsEl) minsEl.innerText = String(minutes).padStart(2, '0');
+    if (secsEl) secsEl.innerText = String(seconds).padStart(2, '0');
+  });
+}
 
 window.filterStoreContent = function() {
   const queryText = document.getElementById("searchInput").value.trim().toLowerCase();
+  
   if (!queryText) {
-    displayCategories(liveCategories);
+    if (window.currentOpenCategoryId) {
+      const activeProducts = liveProducts.filter(p => p.category === window.currentOpenCategoryName);
+      renderProductGrid(activeProducts, `📦 منتجات القسم: ${window.currentOpenCategoryName}`);
+    } else {
+      displayCategories(liveCategories);
+      const homeMain = document.getElementById("homeMainContent");
+      if (homeMain) homeMain.style.display = "block";
+    }
     return;
   }
-  const filteredCats = liveCategories.filter(c => c.name.toLowerCase().includes(queryText));
-  displayCategories(filteredCats);
-};
 
-// بدء تشغيل المتجر
-initStoreListeners();
-</script>
-</body>
-</html>
+  if (window.currentOpenCategoryId) {
+    const activeProducts = liveProducts.filter(p => p.category === window.currentOpenCategoryName && p.name.toLowerCase().includes(queryText));
+    renderProductGrid(activeProducts, `🔍 نتائج البحث في قسم (${window.currentOpenCategoryName})`);
+    return;
+  }
+
+  const filteredCats = liveCategories.filter(c => c.name.toLowerCase().includes(queryText));
+  const filteredProducts = liveProducts.filter(p => p.name.toLowerCase().includes(queryText));
+
+  const homeMain = document.getElementById("homeMainContent");
+  const catView = document.getElementBy
