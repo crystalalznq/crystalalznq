@@ -608,10 +608,25 @@ to { opacity: 0; transform: translateY(-20px); visibility: hidden; }
 </div>
 </div>
 
-<!-- سكربت الربط الحي مع Firebase Firestore (آمن ضد XSS ومع نظام Toast) -->
+<!-- سكربت الربط الحي مع Firebase Firestore (مع بيانات مشروعك الحقيقية) -->
 <script type="module">
-import { db } from "./firebase-config.js";
-import { collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// بيانات مشروعك الحقيقية على فايربيس
+const firebaseConfig = {
+  apiKey: "AIzaSyASsdEASM5NEUZ7X71glbfMCVYw44WJUJI",
+  authDomain: "crystalalznq-d6f7d.firebaseapp.com",
+  projectId: "crystalalznq-d6f7d",
+  storageBucket: "crystalalznq-d6f7d.firebasestorage.app",
+  messagingSenderId: "825883317223",
+  appId: "1:825883317223:web:18caa48d7dfb8c0664e342",
+  measurementId: "G-SQBVZ03071"
+};
+
+// تشغيل وتصدير قاعدة البيانات
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 let liveProducts = [];
 let liveCategories = [];
@@ -1314,21 +1329,4 @@ window.filterStoreContent = function() {
   }
 
   if (window.currentOpenCategoryId) {
-    const activeProducts = liveProducts.filter(p => p.category === window.currentOpenCategoryName && p.name.toLowerCase().includes(queryText));
-    renderProductGrid(activeProducts, `🔍 نتائج البحث في قسم (${window.currentOpenCategoryName})`);
-    return;
-  }
-
-  const filteredCats = liveCategories.filter(c => c.name.toLowerCase().includes(queryText));
-  const filteredProducts = liveProducts.filter(p => p.name.toLowerCase().includes(queryText));
-
-  displayCategories(filteredCats);
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  initStoreListeners();
-});
-</script>
-</body>
-</html>
-2
+    const activeProducts = liveProducts.filter(p => p.category === window.curr
