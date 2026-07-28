@@ -383,7 +383,7 @@
         categoriesData = [];
         catSnap.forEach(doc => categoriesData.push({ id: doc.id, ...doc.data() }));
 
-        const prodSnap = await getDocs(collection(db, "cat_products"));
+        const prodSnap = await getDocs(collection(db, "products"));
         catProductsData = [];
         prodSnap.forEach(doc => catProductsData.push({ id: doc.id, ...doc.data() }));
 
@@ -602,7 +602,7 @@
         await deleteDoc(doc(db, "categories", id));
         const relatedProds = catProductsData.filter(p => p.categoryId === id);
         for(let p of relatedProds) {
-          await deleteDoc(doc(db, "cat_products", p.id));
+          await deleteDoc(doc(db, "products", p.id));
         }
         resetCategoryForm(); 
         loadAllDataFromFirebase();
@@ -651,7 +651,7 @@
         img 
       };
 
-      await setDoc(doc(db, "cat_products", prodId), productData);
+      await setDoc(doc(db, "products", prodId), productData);
       resetProductForm();
       loadAllDataFromFirebase();
     }
@@ -707,7 +707,7 @@
 
     window.deleteCategoryProduct = async function(id, name) {
       if(confirm(`هل أنت متأكد من حذف المنتج "${name}"؟`)) {
-        await deleteDoc(doc(db, "cat_products", id));
+        await deleteDoc(doc(db, "products", id));
         resetProductForm();
         loadAllDataFromFirebase();
       }
