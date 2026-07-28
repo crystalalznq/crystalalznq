@@ -712,7 +712,7 @@ function initStoreListeners() {
     snapshot.forEach((doc) => {
       liveCoupons.push({ id: doc.id, ...doc.data() });
     });
-    renderSlider();
+    renderSlider(liveCoupons);
     startAutoSlider();
   });
 
@@ -1341,4 +1341,193 @@ window.checkoutWhatsApp = async function() {
     msg += `\n🏷️ **كوبون الخصم المطبق:** ${appliedCoupon.code} (خصم: ${discountAmount} ج.م)`;
   }
 
-  let finalTotal = Mat
+  let finalTotal = Math.max(0, subtotal - discountAmount);
+  msg += `\n💰 **الإجمالي النهائي:** ${finalTotal} جنيه\n`;
+  msg += "\n✨ في انتظار تأكيدكم، شكراً لثقتكم بينا! 🌸";
+
+  const encodedMsg = encodeURIComponent(msg);
+  const waLink = `https://wa.me/${dynamicWhatsAppNumber}?text=${encodedMsg}`;
+  window.open(waLink, '_blank');
+
+  // تفريغ السلة والكوبون بعد إرسال الطلب بنجاح
+  cart = [];
+  appliedCoupon = null;
+  localStorage.removeItem('crystal_cart');
+  localStorage.removeItem('crystal_applied_coupon');
+  updateCartBadge();
+
+  // إغلاق نافذة الشروط
+  toggleRulesModal(false);
+
+  window.showToast("تم إرسال طلبك بنجاح عبر الواتساب! 🎉", "success");
+};
+
+// ================== الدوال الناقصة (تمت إعادة بنائها) ==================
+
+window.renderSlider = function(offers) {
+  const slider = document.getElementById("offerSlider");
+  const dots = document.getElementById("sliderDots");
+  if (!slider || !dots) return;
+
+  const now = Date.now();
+  const activeOffers = (offers || []).filter(o => !o.hasTimer || o.endTime > now);
+
+  slider.innerHTML = "";
+  dots.innerHTML = "";
+
+  if (activeOffers.length === 0) {
+    slider.parentElement.style.display = "none";
+    return;
+  }
+  slider.parentElement.style.display = "block";
+
+  activeOffers.forEach((offer, idx) => {
+    const slideDiv = document.createElement('div');
+    slideDiv.className = 'slide';
+    slideDiv.style.cursor = offer.targetType && offer.targetType !== 'store' ? 'pointer' : 'default';
+
+    slideDiv.onclick = () => {
+      if (offer.targetType === 'category' && offer.targetCategoryId) {
+        const cat = liveCategories.find(c => c.id === offer.targetCategoryId);
+        if (cat) openCategoryPage(cat.id, cat.name);
+      } else if (offer.targetType === 'product' && offer.targetProductId) {
+        openProductDetailsModal(offer.targetProductId);
+      }
+    };
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'slide-content';
+
+    if (offer.badge) {
+      const badgeEl = document.createElement('div');
+      badgeEl.className = 'badge-discount';
+      badgeEl.textContent = offer.badge;
+      contentDiv.appendChild(badgeEl);
+    }
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'slide-title';
+    titleEl.textContent = offer.title || '';
+    contentDiv.appendChild(titleEl);
+
+    if (offer.subtitle) {
+      const subEl = document.createElement('div');
+      subEl.className = 'slide-sub';
+      subEl.textContent = offer.subtitle;
+      contentDiv.appendChild(subEl);
+    }
+
+    if (offer.hasTimer && offer.endTime) {
+      const timerEl = document.createElement('div');
+      timerEl.className = 'countdown-timer';
+      timerEl.dataset.endtime = offer.endTime;
+      timerEl.innerHTML = `⏳ <span class="cd-d">00</span>ي <span class="cd-h">00</span>س <span class="cd-m">00</span>د <span class="cd-s">00</span>ث`;
+      contentDiv.appendChild(timerEl);
+    }
+
+    slideDiv.appendChild(contentDiv);
+
+    const imgEl = document.createElement('img');
+    imgEl.className = 'slide-img';
+    imgEl.src = offer.img && offer.img.trim() !== "" ? offer.img : DEFAULT_IMAGE;
+    imgEl.onerror = function() { this.src = DEFAULT_IMAGE; };
+    slideDiv.appendChild(imgEl);
+
+    slider.appendChild(slideDiv);
+
+    const dotEl = document.createElement('div');
+    dotEl.className = idx === 0 ? 'dot-indicator active' : 'dot-indicator';
+    dotEl.onclick = (e) => {
+      e.stopPropagation();
+      slider.scrollTo({ left: slider.offsetWidth * idx, behavior: 'smooth' });
+    };
+    dots.appendChild(dotEl);
+  });
+
+  slider.onscroll = () => {
+    const idx = Math.round(slider.scrollLeft / slider.offsetWidth);
+    dots.querySelectorAll('.dot-indicator').forEach((d, i) => {
+      d.classList.toggle('active', i === idx);
+    });
+    currentSlideIndex = idx;
+  };
+};
+
+window.startAutoSlider = function() {
+  const slider = document.getElementById("offerSlider");
+  if (!slider) return;
+  if (sliderInterval) clearInterval(sliderInterval);
+
+  sliderInterval = setInterval(() => {
+    const slides = slider.querySelectorAll('.slide');
+    if (slides.length === 0) return;
+    currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+    slider.scrollTo({ left: slider.offsetWidth * currentSlideIndex, behavior: 'smooth' });
+  }, 5000);
+};
+
+window.updateCountdowns = function() {
+  const timers = document.querySelectorAll('.countdown-timer');
+  const now = Date.now();
+  let anyExpired = false;
+
+  timers.forEach(timerEl => {
+    const endTime = Number(timerEl.dataset.endtime);
+    if (!endTime) return;
+    const diff = endTime - now;
+
+    if (diff <= 0) {
+      anyExpired = true;
+      return;
+    }
+
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+    const dEl = timerEl.querySelector('.cd-d');
+    const hEl = timerEl.querySelector('.cd-h');
+    const mEl = timerEl.querySelector('.cd-m');
+    const sEl = timerEl.querySelector('.cd-s');
+    if (dEl) dEl.textContent = String(d).padStart(2, '0');
+    if (hEl) hEl.textContent = String(h).padStart(2, '0');
+    if (mEl) mEl.textContent = String(m).padStart(2, '0');
+    if (sEl) sEl.textContent = String(s).padStart(2, '0');
+  });
+
+  if (anyExpired) {
+    renderSlider(liveCoupons);
+  }
+};
+
+window.filterStoreContent = function() {
+  const searchInput = document.getElementById("searchInput");
+  const queryText = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+  if (!queryText) {
+    displayCategories(liveCategories);
+    if (window.currentOpenCategoryId) backToHome();
+    return;
+  }
+
+  const matchedCategories = liveCategories.filter(c =>
+    (c.name || "").toLowerCase().includes(queryText)
+  );
+
+  const matchedProducts = liveProducts.filter(p =>
+    (p.name || "").toLowerCase().includes(queryText) ||
+    (p.category || "").toLowerCase().includes(queryText)
+  );
+
+  if (matchedProducts.length > 0) {
+    renderProductGrid(matchedProducts, `🔍 نتائج البحث عن: "${searchInput.value.trim()}"`);
+  } else {
+    displayCategories(matchedCategories);
+  }
+};
+
+</script>
+</div>
+</body>
+</html>
