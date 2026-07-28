@@ -48,7 +48,7 @@
 
     .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; width: 100%; }
     .form-group label { font-size: 12px; font-weight: bold; color: #334155; }
-    .form-group input, .form-group select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; background: #fff; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-gray); outline: none; font-size: 13px; background: #fff; resize: vertical; }
 
     .checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border-gray); cursor: pointer; width: 100%; user-select: none; }
     .checkbox-group input { width: 16px; height: 16px; accent-color: var(--orange-btn); cursor: pointer; flex-shrink: 0; }
@@ -56,6 +56,9 @@
 
     .time-inputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
     .time-inputs-grid input { width: 100%; text-align: center; padding: 8px 4px; font-size: 12px; }
+    
+    .row-inputs { display: flex; gap: 10px; }
+    .row-inputs .form-group { flex: 1; }
 
     .action-btn { background: var(--primary-blue); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
     .action-btn.edit-mode { background: var(--success-green); }
@@ -117,15 +120,36 @@
       <div class="admin-card">
         <div class="admin-card-title" id="prodCardTitle">➕ إضافة منتج داخل قسم</div>
         <input type="hidden" id="editProdId" value="">
+        
         <div class="form-group">
           <label>اختر القسم:</label>
           <select id="productCategorySelect">
             <option value="">-- اختر القسم أولاً --</option>
           </select>
         </div>
+        
         <div class="form-group"><label>اسم المنتج:</label><input type="text" id="newProdName" placeholder="مثال: طوق ورد أحمر"></div>
-        <div class="form-group"><label>السعر (جنيه):</label><input type="number" id="newProdPrice" placeholder="45"></div>
-        <div class="form-group"><label>رابط صورة المنتج:</label><input type="text" id="newProdImgUrl" placeholder="الصق رابط الصورة" autocomplete="off"></div>
+        
+        <div class="row-inputs">
+          <div class="form-group"><label>السعر الأساسي:</label><input type="number" id="newProdPrice" placeholder="مثال: 45"></div>
+          <div class="form-group"><label>السعر بعد الخصم:</label><input type="number" id="newProdDiscountPrice" placeholder="مثال: 40 (اختياري)"></div>
+        </div>
+
+        <div class="row-inputs">
+          <div class="form-group"><label>الكمية (المخزون):</label><input type="number" id="newProdStock" placeholder="مثال: 10"></div>
+          <div class="form-group"><label>المقاس:</label><input type="text" id="newProdSize" placeholder="مثال: L أو 20cm"></div>
+        </div>
+        
+        <div class="form-group"><label>اللون:</label><input type="text" id="newProdColor" placeholder="مثال: أحمر, أزرق"></div>
+        
+        <div class="form-group"><label>الوصف:</label><textarea id="newProdDesc" rows="2" placeholder="اكتب وصفاً مختصراً للمنتج..."></textarea></div>
+
+        <!-- حقل صور متعددة بدعم Textarea لسهولة الإدخال (أو فواصل/أسطر جديدة) -->
+        <div class="form-group">
+          <label>🔗 روابط صور المنتج (كل رابط في سطر أو مفصولة بفاصلة ,):</label>
+          <textarea id="newProdImages" rows="3" placeholder="الصق الروابط هنا، كل رابط في سطر أو مفصول بفاصلة..." autocomplete="off"></textarea>
+        </div>
+        
         <button class="action-btn purple-btn" id="prodSubmitBtn" onclick="saveCategoryProduct()">إضافة المنتج للقسم</button>
         <button class="action-btn cancel-edit-btn" id="prodCancelBtn" onclick="resetProductForm()">إلغاء التعديل</button>
       </div>
@@ -162,6 +186,24 @@
         <div class="form-group"><label>الوصف الفرعي:</label><input type="text" id="newOfferSub" placeholder="مثال: لفترة محدودة جداً"></div>
         <div class="form-group"><label>رابط الصورة:</label><input type="text" id="newOfferImgUrl" placeholder="الصق رابط الصورة هنا" autocomplete="off"></div>
         
+        <div class="row-inputs">
+          <div class="form-group">
+            <label>نوع الخصم:</label>
+            <select id="newDiscountType">
+              <option value="percentage">نسبة مئوية (%)</option>
+              <option value="fixed">مبلغ ثابت (ج.م)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>قيمة الخصم:</label>
+            <input type="number" id="newDiscountValue" placeholder="مثال: 15 أو 20" min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>كود الكوبون (اختياري، لو العرض بكوبون منفصل):</label>
+          <input type="text" id="newCouponCode" placeholder="مثال: CRYSTAL20" autocomplete="off">
+        </div>
+
         <div class="checkbox-group" id="timerBoxWrapper">
           <input type="checkbox" id="hasTimerCheckbox">
           <label for="hasTimerCheckbox">تفعيل عداد تنازلي ووقت انتهاء للعرض (اختياري)</label>
@@ -337,27 +379,22 @@
 
     async function loadAllDataFromFirebase() {
       try {
-        // تحميل الأقسام
         const catSnap = await getDocs(collection(db, "categories"));
         categoriesData = [];
         catSnap.forEach(doc => categoriesData.push({ id: doc.id, ...doc.data() }));
 
-        // تحميل منتجات الأقسام (تم التعديل لتستخدم products)
-        const prodSnap = await getDocs(collection(db, "products"));
+        const prodSnap = await getDocs(collection(db, "cat_products"));
         catProductsData = [];
         prodSnap.forEach(doc => catProductsData.push({ id: doc.id, ...doc.data() }));
 
-        // تحميل الأكثر مبيعاً
         const trendSnap = await getDocs(collection(db, "trending"));
         trendingData = [];
         trendSnap.forEach(doc => trendingData.push({ id: doc.id, ...doc.data() }));
 
-        // تحميل العروض 
         const offerSnap = await getDocs(collection(db, "coupons"));
         offersData = [];
         offerSnap.forEach(doc => offersData.push({ id: doc.id, ...doc.data() }));
 
-        // تحميل التواصل
         const socialSnap = await getDocs(collection(db, "social"));
         socialData = {};
         socialSnap.forEach(doc => { socialData = doc.data(); });
@@ -372,7 +409,7 @@
       updateCategoryDropdown();
       updateOfferTargetDropdowns();
 
-      // 1. الأقسام الرئيسية
+      // الأقسام الرئيسية
       const catList = document.getElementById('adminCategoriesList');
       let catHtml = '';
       categoriesData.forEach((cat) => {
@@ -391,7 +428,7 @@
       });
       catList.innerHTML = catHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد أقسام مضافة بعد</p>';
 
-      // 2. منتجات الأقسام
+      // منتجات الأقسام
       const prodList = document.getElementById('adminCatProductsList');
       let prodHtml = '';
       if (categoriesData.length === 0) {
@@ -411,9 +448,10 @@
             prodHtml += `<p style="font-size: 11px; color: #94a3b8; text-align: center; padding: 6px;">لا توجد منتجات في هذا القسم بعد</p>`;
           } else {
             productsInThisCat.forEach(prod => {
+              const displayImg = (prod.images && Array.isArray(prod.images) && prod.images.length > 0) ? prod.images[0] : (prod.img || '');
               prodHtml += `
                 <div class="admin-list-item">
-                  ${prod.img ? `<img src="${prod.img}" onerror="this.style.display='none'">` : ''}
+                  ${displayImg ? `<img src="${displayImg}" onerror="this.style.display='none'">` : ''}
                   <div class="admin-item-info">
                     <h5>${escapeHtml(prod.name)}</h5>
                     <p>${prod.price} ج.م</p>
@@ -431,7 +469,7 @@
       }
       prodList.innerHTML = prodHtml;
 
-      // 3. الأكثر مبيعاً
+      // الأكثر مبيعاً
       const trendList = document.getElementById('adminTrendingList');
       let trendHtml = '';
       trendingData.forEach((item) => {
@@ -451,7 +489,7 @@
       });
       trendList.innerHTML = trendHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد منتجات مضافة بعد</p>';
 
-      // 4. العروض
+      // العروض
       const now = Date.now();
       const activeOffers = offersData.filter(o => !o.hasTimer || o.endTime > now);
       const expiredOffers = offersData.filter(o => o.hasTimer && o.endTime <= now);
@@ -462,6 +500,10 @@
         let timeDesc = '♾️ عرض مستمر (بدون عداد)';
         if(offer.targetType === 'category') timeDesc = '📁 موجه لقسم محدد';
         if(offer.targetType === 'product') timeDesc = '📦 موجه لمنتج محدد';
+
+        let discountDesc = offer.discountType === 'fixed' ? `💸 خصم: ${offer.discountValue} ج.م` : `📉 خصم: ${offer.discountValue}%`;
+        timeDesc += ` | ${discountDesc}`;
+        if(offer.code) timeDesc += ` | 🎟️ كود: ${offer.code}`;
 
         if(offer.hasTimer) {
           const diffMs = offer.endTime - now;
@@ -505,7 +547,7 @@
       });
       expiredList.innerHTML = expiredHtml || '<p style="font-size:12px; color:#64748b; text-align:center; padding:10px;">لا توجد عروض منتهية مسجلة</p>';
 
-      // 5. التواصل
+      // التواصل
       document.getElementById('socialWa').value = socialData.wa || '';
       document.getElementById('socialPhone').value = socialData.phone || '';
       document.getElementById('socialLandline').value = socialData.landline || '';
@@ -560,28 +602,56 @@
         await deleteDoc(doc(db, "categories", id));
         const relatedProds = catProductsData.filter(p => p.categoryId === id);
         for(let p of relatedProds) {
-          // تم التعديل لتستخدم products عند حذف القسم ومنتجاته
-          await deleteDoc(doc(db, "products", p.id));
+          await deleteDoc(doc(db, "cat_products", p.id));
         }
         resetCategoryForm(); 
         loadAllDataFromFirebase();
       } 
     }
 
-    // --- إدارة منتجات الأقسام ---
+    // --- إدارة منتجات الأقسام (مع دعم متعدد الصور عبر الـ Textarea) ---
     window.saveCategoryProduct = async function() {
       const categoryId = document.getElementById('productCategorySelect').value;
       const name = document.getElementById('newProdName').value.trim();
       const price = parseFloat(document.getElementById('newProdPrice').value);
-      const img = cleanImageUrl(document.getElementById('newProdImgUrl').value);
+      
+      const discountPrice = parseFloat(document.getElementById('newProdDiscountPrice').value) || 0;
+      const stock = parseInt(document.getElementById('newProdStock').value) || 0;
+      const description = document.getElementById('newProdDesc').value.trim();
+      const size = document.getElementById('newProdSize').value.trim();
+      const color = document.getElementById('newProdColor').value.trim();
+      
+      // قراءة الروابط من الـ Textarea ودعم الفواصل أو الأسطر الجديدة
+      const imagesStr = document.getElementById('newProdImages').value;
       const editId = document.getElementById('editProdId').value;
 
       if(!categoryId) return alert('يرجى اختيار القسم أولاً!');
       if(!name || isNaN(price) || price <= 0) return alert('أدخل اسم المنتج وسعراً صحيحاً!');
 
+      const catObj = categoriesData.find(c => c.id === categoryId);
+      const categoryName = catObj ? catObj.name : '';
+
+      // تقسيم النص بناءً على السطر الجديد أو الفاصلة لاستخراج مصفوفة روابط نظيفة
+      const imagesArray = imagesStr.split(/[\n,]+/).map(url => cleanImageUrl(url)).filter(url => url !== '');
+      const img = imagesArray.length > 0 ? imagesArray[0] : ''; 
+
       const prodId = editId ? editId : 'prod_' + Date.now();
-      // تم التعديل لتستخدم products
-      await setDoc(doc(db, "products", prodId), { categoryId, name, price, img });
+      
+      const productData = { 
+        categoryId,
+        category: categoryName,
+        name, 
+        price, 
+        discountPrice,
+        stock,
+        description,
+        size,
+        color,
+        images: imagesArray,
+        img 
+      };
+
+      await setDoc(doc(db, "cat_products", prodId), productData);
       resetProductForm();
       loadAllDataFromFirebase();
     }
@@ -590,10 +660,25 @@
       const prod = catProductsData.find(p => p.id === id);
       if(!prod) return;
       updateCategoryDropdown();
-      document.getElementById('productCategorySelect').value = prod.categoryId;
-      document.getElementById('newProdName').value = prod.name;
-      document.getElementById('newProdPrice').value = prod.price;
-      document.getElementById('newProdImgUrl').value = prod.img || '';
+      
+      document.getElementById('productCategorySelect').value = prod.categoryId || '';
+      document.getElementById('newProdName').value = prod.name || '';
+      document.getElementById('newProdPrice').value = prod.price || '';
+      document.getElementById('newProdDiscountPrice').value = prod.discountPrice || '';
+      document.getElementById('newProdStock').value = prod.stock || '';
+      document.getElementById('newProdDesc').value = prod.description || '';
+      document.getElementById('newProdSize').value = prod.size || '';
+      document.getElementById('newProdColor').value = prod.color || '';
+      
+      // عرض الصور في الـ Textarea مرتبة كل رابط في سطر
+      let currentImages = '';
+      if(prod.images && Array.isArray(prod.images) && prod.images.length > 0) {
+        currentImages = prod.images.join('\n');
+      } else if (prod.img) {
+        currentImages = prod.img;
+      }
+      document.getElementById('newProdImages').value = currentImages;
+      
       document.getElementById('editProdId').value = prod.id;
       document.getElementById('prodCardTitle').innerText = '✏️ تعديل المنتج';
       document.getElementById('prodSubmitBtn').innerText = 'حفظ التعديل';
@@ -606,8 +691,14 @@
       document.getElementById('productCategorySelect').value = '';
       document.getElementById('newProdName').value = '';
       document.getElementById('newProdPrice').value = '';
-      document.getElementById('newProdImgUrl').value = '';
+      document.getElementById('newProdDiscountPrice').value = '';
+      document.getElementById('newProdStock').value = '';
+      document.getElementById('newProdDesc').value = '';
+      document.getElementById('newProdSize').value = '';
+      document.getElementById('newProdColor').value = '';
+      document.getElementById('newProdImages').value = '';
       document.getElementById('editProdId').value = '';
+      
       document.getElementById('prodCardTitle').innerText = '➕ إضافة منتج داخل قسم';
       document.getElementById('prodSubmitBtn').innerText = 'إضافة المنتج للقسم';
       document.getElementById('prodSubmitBtn').classList.remove('edit-mode');
@@ -616,8 +707,7 @@
 
     window.deleteCategoryProduct = async function(id, name) {
       if(confirm(`هل أنت متأكد من حذف المنتج "${name}"؟`)) {
-        // تم التعديل لتستخدم products
-        await deleteDoc(doc(db, "products", id));
+        await deleteDoc(doc(db, "cat_products", id));
         resetProductForm();
         loadAllDataFromFirebase();
       }
@@ -671,12 +761,16 @@
       } 
     }
 
-    // --- إدارة العروض والعداد (مجموعة coupons) ---
+    // --- إدارة العروض والعداد ---
     window.saveOffer = async function() {
       const tag = document.getElementById('newOfferTag').value.trim();
       const title = document.getElementById('newOfferTitle').value.trim();
       const subtitle = document.getElementById('newOfferSub').value.trim();
       const img = cleanImageUrl(document.getElementById('newOfferImgUrl').value);
+
+      const discountType = document.getElementById('newDiscountType').value;
+      const discountValue = parseFloat(document.getElementById('newDiscountValue').value);
+      const couponCode = document.getElementById('newCouponCode').value.trim();
 
       const hasTimer = document.getElementById('hasTimerCheckbox').checked;
       let endTime = 0;
@@ -699,6 +793,7 @@
       const editId = document.getElementById('editOfferId').value;
 
       if(!tag || !title) return alert('أدخل شارة وعنوان العرض!');
+      if(isNaN(discountValue) || discountValue < 0) return alert('برجاء إدخال قيمة خصم صحيحة!');
       if(targetType === 'category' && !targetCategoryId) return alert('برجاء اختيار القسم المستهدف!');
       if(targetType === 'product') {
         if(!targetProdFilterCat) return alert('برجاء اختيار القسم الخاص بالمنتج!');
@@ -708,13 +803,14 @@
       const offerId = editId ? editId : 'o' + Date.now();
       
       const couponData = {
-        code: tag || title,
-        discount: 10,
-        expireDate: hasTimer ? new Date(endTime).toISOString().split('T')[0] : '2026-12-31',
+        code: couponCode || tag || title,
+        discountType: discountType,
+        discountValue: discountValue,
         badge: tag,
         title: title,
         subtitle: subtitle,
         img: img,
+        expireDate: hasTimer ? new Date(endTime).toISOString().split('T')[0] : '2026-12-31',
         expiryDate: hasTimer ? new Date(endTime).toISOString().split('T')[0] : null,
         hasTimer, 
         endTime,
@@ -736,6 +832,10 @@
       document.getElementById('newOfferTitle').value = offer.title || '';
       document.getElementById('newOfferSub').value = offer.subtitle || '';
       document.getElementById('newOfferImgUrl').value = offer.img || '';
+
+      document.getElementById('newDiscountType').value = offer.discountType || 'percentage';
+      document.getElementById('newDiscountValue').value = offer.discountValue !== undefined ? offer.discountValue : (offer.discount || 10);
+      document.getElementById('newCouponCode').value = offer.code || '';
 
       const hasTimer = offer.hasTimer || false;
       document.getElementById('hasTimerCheckbox').checked = hasTimer;
@@ -782,6 +882,9 @@
       document.getElementById('newOfferTitle').value = '';
       document.getElementById('newOfferSub').value = '';
       document.getElementById('newOfferImgUrl').value = '';
+      document.getElementById('newDiscountType').value = 'percentage';
+      document.getElementById('newDiscountValue').value = '';
+      document.getElementById('newCouponCode').value = '';
       document.getElementById('hasTimerCheckbox').checked = false;
       handleTimerToggle();
       document.getElementById('offerDays').value = 1;
