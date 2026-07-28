@@ -342,8 +342,8 @@
         categoriesData = [];
         catSnap.forEach(doc => categoriesData.push({ id: doc.id, ...doc.data() }));
 
-        // تحميل منتجات الأقسام
-        const prodSnap = await getDocs(collection(db, "cat_products"));
+        // تحميل منتجات الأقسام (تم التعديل لتستخدم products)
+        const prodSnap = await getDocs(collection(db, "products"));
         catProductsData = [];
         prodSnap.forEach(doc => catProductsData.push({ id: doc.id, ...doc.data() }));
 
@@ -352,7 +352,7 @@
         trendingData = [];
         trendSnap.forEach(doc => trendingData.push({ id: doc.id, ...doc.data() }));
 
-        // تحميل العروض (تم التعديل لتقرأ من مجموعة coupons)
+        // تحميل العروض 
         const offerSnap = await getDocs(collection(db, "coupons"));
         offersData = [];
         offerSnap.forEach(doc => offersData.push({ id: doc.id, ...doc.data() }));
@@ -560,7 +560,8 @@
         await deleteDoc(doc(db, "categories", id));
         const relatedProds = catProductsData.filter(p => p.categoryId === id);
         for(let p of relatedProds) {
-          await deleteDoc(doc(db, "cat_products", p.id));
+          // تم التعديل لتستخدم products عند حذف القسم ومنتجاته
+          await deleteDoc(doc(db, "products", p.id));
         }
         resetCategoryForm(); 
         loadAllDataFromFirebase();
@@ -579,7 +580,8 @@
       if(!name || isNaN(price) || price <= 0) return alert('أدخل اسم المنتج وسعراً صحيحاً!');
 
       const prodId = editId ? editId : 'prod_' + Date.now();
-      await setDoc(doc(db, "cat_products", prodId), { categoryId, name, price, img });
+      // تم التعديل لتستخدم products
+      await setDoc(doc(db, "products", prodId), { categoryId, name, price, img });
       resetProductForm();
       loadAllDataFromFirebase();
     }
@@ -614,7 +616,8 @@
 
     window.deleteCategoryProduct = async function(id, name) {
       if(confirm(`هل أنت متأكد من حذف المنتج "${name}"؟`)) {
-        await deleteDoc(doc(db, "cat_products", id));
+        // تم التعديل لتستخدم products
+        await deleteDoc(doc(db, "products", id));
         resetProductForm();
         loadAllDataFromFirebase();
       }
@@ -704,7 +707,6 @@
 
       const offerId = editId ? editId : 'o' + Date.now();
       
-      // هيكل البيانات المتوافق تماماً مع index.html ويحافظ على خصائص العداد والتوجيه
       const couponData = {
         code: tag || title,
         discount: 10,
