@@ -283,7 +283,7 @@
   <!-- سكربتات التطبيق والاتصال بفايربيز -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyASsdEASM5NEUZ7X71glbfMCVYw44WJUJI",
@@ -383,6 +383,7 @@
         categoriesData = [];
         catSnap.forEach(doc => categoriesData.push({ id: doc.id, ...doc.data() }));
 
+        // تم التصحيح: القراءة الآن من مجموعة "products" لتطابق ملف المتجر index.html
         const prodSnap = await getDocs(collection(db, "products"));
         catProductsData = [];
         prodSnap.forEach(doc => catProductsData.push({ id: doc.id, ...doc.data() }));
@@ -600,6 +601,7 @@
     window.deleteCategory = async function(id, name) { 
       if(confirm(`هل أنت متأكد من حذف القسم "${name}"؟`)) { 
         await deleteDoc(doc(db, "categories", id));
+        // تم التصحيح: الحذف الآن من مجموعة "products"
         const relatedProds = catProductsData.filter(p => p.categoryId === id);
         for(let p of relatedProds) {
           await deleteDoc(doc(db, "products", p.id));
@@ -636,6 +638,11 @@
       const img = imagesArray.length > 0 ? imagesArray[0] : ''; 
 
       const prodId = editId ? editId : 'prod_' + Date.now();
+
+      // الحفاظ على createdAt الأصلي عند التعديل، أو إنشاء واحد جديد عند الإضافة
+      // ضروري لأن index.html يرتب المنتجات بـ orderBy("createdAt", "desc")
+      const existingProd = editId ? catProductsData.find(p => p.id === editId) : null;
+      const createdAt = existingProd && existingProd.createdAt ? existingProd.createdAt : serverTimestamp();
       
       const productData = { 
         categoryId,
@@ -648,9 +655,11 @@
         size,
         color,
         images: imagesArray,
-        img 
+        img,
+        createdAt
       };
 
+      // تم التصحيح: الحفظ الآن في مجموعة "products" (بدل cat_products) لتطابق ملف المتجر
       await setDoc(doc(db, "products", prodId), productData);
       resetProductForm();
       loadAllDataFromFirebase();
@@ -707,6 +716,7 @@
 
     window.deleteCategoryProduct = async function(id, name) {
       if(confirm(`هل أنت متأكد من حذف المنتج "${name}"؟`)) {
+        // تم التصحيح: الحذف الآن من مجموعة "products"
         await deleteDoc(doc(db, "products", id));
         resetProductForm();
         loadAllDataFromFirebase();
