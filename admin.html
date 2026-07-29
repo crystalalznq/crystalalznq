@@ -17,33 +17,70 @@
       --purple-accent: #7c3aed;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: #f1f5f9; color: var(--text-dark); direction: rtl; display: flex; justify-content: center; padding: 20px 10px; }
+    body { background-color: #f1f5f9; color: var(--text-dark); direction: rtl; display: flex; justify-content: center; }
 
     .admin-container {
       width: 100%;
       max-width: 480px;
       background: #ffffff;
-      min-height: 95vh;
-      padding: 15px;
-      border-radius: 16px;
+      min-height: 100vh;
+      padding-bottom: 40px;
       box-shadow: 0 0 20px rgba(0,0,0,0.05);
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
-    .admin-header { background: var(--admin-dark); color: #fff; padding: 15px; border-radius: 14px; margin-bottom: 15px; text-align: center; }
-    .admin-header h2 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
-    .admin-header p { font-size: 11px; opacity: 0.8; }
+    /* الهيدر العلوي - بنفس أسلوب هيدر المتجر (شعار + شارة الإدارة) */
+    .admin-header {
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      border-bottom: 1px solid var(--border-gray);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .admin-header .brand-banner-logo { height: 40px; width: auto; object-fit: contain; }
+    .admin-header-badge {
+      background: var(--admin-dark);
+      padding: 8px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    /* عنوان الصفحة بنفس أسلوب فواصل الأقسام في المتجر */
+    .admin-page-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 20px 20px 15px;
+    }
+    .admin-page-title .line { flex: 1; height: 1px; background-color: #cbd5e1; }
+    .admin-page-title .dot { width: 6px; height: 6px; border-radius: 50%; background-color: var(--orange-btn); }
+    .admin-page-title .title { font-size: 15px; font-weight: 800; color: #0f172a; white-space: nowrap; }
+
+    .admin-body { padding: 0 15px; flex-grow: 1; }
 
     .admin-tabs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 15px; scrollbar-width: none; }
     .admin-tabs::-webkit-scrollbar { display: none; }
 
-    .tab-btn { flex: 0 0 auto; padding: 8px 14px; background: #e2e8f0; color: #334155; border: none; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; }
-    .tab-btn.active { background: var(--orange-btn); color: #fff; }
+    .tab-btn { flex: 0 0 auto; padding: 8px 16px; background: var(--orange-bg); color: var(--orange-btn); border: 1px solid #fed7aa; border-radius: 20px; font-size: 12px; font-weight: 800; cursor: pointer; transition: transform 0.15s ease; }
+    .tab-btn:active { transform: scale(0.94); }
+    .tab-btn.active { background: var(--orange-btn); color: #fff; border-color: var(--orange-btn); box-shadow: 0 4px 10px rgba(217, 83, 30, 0.35); }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .admin-card { background: #fff; border: 1px solid var(--border-gray); border-radius: 14px; padding: 15px; margin-bottom: 15px; width: 100%; }
+    .admin-card { background: #fff; border: 1px solid var(--border-gray); border-radius: 14px; padding: 15px; margin-bottom: 15px; width: 100%; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
     .admin-card-title { font-size: 14px; font-weight: 800; color: var(--admin-dark); margin-bottom: 12px; border-bottom: 2px solid var(--orange-bg); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
 
     .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; width: 100%; }
@@ -60,7 +97,8 @@
     .row-inputs { display: flex; gap: 10px; }
     .row-inputs .form-group { flex: 1; }
 
-    .action-btn { background: var(--primary-blue); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
+    .action-btn { background: var(--primary-blue); color: #fff; border: none; padding: 12px 15px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 5px; transition: transform 0.15s ease; }
+    .action-btn:active { transform: scale(0.98); }
     .action-btn.edit-mode { background: var(--success-green); }
     .action-btn.purple-btn { background: var(--purple-accent); }
     .cancel-edit-btn { background: #64748b; margin-top: 5px; display: none; }
@@ -77,20 +115,88 @@
     .admin-item-info p { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
     .item-actions { display: flex; gap: 4px; flex-shrink: 0; }
-    .mini-btn { padding: 4px 8px; font-size: 10px; border-radius: 6px; border: none; cursor: pointer; color: #fff; font-weight: bold; }
+    .mini-btn { padding: 5px 9px; font-size: 10px; border-radius: 8px; border: none; cursor: pointer; color: #fff; font-weight: 800; }
     .btn-edit { background: var(--success-green); }
     .btn-delete { background: var(--danger-red); }
 
-    .back-store-link { display: block; text-align: center; margin-top: 15px; font-size: 12px; color: var(--primary-blue); text-decoration: none; font-weight: bold; }
+    .back-store-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-align: center;
+      margin: 5px 15px 15px;
+      padding: 10px;
+      font-size: 12px;
+      color: var(--orange-btn);
+      background: var(--orange-bg);
+      border: 1px solid #fed7aa;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    /* تصميم Toast Notification - نفس تصميم المتجر تماماً لتوحيد الإشعارات */
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      pointer-events: none;
+      width: 90%;
+      max-width: 400px;
+    }
+    .toast-msg {
+      background: #1e293b;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+      border-right: 4px solid var(--orange-btn);
+      animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+    }
+    .toast-msg.success { border-right-color: #22c55e; }
+    .toast-msg.error { border-right-color: #ef4444; }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-20px); visibility: hidden; }
+    }
   </style>
 </head>
 <body>
+  <!-- حاوية الإشعارات - موحدة مع ملف المتجر -->
+  <div id="toast-container"></div>
+
   <div class="admin-container">
-    <div class="admin-header">
-      <h2>🛠️ لوحة الإدارة والتحكم</h2>
-      <p>إدارة العروض المتطورة والتحكم المرن بالعدادات</p>
+    <header class="admin-header">
+      <img src="https://raw.githubusercontent.com/crystalalznq/crystalalznq/refs/heads/main/IMG_%D9%A2%D9%A0%D9%A2%D9%A6%D9%A0%D9%A7%D9%A2%D9%A6_%D9%A0%D9%A2%D9%A4%D9%A5%D9%A3%D9%A7.png" class="brand-banner-logo" alt="كريستال الزنقة" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&auto=format&fit=crop&q=60'">
+      <div class="admin-header-badge">🛠️ <span>لوحة التحكم</span></div>
+    </header>
+
+    <div class="admin-page-title">
+      <div class="line"></div>
+      <div class="dot"></div>
+      <div class="title">إدارة العروض والتحكم المرن بالمتجر</div>
+      <div class="dot"></div>
+      <div class="line"></div>
     </div>
 
+    <div class="admin-body">
     <div class="admin-tabs">
       <button class="tab-btn active" onclick="switchAdminTab('tabCategories', event)">🌸 الأقسام</button>
       <button class="tab-btn" onclick="switchAdminTab('tabCatProducts', event)">📦 المنتجات</button>
@@ -277,6 +383,8 @@
       </div>
     </div>
 
+    </div>
+
     <a href="index.html" class="back-store-link">🛍️ الانتقال إلى صفحة المتجر الرئيسية</a>
   </div>
 
@@ -303,6 +411,26 @@
     let offersData = [];
     let trendingData = [];
     let socialData = {};
+
+    // نفس دالة الإشعارات المستخدمة في ملف المتجر index.html لتوحيد شكل التنبيهات
+    window.showToast = function(message, type = 'success') {
+      const container = document.getElementById("toast-container");
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = `toast-msg ${type}`;
+
+      let icon = '✨';
+      if (type === 'error') icon = '❌';
+      if (type === 'info') icon = '💡';
+
+      toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    };
 
     window.switchAdminTab = function(tabId, event) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -567,10 +695,11 @@
       const name = document.getElementById('newCatName').value.trim();
       const img = cleanImageUrl(document.getElementById('newCatImgUrl').value);
       const editId = document.getElementById('editCatId').value;
-      if(!name) return alert('أدخل اسم القسم من فضلك!');
+      if(!name) return window.showToast('أدخل اسم القسم من فضلك!', 'error');
 
       const catId = editId ? editId : 'cat_' + Date.now();
       await setDoc(doc(db, "categories", catId), { name, img });
+      window.showToast('تم حفظ القسم بنجاح! ✨', 'success');
       resetCategoryForm();
       loadAllDataFromFirebase();
     }
@@ -606,6 +735,7 @@
         for(let p of relatedProds) {
           await deleteDoc(doc(db, "products", p.id));
         }
+        window.showToast('تم حذف القسم بنجاح.', 'success');
         resetCategoryForm(); 
         loadAllDataFromFirebase();
       } 
@@ -627,8 +757,8 @@
       const imagesStr = document.getElementById('newProdImages').value;
       const editId = document.getElementById('editProdId').value;
 
-      if(!categoryId) return alert('يرجى اختيار القسم أولاً!');
-      if(!name || isNaN(price) || price <= 0) return alert('أدخل اسم المنتج وسعراً صحيحاً!');
+      if(!categoryId) return window.showToast('يرجى اختيار القسم أولاً!', 'error');
+      if(!name || isNaN(price) || price <= 0) return window.showToast('أدخل اسم المنتج وسعراً صحيحاً!', 'error');
 
       const catObj = categoriesData.find(c => c.id === categoryId);
       const categoryName = catObj ? catObj.name : '';
@@ -661,6 +791,7 @@
 
       // تم التصحيح: الحفظ الآن في مجموعة "products" (بدل cat_products) لتطابق ملف المتجر
       await setDoc(doc(db, "products", prodId), productData);
+      window.showToast('تم حفظ المنتج بنجاح! 🛍️', 'success');
       resetProductForm();
       loadAllDataFromFirebase();
     }
@@ -718,6 +849,7 @@
       if(confirm(`هل أنت متأكد من حذف المنتج "${name}"؟`)) {
         // تم التصحيح: الحذف الآن من مجموعة "products"
         await deleteDoc(doc(db, "products", id));
+        window.showToast('تم حذف المنتج بنجاح.', 'success');
         resetProductForm();
         loadAllDataFromFirebase();
       }
@@ -730,10 +862,11 @@
       const img = cleanImageUrl(document.getElementById('newTrendImgUrl').value);
       const editId = document.getElementById('editTrendId').value;
 
-      if(!name || isNaN(price) || price <= 0) return alert('أدخل بيانات المنتج بدقة!');
+      if(!name || isNaN(price) || price <= 0) return window.showToast('أدخل بيانات المنتج بدقة!', 'error');
 
       const trendId = editId ? editId : 't' + Date.now();
       await setDoc(doc(db, "trending", trendId), { name, price, img });
+      window.showToast('تم حفظ المنتج بنجاح! 🔥', 'success');
       resetTrendingForm();
       loadAllDataFromFirebase();
     }
@@ -766,6 +899,7 @@
     window.deleteTrending = async function(id, name) { 
       if(confirm(`هل أنت متأكد من حذف المنتج "${name}"؟`)) { 
         await deleteDoc(doc(db, "trending", id));
+        window.showToast('تم حذف المنتج بنجاح.', 'success');
         resetTrendingForm();
         loadAllDataFromFirebase();
       } 
@@ -790,7 +924,7 @@
         const hours = parseInt(document.getElementById('offerHours').value) || 0;
         const minutes = parseInt(document.getElementById('offerMinutes').value) || 0;
         if(days === 0 && hours === 0 && minutes === 0) {
-          return alert('برجاء تحديد مدة العداد أو إلغاء تحديد خانة تفعيل العداد!');
+          return window.showToast('برجاء تحديد مدة العداد أو إلغاء تحديد خانة تفعيل العداد!', 'error');
         }
         const totalMs = (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
         endTime = Date.now() + totalMs;
@@ -802,12 +936,12 @@
       const targetProductId = document.getElementById('targetProductSelect').value;
       const editId = document.getElementById('editOfferId').value;
 
-      if(!tag || !title) return alert('أدخل شارة وعنوان العرض!');
-      if(isNaN(discountValue) || discountValue < 0) return alert('برجاء إدخال قيمة خصم صحيحة!');
-      if(targetType === 'category' && !targetCategoryId) return alert('برجاء اختيار القسم المستهدف!');
+      if(!tag || !title) return window.showToast('أدخل شارة وعنوان العرض!', 'error');
+      if(isNaN(discountValue) || discountValue < 0) return window.showToast('برجاء إدخال قيمة خصم صحيحة!', 'error');
+      if(targetType === 'category' && !targetCategoryId) return window.showToast('برجاء اختيار القسم المستهدف!', 'error');
       if(targetType === 'product') {
-        if(!targetProdFilterCat) return alert('برجاء اختيار القسم الخاص بالمنتج!');
-        if(!targetProductId) return alert('برجاء اختيار المنتج المستهدف!');
+        if(!targetProdFilterCat) return window.showToast('برجاء اختيار القسم الخاص بالمنتج!', 'error');
+        if(!targetProductId) return window.showToast('برجاء اختيار المنتج المستهدف!', 'error');
       }
 
       const offerId = editId ? editId : 'o' + Date.now();
@@ -831,6 +965,7 @@
       };
 
       await setDoc(doc(db, "coupons", offerId), couponData);
+      window.showToast('تم حفظ العرض بنجاح! 🎁', 'success');
       resetOfferForm();
       loadAllDataFromFirebase();
     }
@@ -912,6 +1047,7 @@
     window.deleteOffer = async function(id, title) { 
       if(confirm(`هل أنت متأكد من حذف العرض "${title}"؟`)) { 
         await deleteDoc(doc(db, "coupons", id));
+        window.showToast('تم حذف العرض بنجاح.', 'success');
         resetOfferForm();
         loadAllDataFromFirebase();
       } 
@@ -929,7 +1065,7 @@
       };
       await setDoc(doc(db, "social", "links"), socialObj);
       socialData = socialObj;
-      alert('✨ تم حفظ وسائل التواصل بنجاح!');
+      window.showToast('تم حفظ وسائل التواصل بنجاح!', 'success');
     }
 
     document.addEventListener("DOMContentLoaded", () => {
